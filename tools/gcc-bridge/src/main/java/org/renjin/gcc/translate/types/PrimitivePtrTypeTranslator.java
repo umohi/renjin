@@ -19,7 +19,7 @@ public class PrimitivePtrTypeTranslator extends TypeTranslator {
   private PrimitiveType primitiveType;
 
   public PrimitivePtrTypeTranslator(PointerType type) {
-    this.primitiveType = (PrimitiveType)type.getInnerType();
+    this.primitiveType = (PrimitiveType)type.getBaseType();
     this.wrapperClass = PrimitiveTypes.getWrapperType(primitiveType);
   }
 

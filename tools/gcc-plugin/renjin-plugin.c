@@ -43,6 +43,7 @@
 
 int plugin_is_GPL_compatible;
 
+FILE *json_f;
 
 int json_indent_level = 0;
 int json_needs_comma = 0;
@@ -78,7 +79,7 @@ void json_context_pop() {
 void json_indent() {
   int i;
   for(i=0;i!=json_context_head;++i) {
-    printf("  ");
+    fprintf(json_f, "  ");
   }
 }
 
@@ -86,51 +87,51 @@ void json_pre_value() {
   json_context *context = &json_context_stack[json_context_head];
   if(context->type == JSON_ARRAY) {
     if(context->needs_comma) {
-      printf(",");
+      fprintf(json_f, ",");
     }
     context->needs_comma = 1;
-    printf("\n");
+    fprintf(json_f, "\n");
     json_indent(); 
   }
 }
 
 void json_start_object() {
   json_pre_value();
-  printf("{");
+  fprintf(json_f, "{");
   json_context_push(JSON_OBJECT);
 }
 
 void json_start_array() {
-  printf("[");
+  fprintf(json_f, "[");
   json_context_push(JSON_ARRAY);
 }
 
 void json_null() {
   json_pre_value();
-  printf("null");
+  fprintf(json_f, "null");
 }
 
 void json_field(const char *name) {
   json_context *context = &json_context_stack[json_context_head];
   if(context->needs_comma) {
-    printf(",");
+    fprintf(json_f, ",");
   }
   context->needs_comma = 1;
-  printf("\n");
+  fprintf(json_f, "\n");
   json_indent();
-  printf("\"%s\": ", name);
+  fprintf(json_f, "\"%s\": ", name);
 
   json_context_stack[json_context_head].needs_comma = 1;
 }
 
 void json_string_field(const char *name, const char *value) {
   json_field(name);
-  printf("\"%s\"", value);
+  fprintf(json_f, "\"%s\"", value);
 }
 
 void json_int(int value) {
   json_pre_value();
-  printf("%d", value);
+  fprintf(json_f, "%d", value);
 }
 void json_int_field(const char *name, int value) {
   json_field(name);
@@ -140,19 +141,19 @@ void json_int_field(const char *name, int value) {
 void json_real_field(const char *name, REAL_VALUE_TYPE value) {
   json_field(name);
   if (REAL_VALUE_ISINF (value)) {
-    printf("\"%s\"", REAL_VALUE_NEGATIVE (value) ? "-Inf" : "Inf");
+    fprintf(json_f, "\"%s\"", REAL_VALUE_NEGATIVE (value) ? "-Inf" : "Inf");
   } else if(REAL_VALUE_ISNAN (value)) {
-    printf("\"%s\"", "NaN");
+    fprintf(json_f, "\"%s\"", "NaN");
   } else {
     char string[100];
     real_to_decimal (string, &value, sizeof (string), 0, 1);
-    printf("%s", string);
+    fprintf(json_f, "%s", string);
   }
 }
 
 void json_bool_field(const char *name, int value) {
   json_field(name);
-  printf(value ? "true" : "false");
+  fprintf(json_f, value ? "true" : "false");
 }
 
 
@@ -162,17 +163,17 @@ void json_array_field(const char *name) {
 }
 
 void json_end_array() {
-  printf("\n");
+  fprintf(json_f, "\n");
   json_context_pop();
   json_indent();
-  printf("]");
+  fprintf(json_f, "]");
 }
 
 void json_end_object() {
   json_context_pop();
-  printf("\n");
+  fprintf(json_f, "\n");
   json_indent();
-  printf("}");
+  fprintf(json_f, "}");
 }
 
 
@@ -197,12 +198,12 @@ static void dump_type(tree type) {
     break;
   case POINTER_TYPE:
   case REFERENCE_TYPE:
-    json_field("base_type");
+    json_field("baseType");
     dump_type(TREE_TYPE(type));
     break;
 
   case ARRAY_TYPE:
-    json_field("component_type");
+    json_field("componentType");
     dump_type(TREE_TYPE(type));
     
     /*if(TYPE_DOMAIN(type)) {
@@ -223,7 +224,7 @@ static void dump_op(tree op) {
  	
   if(op) {
     json_start_object();
-    json_string_field("expr_type", tree_code_name[TREE_CODE(op)]);
+    json_string_field("type", tree_code_name[TREE_CODE(op)]);
     
    
     switch(TREE_CODE(op)) {
@@ -247,17 +248,29 @@ static void dump_op(tree op) {
       json_field("type");
       dump_type(TREE_TYPE(op));
 	    break;
+	    
+	  case MEM_REF:
+	    json_field("pointer");
+	    dump_op(TREE_OPERAND(op, 0));
+	    break;
+	    
+	  case ARRAY_REF:
+	    json_field("array");
+ 	    dump_op(TREE_OPERAND(op, 0));
+ 	    
+ 	    json_field("index");
+ 	    dump_op(TREE_OPERAND(op, 1));
+      break;
+    case ADDR_EXPR:
+      json_field("value");
+ 	    dump_op(TREE_OPERAND(op, 0));
+ 	    
+ 	  //  json_field("offset");
+ 	 //   dump_op(TREE_OPERAND(op, 1));
+      break;
+	  
     }
     
-    int numops = TREE_OPERAND_LENGTH(op);
-    if(numops > 0) {
-      json_array_field("operands");
-      int i;
-      for(i=0;i!=numops;++i) {
-         dump_op(TREE_OPERAND(op, i));
-      }
-      json_end_array();
-    }
         
     json_end_object();
   } else {
@@ -281,24 +294,19 @@ static void dump_ops(gimple stmt) {
 }
 
 static void dump_assignment(gimple stmt) {
-  json_string_field("stmt_type", "assignment");
+  json_string_field("type", "assign");
 
   json_string_field("operator", tree_code_name[gimple_assign_rhs_code(stmt)]);
 
   json_field("lhs");
   dump_op(gimple_assign_lhs(stmt));
   
-  json_array_field("rhs");
-  dump_op(gimple_assign_rhs1(stmt));
-  dump_op(gimple_assign_rhs2(stmt));
-  dump_op(gimple_assign_rhs3(stmt));
-  json_end_array();
+  dump_ops(stmt);
 }
-
 
 static void dump_cond(basic_block bb, gimple stmt) {
   
-  json_string_field("stmt_type", "cond");
+  json_string_field("type", "conditional");
   json_string_field("operator", tree_code_name[gimple_assign_rhs_code(stmt)]);
   
   dump_ops(stmt);
@@ -306,44 +314,37 @@ static void dump_cond(basic_block bb, gimple stmt) {
   edge true_edge, false_edge;
   extract_true_false_edges_from_block (bb, &true_edge, &false_edge);
   
-  json_int_field("true_label", true_edge->dest->index);
-  json_int_field("false_label", false_edge->dest->index);
+  json_int_field("trueLabel", true_edge->dest->index);
+  json_int_field("falseLabel", false_edge->dest->index);
   
 }
-
-static void dump_goto(gimple stmt) {
-  
-  json_string_field("stmt_type", "goto");
-  
-}
-
 
 static void dump_nop(gimple stmt) {
   
-  json_string_field("stmt_type", "nop");
+  json_string_field("type", "nop");
   
 }
 
 static void dump_return(gimple stmt) {
-  json_string_field("stmt_type", "return");
+  json_string_field("type", "return");
   
-  json_field("retval");
+  json_field("value");
   dump_op(gimple_return_retval(stmt));
 }
 
 
 static void dump_call(gimple stmt) {
-  json_string_field("stmt_type", "call");
+  json_string_field("type", "call");
   
   json_field("lhs");
   dump_op(gimple_call_lhs(stmt));
   
-  json_field("fn");
+  json_field("function");
   dump_op(gimple_call_fn(stmt));
   
   int numargs = gimple_call_num_args(stmt);
   if(numargs > 0) {
-    json_array_field("args");
+    json_array_field("arguments");
     int i;
     for(i=0;i<numargs;++i) {
       dump_op(gimple_call_arg(stmt,i));
@@ -366,9 +367,6 @@ static void dump_statement(basic_block bb, gimple stmt) {
     break;
   case GIMPLE_COND:
     dump_cond(bb, stmt);
-    break;
-  case GIMPLE_GOTO:
-    dump_goto(stmt);
     break;
   case GIMPLE_NOP:
     dump_nop(stmt);
@@ -400,7 +398,7 @@ static void dump_arguments(tree decl) {
   tree arg = DECL_ARGUMENTS(decl);
   
   if(arg) {
-    json_array_field("arguments");
+    json_array_field("parameters");
     
     while(arg) {
       dump_argument(arg);
@@ -428,7 +426,7 @@ static void dump_local_decls(struct function *fun) {
   unsigned ix;
   tree var;
   
-  json_array_field("local_decl");
+  json_array_field("variableDeclarations");
   
   FOR_EACH_LOCAL_DECL (fun, ix, var)
 	  {
@@ -440,7 +438,7 @@ static void dump_local_decls(struct function *fun) {
 static void dump_basic_block(basic_block bb) {
 
   json_start_object();
-  json_int_field("label", bb->index);
+  json_int_field("index", bb->index);
   json_array_field("instructions");
       
   gimple_stmt_iterator gsi;
@@ -455,8 +453,8 @@ static void dump_basic_block(basic_block bb) {
   if (e && e->dest != bb->next_bb)
     {
       json_start_object();
-      json_string_field("stmt_type", "goto");
-      json_int_field("label", e->dest->index);
+      json_string_field("type", "goto");
+      json_int_field("target", e->dest->index);
       json_end_object();
     }
     
@@ -464,9 +462,9 @@ static void dump_basic_block(basic_block bb) {
   json_end_object();
 }
 
+
 static unsigned int dump_function (void)
 {
-
   basic_block bb;
   
   json_start_object();
@@ -476,7 +474,7 @@ static unsigned int dump_function (void)
   dump_arguments(cfun->decl);
   dump_local_decls(cfun);
   
-  json_array_field("basic blocks");
+  json_array_field("basicBlocks");
   
   FOR_EACH_BB (bb)
     {
@@ -489,23 +487,35 @@ static unsigned int dump_function (void)
   return 0;
 }
 
+static void start_unit_callback (void *gcc_data, void *user_data)
+{
+  json_start_object();
+  json_array_field("functions");
+  
+}
+
+static void finish_unit_callback (void *gcc_data, void *user_data)
+{
+  json_end_array();
+  json_end_object();
+}
 
 static struct gimple_opt_pass pass_dump_json =
 {
     {
       GIMPLE_PASS,
-      "json", 	/* name */
-      NULL,	            /* gate */
+      "json", 	      /* pass name */
+      NULL,	          /* gate */
       dump_function,	/* execute */
-      NULL,		          /* sub */
-      NULL,		          /* next */
-      0,		            /* static_pass_number */
-      0,		            /* tv_id */
-      PROP_cfg | PROP_ssa,		/* properties_required */
-      0,		/* properties_provided */
-      0,		/* properties_destroyed */
-      0,		/* todo_flags_start */
-      0		/* todo_flags_finish */
+      NULL,		        /* sub */
+      NULL,		        /* next */
+      0,		          /* static_pass_number */
+      0,		          /* tv_id */
+      PROP_cfg,   		/* properties_required */
+      0,		          /* properties_provided */
+      0,		          /* properties_destroyed */
+      0,		          /* todo_flags_start */
+      0		            /* todo_flags_finish */
     }
 };
 
@@ -517,22 +527,36 @@ plugin_init (struct plugin_name_args *plugin_info,
 {
   struct register_pass_info pass_info;
   const char *plugin_name = plugin_info->base_name;
-  int argc = plugin_info->argc;
-  struct plugin_argument *argv = plugin_info->argv;
-
 
   pass_info.pass = &pass_dump_json;
   pass_info.reference_pass_name = "cfg";
   pass_info.ref_pass_instance_number = 1;
   pass_info.pos_op = PASS_POS_INSERT_AFTER;
+  
+  /* find the output file */
+  
+  json_f = stdout;
+  
+  int argi;
+  for(argi=0;argi!=plugin_info->argc;++argi) {
+    printf("key=%s, value=%s", 
+      plugin_info->argv[argi].key,
+      plugin_info->argv[argi].value);
+      
+    if(strcmp(plugin_info->argv[argi].key, "json-output-file") == 0) {
+      printf("Writing Gimple to %s\n", plugin_info->argv[argi].value);
+      json_f = fopen(plugin_info->argv[argi].value, "w");
+    } 
+  }
 
   /* Register this new pass with GCC */
   register_callback (plugin_name, PLUGIN_PASS_MANAGER_SETUP, NULL,
                      &pass_info);
                      
-  //register_callback ("start_unit", PLUGIN_START_UNIT, &start_unit_callback, NULL);
-  ///register_callback ("finish_unit", PLUGIN_FINISH_UNIT, &finish_unit_callback, NULL);
+  register_callback ("start_unit", PLUGIN_START_UNIT, &start_unit_callback, NULL);
+  register_callback ("finish_unit", PLUGIN_FINISH_UNIT, &finish_unit_callback, NULL);
 
+  
   return 0;
 }
 

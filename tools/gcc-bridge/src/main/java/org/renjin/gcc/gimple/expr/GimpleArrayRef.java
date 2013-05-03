@@ -2,24 +2,27 @@ package org.renjin.gcc.gimple.expr;
 
 
 public class GimpleArrayRef extends GimpleLValue {
-  private GimpleExpr var;
-  private GimpleExpr index;
+	private GimpleExpr array;
+	private GimpleExpr index;
 
-  public GimpleArrayRef(GimpleExpr var, GimpleExpr index) {
-    this.var = var;
-    this.index = index;
-  }
+	public GimpleExpr getArray() {
+		return array;
+	}
 
-  public GimpleExpr getVar() {
-    return var;
-  }
+	public void setValue(GimpleExpr value) {
+		this.array = value;
+	}
 
-  public GimpleExpr getIndex() {
-    return index;
-  }
+	public void setIndex(GimpleExpr index) {
+		this.index = index;
+	}
 
-  @Override
-  public String toString() {
-    return var + "[" + index + "]";
-  }
+	public GimpleExpr getIndex() {
+		return index;
+	}
+
+	@Override
+	public String toString() {
+		return array + "[" + index + "]";
+	}
 }

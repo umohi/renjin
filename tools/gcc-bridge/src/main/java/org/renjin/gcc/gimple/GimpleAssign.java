@@ -1,24 +1,34 @@
 package org.renjin.gcc.gimple;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleLValue;
 
 import java.util.List;
 
 public class GimpleAssign extends GimpleIns {
-	private GimpleOp op;
+	private GimpleOp operator;
 	private GimpleLValue lhs;
-	private List<GimpleExpr> arguments;
+	private List<GimpleExpr> operands = Lists.newArrayList();
+	
+	public GimpleAssign() {
+		
+	}
 	
 	GimpleAssign(GimpleOp op, GimpleLValue lhs, List<GimpleExpr> arguments) {
-		this.op = op;
+		this.operator = op;
 		this.lhs = lhs;
-		this.arguments = arguments;
+		this.operands = arguments;
 	}
 	
 	public GimpleOp getOperator() {
-		return op;
+		return operator;
+	}
+	
+	public void setOperator(GimpleOp op) {
+		this.operator = op;
 	}
 	
 	public GimpleLValue getLHS() {
@@ -26,17 +36,17 @@ public class GimpleAssign extends GimpleIns {
 	}
 	
 	public List<GimpleExpr> getOperands() {
-		return arguments;
+		return operands;
 	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("gimple_assign<")
-			.append(op)
+			.append(operator)
 			.append(", ")
 			.append(lhs)
 			.append(", ");
-		Joiner.on(", ").appendTo(sb, arguments);
+		Joiner.on(", ").appendTo(sb, operands);
 		sb.append(">");
 		return sb.toString();
 	}

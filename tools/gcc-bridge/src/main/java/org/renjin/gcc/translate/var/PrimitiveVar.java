@@ -6,8 +6,8 @@ import java.util.List;
 import org.renjin.gcc.gimple.GimpleOp;
 import org.renjin.gcc.gimple.expr.GimpleCompoundRef;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleIndirection;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleMemRef;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
@@ -252,13 +252,13 @@ public class PrimitiveVar extends Variable {
   }
 
   private PrimitivePtrVar asPointer(GimpleExpr expr) {
-    if(expr instanceof GimpleVar) {
-      Variable var = context.lookupVar((GimpleVar) expr);
+    if(expr instanceof GimpleVariableRef) {
+      Variable var = context.lookupVar((GimpleVariableRef) expr);
       if(var instanceof PrimitivePtrVar) {
         return (PrimitivePtrVar) var;
       }
-    } else if(expr instanceof GimpleIndirection) {
-      return asPointer(((GimpleIndirection) expr).getPointer());
+    } else if(expr instanceof GimpleMemRef) {
+      return asPointer(((GimpleMemRef) expr).getPointer());
     }
     throw new IllegalArgumentException(expr.toString());
   }

@@ -46,8 +46,8 @@ public class MemberFinder extends GimpleVisitor {
   }
 
   private GimpleType typeFromExpr(GimpleExpr expr) {
-    if(expr instanceof GimpleVar) {
-      return function.getVariableType(((GimpleVar) expr).getName());
+    if(expr instanceof GimpleVariableRef) {
+      return function.getVariableType(((GimpleVariableRef) expr).getName());
     } else if(expr instanceof GimpleConstant) {
       Object value = ((GimpleConstant) expr).getValue();
       if(value instanceof Double) {
@@ -72,7 +72,7 @@ public class MemberFinder extends GimpleVisitor {
     if(type instanceof GimpleStructType) {
       return ((GimpleStructType) type).getName();
     } else if(type instanceof PointerType) {
-      return structName(((PointerType) type).getInnerType());
+      return structName(((PointerType) type).getBaseType());
     } else {
       throw new UnsupportedOperationException(type.toString());
     }

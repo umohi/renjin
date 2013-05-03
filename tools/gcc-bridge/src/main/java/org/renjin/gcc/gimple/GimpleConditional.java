@@ -16,6 +16,9 @@ public class GimpleConditional extends GimpleIns {
 	private GimpleLabel trueTarget;
 	private GimpleLabel falseTarget;
 	
+	private int trueLabel;
+	private int falseLabel;
+	
 	GimpleConditional() {
 		
 	}
@@ -50,6 +53,22 @@ public class GimpleConditional extends GimpleIns {
 
 	public List<GimpleExpr> getOperands() {
 		return operands;
+	}
+
+	public int getTrueLabel() {
+		return trueLabel;
+	}
+
+	public void setTrueLabel(int trueLabel) {
+		this.trueLabel = trueLabel;
+	}
+
+	public int getFalseLabel() {
+		return falseLabel;
+	}
+
+	public void setFalseLabel(int falseLabel) {
+		this.falseLabel = falseLabel;
 	}
 
 	@Override

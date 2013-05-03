@@ -3,24 +3,24 @@ package org.renjin.gcc.gimple;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 
 public class GimpleReturn extends GimpleIns {
-	private final GimpleExpr value;
+	private GimpleExpr value;
 
-	public GimpleReturn(GimpleExpr value) {
-		super();
+
+	public void setValue(GimpleExpr value) {
 		this.value = value;
 	}
-	
+
 	public GimpleExpr getValue() {
 		return value;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "gimple_return <" + value + ">";
 	}
 
-  @Override
-  public void visit(GimpleVisitor visitor) {
-    visitor.visitReturn(this);
-  }
+	@Override
+	public void visit(GimpleVisitor visitor) {
+		visitor.visitReturn(this);
+	}
 }

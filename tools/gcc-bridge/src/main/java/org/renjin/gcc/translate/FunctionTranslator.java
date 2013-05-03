@@ -12,15 +12,15 @@ import org.renjin.gcc.gimple.GimpleLabelIns;
 import org.renjin.gcc.gimple.GimpleReturn;
 import org.renjin.gcc.gimple.GimpleSwitch;
 import org.renjin.gcc.gimple.GimpleVisitor;
-import org.renjin.gcc.gimple.Goto;
+import org.renjin.gcc.gimple.GimpleGoto;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleCompoundRef;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
-import org.renjin.gcc.gimple.expr.GimpleIndirection;
+import org.renjin.gcc.gimple.expr.GimpleMemRef;
 import org.renjin.gcc.gimple.expr.GimpleNull;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
@@ -70,7 +70,7 @@ public class FunctionTranslator extends GimpleVisitor {
     if(returnType instanceof PrimitiveType) {
       return PrimitiveTypes.get((PrimitiveType) returnType);
     } else if(returnType instanceof PointerType) {
-      GimpleType innerType = ((PointerType) returnType).getInnerType();
+      GimpleType innerType = ((PointerType) returnType).getBaseType();
       if(innerType instanceof PrimitiveType) {
         return PrimitiveTypes.getWrapperType((PrimitiveType) innerType);
       }
@@ -86,16 +86,16 @@ public class FunctionTranslator extends GimpleVisitor {
   @Override
   public void visitAssignment(GimpleAssign assignment) {
     try {
-      if(assignment.getLHS() instanceof GimpleVar) {
-        context.lookupVar((GimpleVar) assignment.getLHS()).assign(assignment.getOperator(), assignment.getOperands());
+      if(assignment.getLHS() instanceof GimpleVariableRef) {
+        context.lookupVar((GimpleVariableRef) assignment.getLHS()).assign(assignment.getOperator(), assignment.getOperands());
       
       } else if(assignment.getLHS() instanceof GimpleCompoundRef) {
         GimpleCompoundRef ref = (GimpleCompoundRef) assignment.getLHS();
         Variable var = context.lookupVar(ref.getVar());
         var.assignMember(ref.getMember(), assignment.getOperator(), assignment.getOperands());
       
-      } else if(assignment.getLHS() instanceof GimpleIndirection) {
-        GimpleIndirection indirectRef = (GimpleIndirection) assignment.getLHS();
+      } else if(assignment.getLHS() instanceof GimpleMemRef) {
+        GimpleMemRef indirectRef = (GimpleMemRef) assignment.getLHS();
         Variable var = context.lookupVar(indirectRef.getPointer());
         var.assignIndirect(assignment.getOperator(), assignment.getOperands());
         
@@ -112,7 +112,7 @@ public class FunctionTranslator extends GimpleVisitor {
     if(gimpleReturn.getValue() == GimpleNull.INSTANCE) {
       builder.addStatement("return");
     } else {
-      if(gimpleReturn.getValue() instanceof GimpleVar) {
+      if(gimpleReturn.getValue() instanceof GimpleVariableRef) {
         Variable var = context.lookupVar(gimpleReturn.getValue());
         builder.addStatement("return " + var.returnExpr());
       } else {
@@ -122,8 +122,8 @@ public class FunctionTranslator extends GimpleVisitor {
   }
 
   @Override
-  public void visitGoto(Goto gotoIns) {
-    builder.addStatement(new JimpleGoto(gotoIns.getTarget().getName()));
+  public void visitGoto(GimpleGoto gotoIns) {
+    builder.addStatement(new JimpleGoto(gotoIns.getTargetLabel().getName()));
   }
 
   @Override
@@ -236,7 +236,7 @@ public class FunctionTranslator extends GimpleVisitor {
   }
 
   private String translateExpr(GimpleExpr expr) {
-    if(expr instanceof GimpleVar) {
+    if(expr instanceof GimpleVariableRef) {
       Variable var = context.lookupVar(expr);
       return var.returnExpr().toString();
     } else if(expr instanceof GimpleConstant) {
@@ -251,7 +251,7 @@ public class FunctionTranslator extends GimpleVisitor {
   }
 
   private String translateAddressOf(GimpleAddressOf expr) {
-    Variable var = context.lookupVar(expr.getExpr());
+    Variable var = context.lookupVar(expr.getValue());
     return var.wrapPointer().toString();
   }
 

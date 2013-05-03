@@ -9,7 +9,7 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleArrayRef;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
@@ -132,13 +132,13 @@ public class PrimitivePtrVar extends Variable {
   private void assignAddress(List<GimpleExpr> operands) {
     GimpleExpr operand = operands.get(0);
     if(operand instanceof GimpleAddressOf) {
-      GimpleExpr value = ((GimpleAddressOf) operand).getExpr();
+      GimpleExpr value = ((GimpleAddressOf) operand).getValue();
       if(value instanceof GimpleArrayRef) {
         assignArrayElement((GimpleArrayRef)value);
       }
     } else if(isStringConstant(operand)) {
       assignStringConstant((GimpleConstant) operand);
-    } else if(operand instanceof GimpleVar) {
+    } else if(operand instanceof GimpleVariableRef) {
       assignPointer(asPtr(operand), JimpleExpr.integerConstant(0));
     } else {
       throw new UnsupportedOperationException(operand.toString());
@@ -160,7 +160,7 @@ public class PrimitivePtrVar extends Variable {
   }
 
   private void assignArrayElement(GimpleArrayRef arrayRef) {
-    PrimitivePtrVar var = asPtr(arrayRef.getVar());
+    PrimitivePtrVar var = asPtr(arrayRef.getArray());
     JimpleExpr positionsToIncrement = context.asNumericExpr(arrayRef.getIndex(), JimpleType.INT);
     assignPointer(var, positionsToIncrement);
   }
@@ -183,8 +183,8 @@ public class PrimitivePtrVar extends Variable {
   }
 
   private PrimitivePtrVar asPtr(GimpleExpr gimpleExpr) {
-    if(gimpleExpr instanceof GimpleVar) {
-      Variable var = context.lookupVar((GimpleVar) gimpleExpr);
+    if(gimpleExpr instanceof GimpleVariableRef) {
+      Variable var = context.lookupVar((GimpleVariableRef) gimpleExpr);
       if(var instanceof PrimitivePtrVar) {
         return (PrimitivePtrVar) var;
       }

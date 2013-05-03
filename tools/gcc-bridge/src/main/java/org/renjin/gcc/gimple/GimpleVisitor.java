@@ -26,7 +26,7 @@ public class GimpleVisitor {
 
   }
 
-  public void visitGoto(Goto gotoIns) {
+  public void visitGoto(GimpleGoto gotoIns) {
 
 
   }

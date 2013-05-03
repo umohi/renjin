@@ -3,15 +3,15 @@ package org.renjin.gcc.gimple.expr;
 
 public class GimpleCompoundRef extends GimpleLValue {
 
-  private final GimpleVar var;
+  private final GimpleVariableRef var;
   private String member;
 
-  public GimpleCompoundRef(GimpleVar var, String member) {
+  public GimpleCompoundRef(GimpleVariableRef var, String member) {
     this.var = var;
     this.member = member;
   }
 
-  public GimpleVar getVar() {
+  public GimpleVariableRef getVar() {
     return var;
   }
 

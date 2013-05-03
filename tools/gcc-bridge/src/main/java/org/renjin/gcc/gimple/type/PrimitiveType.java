@@ -10,3 +10,4 @@ public enum PrimitiveType implements GimpleType {
   BOOLEAN,
   CHAR
 }
+ 

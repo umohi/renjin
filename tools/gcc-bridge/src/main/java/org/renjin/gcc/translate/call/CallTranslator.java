@@ -5,7 +5,7 @@ import java.util.List;
 import org.renjin.gcc.gimple.GimpleCall;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.FunctionPointerType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
@@ -38,7 +38,7 @@ public class CallTranslator {
     if(functionExpr instanceof GimpleExternal) {
       translateStaticCall();
       
-    } else if(functionExpr instanceof GimpleVar) {
+    } else if(functionExpr instanceof GimpleVariableRef) {
       translateFunctionPointerCall();    
     
     } else {
@@ -107,7 +107,7 @@ public class CallTranslator {
   private List<JimpleExpr> marshallParams(List<CallParam> callParams) {
     List<JimpleExpr> exprs = Lists.newArrayList();
     for(int i=0;i!=call.getParamCount();++i) {
-      exprs.add(paramMarshallers.marshall(context, call.getParams().get(i), callParams.get(i)));
+      exprs.add(paramMarshallers.marshall(context, call.getArguments().get(i), callParams.get(i)));
     }
     return exprs;
   }

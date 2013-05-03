@@ -94,9 +94,9 @@ public class TranslationContext {
   public TypeTranslator resolveType(GimpleType type) {
     if(type instanceof PrimitiveType) {
       return new PrimitiveTypeTranslator((PrimitiveType) type);
-    } else if(type instanceof PointerType && ((PointerType) type).getInnerType() instanceof PrimitiveType) {
+    } else if(type instanceof PointerType && ((PointerType) type).getBaseType() instanceof PrimitiveType) {
       return new PrimitivePtrTypeTranslator((PointerType) type);
-    } else if(type instanceof PointerType && ((PointerType) type).getInnerType() instanceof GimpleStructType) {
+    } else if(type instanceof PointerType && ((PointerType) type).getBaseType() instanceof GimpleStructType) {
       return new StructTypeTranslator(this, type);
     } else if(type instanceof FunctionPointerType) {
       return new FunPtrTranslator(this, (FunctionPointerType)type);

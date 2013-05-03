@@ -3,38 +3,59 @@ package org.renjin.gcc.gimple;
 import org.renjin.gcc.gimple.type.GimpleType;
 
 public class GimpleVarDecl {
-	private final GimpleType type;
-	private final String name;
-  private final Object constantValue;
+	private int id;
+	private GimpleType type;
+	private String name;
+	private Object constantValue;
+
+	public GimpleVarDecl() {
+		
+	}
 	
 	public GimpleVarDecl(GimpleType type, String name) {
 		super();
 		this.type = type;
 		this.name = name;
-    constantValue = null;
+		constantValue = null;
 	}
 
-  public GimpleVarDecl(GimpleType type, String name, Object constantValue) {
+	public GimpleVarDecl(GimpleType type, String name, Object constantValue) {
 		this.type = type;
 		this.name = name;
-    this.constantValue = constantValue;
-  }
+		this.constantValue = constantValue;
+	}
 
-  public GimpleType getType() {
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public GimpleType getType() {
 		return type;
+	}
+
+	public void setType(GimpleType type) {
+		this.type = type;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-  public Object getConstantValue() {
-    return constantValue;
-  }
-
-  @Override
-	public String toString() {
-		return type + " " + name;
+	public void setName(String name) {
+		this.name = name;
 	}
-	
+
+	public Object getConstantValue() {
+		return constantValue;
+	}
+
+	@Override
+	public String toString() {
+		return type + " " + (name == null ? "T" + Math.abs(id) : name);
+	}
+
 }

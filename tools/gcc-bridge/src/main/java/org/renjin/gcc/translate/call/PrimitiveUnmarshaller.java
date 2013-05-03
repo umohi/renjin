@@ -1,7 +1,7 @@
 package org.renjin.gcc.translate.call;
 
 import org.renjin.gcc.gimple.expr.GimpleLValue;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
@@ -22,7 +22,7 @@ public class PrimitiveUnmarshaller extends CallUnmarshaller {
   }
   
   private PrimitiveVar isPrimitiveVar(FunctionContext context, GimpleLValue lhs) {
-    if(lhs instanceof GimpleVar) {
+    if(lhs instanceof GimpleVariableRef) {
       Variable var = context.lookupVar(lhs);
       if(var instanceof PrimitiveVar) {
         return (PrimitiveVar) var;

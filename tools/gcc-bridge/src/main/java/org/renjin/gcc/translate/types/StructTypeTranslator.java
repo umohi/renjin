@@ -22,7 +22,7 @@ public class StructTypeTranslator extends TypeTranslator {
 
   public StructTypeTranslator(TranslationContext translationContext, GimpleType type) {
     if(type instanceof PointerType) {
-      this.structType = (GimpleStructType) ((PointerType) type).getInnerType();
+      this.structType = (GimpleStructType) ((PointerType) type).getBaseType();
       this.pointer = true;
     } else if(type instanceof GimpleStructType) {
       this.structType = (GimpleStructType) type;

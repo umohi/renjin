@@ -2,7 +2,7 @@ package org.renjin.gcc.jimple;
 
 
 import org.renjin.gcc.gimple.GimpleParameter;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.GimpleStructType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
@@ -23,7 +23,7 @@ public class Jimple {
     return name.replace('.', '$');
   }
 
-  public static String id(GimpleVar rhs) {
+  public static String id(GimpleVariableRef rhs) {
     return id(rhs.getName());
   }
 

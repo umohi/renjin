@@ -12,7 +12,7 @@ import org.renjin.gcc.gimple.expr.GimpleArrayRef;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleMethodBuilder;
@@ -91,7 +91,7 @@ public class FunctionContext {
     return "trlabel" + (nextLabelId++) + "__";
   }
 
-  public Variable lookupVar(GimpleVar var) {
+  public Variable lookupVar(GimpleVariableRef var) {
     return lookupVar(var.getName());
   }
 
@@ -105,8 +105,8 @@ public class FunctionContext {
 
 
   public Variable lookupVar(GimpleExpr gimpleExpr) {
-    if(gimpleExpr instanceof GimpleVar) {
-      return lookupVar((GimpleVar)gimpleExpr);
+    if(gimpleExpr instanceof GimpleVariableRef) {
+      return lookupVar((GimpleVariableRef)gimpleExpr);
     } else {
       throw new UnsupportedOperationException("Expected GimpleVar, got: " + gimpleExpr + " [" + gimpleExpr.getClass().getSimpleName() + "]");
     }
@@ -117,8 +117,8 @@ public class FunctionContext {
   }
 
   public JimpleExpr asNumericExpr(GimpleExpr gimpleExpr, JimpleType type) {
-    if(gimpleExpr instanceof GimpleVar) {
-      Variable variable = lookupVar((GimpleVar)gimpleExpr);
+    if(gimpleExpr instanceof GimpleVariableRef) {
+      Variable variable = lookupVar((GimpleVariableRef)gimpleExpr);
       return variable.asPrimitiveExpr(type);
     } else if (gimpleExpr instanceof GimpleConstant) {
       return asConstant(((GimpleConstant) gimpleExpr).getValue(), type);
@@ -133,7 +133,7 @@ public class FunctionContext {
 
   private JimpleExpr numericFromArrayRef(GimpleArrayRef ref) {
     JimpleExpr index = asNumericExpr(ref.getIndex(), JimpleType.INT);
-    return lookupVar(ref.getVar()).asPrimitiveArrayRef(index);
+    return lookupVar(ref.getArray()).asPrimitiveArrayRef(index);
   }
 
   private JimpleExpr fromField(GimpleExternal external) {

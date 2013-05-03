@@ -5,7 +5,7 @@ import org.renjin.gcc.gimple.GimpleLabel;
 import org.renjin.gcc.gimple.GimpleOp;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleGoto;
 import org.renjin.gcc.jimple.JimpleType;
@@ -67,7 +67,7 @@ public class ConditionalTranslator {
   }
 
   private JimpleType findType(GimpleExpr gimpleExpr) {
-    if(gimpleExpr instanceof GimpleVar) {
+    if(gimpleExpr instanceof GimpleVariableRef) {
       Variable var = context.lookupVar(gimpleExpr);
       return var.getPrimitiveType();
     } else {

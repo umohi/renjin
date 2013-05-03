@@ -2,7 +2,7 @@ package org.renjin.gcc.translate.call;
 
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleLValue;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
@@ -17,7 +17,7 @@ public class WrappedPtrUnmarshaller extends CallUnmarshaller {
   public boolean unmarshall(FunctionContext context, GimpleLValue lhs,
       JimpleType returnType, JimpleExpr callExpr) {
     
-    if(lhs instanceof GimpleVar) {
+    if(lhs instanceof GimpleVariableRef) {
       Variable var = context.lookupVar(lhs);
       if(var instanceof PrimitivePtrVar) {
         PrimitivePtrVar ptrVar = (PrimitivePtrVar) var;
@@ -34,7 +34,7 @@ public class WrappedPtrUnmarshaller extends CallUnmarshaller {
   }
 
   public boolean accept(FunctionContext context, GimpleExpr lhs, MethodRef method) {
-    if( ! (lhs instanceof GimpleVar) ) {
+    if( ! (lhs instanceof GimpleVariableRef) ) {
       return false;
     }
     Variable var = context.lookupVar(lhs);

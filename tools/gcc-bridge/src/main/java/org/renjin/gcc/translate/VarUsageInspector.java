@@ -13,7 +13,7 @@ import org.renjin.gcc.gimple.GimpleVarDecl;
 import org.renjin.gcc.gimple.GimpleVisitor;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleVar;
+import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 
 import com.google.common.collect.Maps;
 
@@ -44,7 +44,7 @@ public class VarUsageInspector extends GimpleVisitor {
     return getUsage(param.getName());
   }
   
-  public VarUsage getUsage(GimpleVar var) {
+  public VarUsage getUsage(GimpleVariableRef var) {
     return getUsage(var.getName());
   }
   
@@ -53,7 +53,7 @@ public class VarUsageInspector extends GimpleVisitor {
   }
     
   private VarUsage getUsage(GimpleExpr var) {
-    return getUsage((GimpleVar)var);
+    return getUsage((GimpleVariableRef)var);
   }
   
   private void visitOperand(GimpleExpr expr) {
@@ -63,8 +63,8 @@ public class VarUsageInspector extends GimpleVisitor {
   }
 
   private void visitAddressOf(GimpleAddressOf expr) {
-    if(expr.getExpr() instanceof GimpleVar) {
-      getUsage(expr.getExpr()).setAddressed(true);
+    if(expr.getValue() instanceof GimpleVariableRef) {
+      getUsage(expr.getValue()).setAddressed(true);
     }
   }
 
@@ -82,7 +82,7 @@ public class VarUsageInspector extends GimpleVisitor {
 
   @Override
   public void visitCall(GimpleCall gimpleCall) {
-    visitOperands(gimpleCall.getParams());
+    visitOperands(gimpleCall.getArguments());
   }
 
   @Override

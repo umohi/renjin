@@ -1,9 +1,7 @@
 package org.renjin.gcc.gimple.type;
 
-
-public class PointerType extends AbstractGimpleType {
+public class ReferenceType extends AbstractGimpleType {
 	private GimpleType baseType;
-
 
 	public GimpleType getBaseType() {
 		return baseType;
@@ -15,6 +13,6 @@ public class PointerType extends AbstractGimpleType {
 
 	@Override
 	public String toString() {
-		return baseType.toString() + "*";
+		return baseType + "&";
 	}
 }

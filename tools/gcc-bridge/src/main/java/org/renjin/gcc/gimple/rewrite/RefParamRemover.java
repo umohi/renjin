@@ -23,7 +23,7 @@ public class RefParamRemover {
   }
 
   private boolean isNumericPtr(GimpleParameter param) {
-    return param.getType() instanceof PointerType && ((PointerType) param.getType()).getInnerType() instanceof PrimitiveType;
+    return param.getType() instanceof PointerType && ((PointerType) param.getType()).getBaseType() instanceof PrimitiveType;
   }
 
 }
