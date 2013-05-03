@@ -109,8 +109,8 @@ public class TestReporter {
         currentCase.getName(), 
         currentSuite.getScriptFile().getName(),
         e.getMessage()));
-    e.printStackTrace(stdout);
-    e.printStackTrace();
+    stdout.println(e.getMessage());
+    System.out.println(e.getMessage());
     functionComplete();
   }
 

@@ -1,4 +1,3 @@
-library(hamcrest)
 
 test.MatrixProduct <- function() {
 	assertThat(dim(matrix(10)), equalTo(c(1L,1L)))

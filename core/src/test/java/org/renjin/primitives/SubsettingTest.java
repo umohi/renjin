@@ -444,7 +444,7 @@ public class SubsettingTest extends EvalTestCase {
   @Test
   public void byNamedCol() {
     eval( " x <- .Internal(rbind(1, c(a=1,b=2))) ");
-
+    eval("print(x)");
     assertThat( eval(" x[,'b'] "), equalTo( c(2) ));
   }
 

@@ -1,6 +1,4 @@
 
-library(hamcrest)
-
 # general tests of correctness of evaluation
 
 test.VectorsDoNotMaskFunctions <- function() {

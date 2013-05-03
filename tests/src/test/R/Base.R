@@ -1,4 +1,3 @@
-library(hamcrest)
 
 test.Bquote <- function() {
 	model <-  bquote(~0 + .(quote(births)))

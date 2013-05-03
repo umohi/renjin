@@ -1,6 +1,4 @@
 
-library(hamcrest)
-
 test.Agrep <- function() {
 	assertThat( agrep("lasy", "1 lazy 2"), equalTo(1) )
 	#assertThat( agrep("lasy", c(" 1 lazy 2", "1 lasy 2"), max = list(sub = 0)), equalTo(2) )

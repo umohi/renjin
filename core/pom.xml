@@ -138,12 +138,7 @@
       <version>1.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.concordion</groupId>
-      <artifactId>concordion</artifactId>
-      <version>1.4.2</version>
-      <scope>test</scope>
-    </dependency>
+
 
     <!-- This library is used during compile-time code generation but is
          not necessary when using renjin-->

@@ -1,4 +1,3 @@
-library(hamcrest)
 
 test.FunctionCallIsNotPairList <- function() {
 	assertFalse( is.pairlist( quote(1+1) ) )

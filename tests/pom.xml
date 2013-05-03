@@ -57,6 +57,11 @@
 							<goal>test</goal>
 						</goals>
 						<phase>test</phase>
+						<configuration>
+							<defaultPackages>
+								<package>hamcrest</package>
+							</defaultPackages>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -14,7 +14,7 @@ assertFalse <- function(value) {
 
 assertThat <- function(actual, matcher) {
 	if(!matcher(actual)) {
-		stop(paste("\nExpected:", deparse(substitute(matcher)), "\ngot: ", deparse(actual) ))
+		stop(paste("\nExpected:", deparse(substitute(matcher)), "\ngot: ", paste(deparse(actual), collapse="\n" )))
 	}
 }
 
@@ -36,4 +36,14 @@ equalTo <- function(expected) {
 		length(actual) == length(expected) &&
 				actual == expected
 	}
+}
+
+
+throws.error <- function(x) {
+  tryCatch({ 
+    x 
+    return(FALSE)
+  }, error = function(e) {
+    return(TRUE)
+  })
 }

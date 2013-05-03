@@ -21,26 +21,45 @@
 
 package org.renjin.primitives;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.renjin.eval.Calls;
-import org.renjin.eval.Context;
-import org.renjin.eval.EvalException;
-import org.renjin.parser.RParser;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Evaluate;
-import org.renjin.primitives.annotations.PassThrough;
-import org.renjin.primitives.annotations.Primitive;
-import org.renjin.primitives.io.connections.Connection;
-import org.renjin.primitives.io.connections.Connections;
-import org.renjin.primitives.special.ReturnException;
-import org.renjin.sexp.*;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+
+import org.renjin.eval.Calls;
+import org.renjin.eval.Context;
+import org.renjin.eval.EvalException;
+import org.renjin.parser.RParser;
+import org.renjin.primitives.annotations.ArgumentList;
+import org.renjin.primitives.annotations.Current;
+import org.renjin.primitives.annotations.Evaluate;
+import org.renjin.primitives.annotations.Primitive;
+import org.renjin.primitives.io.connections.Connection;
+import org.renjin.primitives.io.connections.Connections;
+import org.renjin.primitives.special.ReturnException;
+import org.renjin.sexp.AtomicVector;
+import org.renjin.sexp.DoubleVector;
+import org.renjin.sexp.Environment;
+import org.renjin.sexp.ExpressionVector;
+import org.renjin.sexp.Function;
+import org.renjin.sexp.FunctionCall;
+import org.renjin.sexp.IntArrayVector;
+import org.renjin.sexp.IntVector;
+import org.renjin.sexp.ListVector;
+import org.renjin.sexp.NamedValue;
+import org.renjin.sexp.Null;
+import org.renjin.sexp.PairList;
+import org.renjin.sexp.PrimitiveFunction;
+import org.renjin.sexp.Promise;
+import org.renjin.sexp.SEXP;
+import org.renjin.sexp.StringVector;
+import org.renjin.sexp.Symbol;
+import org.renjin.sexp.Symbols;
+import org.renjin.sexp.Vector;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class Evaluation {
 
@@ -229,19 +248,9 @@ public class Evaluation {
     return doCall(context, (Function) function, arguments, environment);
   }
 
-  @PassThrough
   @Primitive
-  public static SEXP call(@Current Context context, @Current Environment rho, FunctionCall call) {
-    if(call.length() < 1) {
-      throw new EvalException("first argument must be character string");
-    }
-    SEXP name = context.evaluate(call.getArgument(0), rho);
-    if(!(name instanceof StringVector) || name.length() != 1) {
-      throw new EvalException("first argument must be character string");
-    }
-
-    return new FunctionCall(Symbol.get(((StringVector) name).getElementAsString(0)),
-        ((PairList.Node)call.getArguments()).getNextNode());
+  public static SEXP call(String functionName, @ArgumentList ListVector arguments) {
+    return new FunctionCall(Symbol.get(functionName), PairList.Node.fromVector(arguments));
   }
 
   @Primitive
