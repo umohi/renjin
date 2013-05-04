@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class IntegerType extends NumericType {
+public class IntegerType extends PrimitiveType {
 	private int precision;
 	private boolean unsigned;
 

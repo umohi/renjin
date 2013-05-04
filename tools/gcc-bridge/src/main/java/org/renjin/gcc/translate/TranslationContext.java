@@ -79,7 +79,7 @@ public class TranslationContext {
   }
 
   private MethodRef asRef(GimpleFunction function) {
-    JimpleType returnType = resolveType(function.returnType()).returnType();
+    JimpleType returnType = resolveType(function.getReturnType()).returnType();
     List<JimpleType> paramTypes = Lists.newArrayList();
     for(GimpleParameter param : function.getParameters()) {
       paramTypes.add(resolveType(param.getType()).paramType());

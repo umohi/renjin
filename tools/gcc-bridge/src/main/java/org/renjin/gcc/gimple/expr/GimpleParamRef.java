@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.expr;
 
-public class GimpleParamRef extends GimpleExpr {
+public class GimpleParamRef extends GimpleExpr implements SymbolRef {
 	
 	private int id;
 	private String name;

@@ -21,9 +21,11 @@ import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleMemRef;
 import org.renjin.gcc.gimple.expr.GimpleNull;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
+import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
+import org.renjin.gcc.gimple.type.VoidType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleGoto;
 import org.renjin.gcc.jimple.JimpleMethodBuilder;
@@ -33,6 +35,7 @@ import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.call.CallTranslator;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 import org.renjin.gcc.translate.var.Variable;
+
 
 /**
  * Translates a GimpleFunction to a Jimple function
@@ -56,7 +59,7 @@ public class FunctionTranslator extends GimpleVisitor {
       this.builder = translationContext.getMainClass().newMethod();
       builder.setModifiers(JimpleModifiers.PUBLIC, JimpleModifiers.STATIC);
       builder.setName(function.getName());  
-      builder.setReturnType(translateReturnType(function.returnType()));
+      builder.setReturnType(translateReturnType(function.getReturnType()));
 
       context = new FunctionContext(translationContext, function, builder);
 
@@ -74,20 +77,26 @@ public class FunctionTranslator extends GimpleVisitor {
       if(innerType instanceof PrimitiveType) {
         return PrimitiveTypes.getWrapperType((PrimitiveType) innerType);
       }
+    } else if(returnType instanceof VoidType) {
+    	return JimpleType.VOID;
     }
     throw new UnsupportedOperationException(returnType.toString());
   }
 
   @Override
   public void blockStart(GimpleBasicBlock bb) {
-    builder.addLabel(bb.getName());
+    builder.addLabel(basicBlockLabel(bb.getIndex()));
   }
+
+private String basicBlockLabel(int index) {
+	return "BB" + index;
+}
 
   @Override
   public void visitAssignment(GimpleAssign assignment) {
     try {
-      if(assignment.getLHS() instanceof GimpleVariableRef) {
-        context.lookupVar((GimpleVariableRef) assignment.getLHS()).assign(assignment.getOperator(), assignment.getOperands());
+      if(assignment.getLHS() instanceof SymbolRef) {
+        context.lookupVar(assignment.getLHS()).assign(assignment.getOperator(), assignment.getOperands());
       
       } else if(assignment.getLHS() instanceof GimpleCompoundRef) {
         GimpleCompoundRef ref = (GimpleCompoundRef) assignment.getLHS();
@@ -109,7 +118,7 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitReturn(GimpleReturn gimpleReturn) {
-    if(gimpleReturn.getValue() == GimpleNull.INSTANCE) {
+    if(gimpleReturn.getValue() == null) {
       builder.addStatement("return");
     } else {
       if(gimpleReturn.getValue() instanceof GimpleVariableRef) {
@@ -123,7 +132,7 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitGoto(GimpleGoto gotoIns) {
-    builder.addStatement(new JimpleGoto(gotoIns.getTargetLabel().getName()));
+    builder.addStatement(new JimpleGoto(basicBlockLabel(gotoIns.getTarget())));
   }
 
   @Override

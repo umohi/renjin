@@ -1,9 +1,9 @@
 package org.renjin.gcc.gimple.type;
 
-public class BooleanType extends PrimitiveType {
+public class VoidType implements GimpleType {
 
 	@Override
 	public String toString() {
-		return "bool";
+		return "void";
 	}
 }

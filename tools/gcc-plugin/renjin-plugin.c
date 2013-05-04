@@ -214,6 +214,20 @@ static void dump_type(tree type) {
       json_end_array();
     }*/
     break;
+    
+  case FUNCTION_TYPE:
+    json_field("returnType");
+    dump_type(TREE_TYPE(type));
+    
+    tree arg = TYPE_ARG_TYPES(type);
+    if(arg != NULL_TREE) {
+      json_array_field("argumentTypes");
+      while(arg != NULL_TREE) {
+        dump_type(TREE_VALUE(arg));
+        arg = TREE_CHAIN(arg);      
+      }
+    }
+    
   }
   json_end_object();
 
@@ -300,8 +314,16 @@ static void dump_assignment(gimple stmt) {
 
   json_field("lhs");
   dump_op(gimple_assign_lhs(stmt));
-  
-  dump_ops(stmt);
+
+  tree rhs1 = gimple_assign_rhs1(stmt);
+  tree rhs2 = gimple_assign_rhs2(stmt);
+  tree rhs3 = gimple_assign_rhs3(stmt);
+    
+  json_array_field("operands");
+  if(rhs1) dump_op(rhs1);
+  if(rhs2) dump_op(rhs2);
+  if(rhs3) dump_op(rhs3);
+  json_end_array();
 }
 
 static void dump_cond(basic_block bb, gimple stmt) {
@@ -328,8 +350,11 @@ static void dump_nop(gimple stmt) {
 static void dump_return(gimple stmt) {
   json_string_field("type", "return");
   
-  json_field("value");
-  dump_op(gimple_return_retval(stmt));
+  tree retval = gimple_return_retval(stmt);
+  if(retval) {
+    json_field("value");
+    dump_op(retval);
+  }
 }
 
 
@@ -475,13 +500,15 @@ static unsigned int dump_function (void)
   dump_local_decls(cfun);
   
   json_array_field("basicBlocks");
-  
   FOR_EACH_BB (bb)
     {
       dump_basic_block(bb);  
     }
-  
   json_end_array();
+  
+  json_field("returnType");
+  dump_type(TREE_TYPE(DECL_RESULT(cfun->decl)));
+  
   json_end_object();
  
   return 0;

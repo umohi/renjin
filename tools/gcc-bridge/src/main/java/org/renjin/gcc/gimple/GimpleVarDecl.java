@@ -42,7 +42,11 @@ public class GimpleVarDecl {
 	}
 
 	public String getName() {
-		return name;
+		if(name != null) {
+			return name;
+		} else {
+			return "T" + Math.abs(id);
+		}
 	}
 
 	public void setName(String name) {

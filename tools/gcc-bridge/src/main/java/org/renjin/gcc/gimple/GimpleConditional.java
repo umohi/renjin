@@ -13,9 +13,6 @@ public class GimpleConditional extends GimpleIns {
 	
 	private GimpleOp operator;
 	private List<GimpleExpr> operands;
-	private GimpleLabel trueTarget;
-	private GimpleLabel falseTarget;
-	
 	private int trueLabel;
 	private int falseLabel;
 	
@@ -30,23 +27,7 @@ public class GimpleConditional extends GimpleIns {
 	void setOperands(List<GimpleExpr> operands) {
 		this.operands = operands;
 	}
-
-	public GimpleLabel getTrueTarget() {
-		return trueTarget;
-	}
-
-	public void setTrueTarget(GimpleLabel trueTarget) {
-		this.trueTarget = trueTarget;
-	}
-
-	public GimpleLabel getFalseTarget() {
-		return falseTarget;
-	}
-
-	public void setFalseTarget(GimpleLabel falseTarget) {
-		this.falseTarget = falseTarget;
-	}
-
+	
 	public GimpleOp getOperator() {
 		return operator;
 	}
@@ -80,9 +61,9 @@ public class GimpleConditional extends GimpleIns {
 		
 		Joiner.on(", ").appendTo(sb, operands);
 		sb.append("> goto <")
-		  .append(trueTarget)
+		  .append("BB").append(trueLabel)
 		  .append("> else goto <")
-		  .append(falseTarget)
+		  .append("BB").append(falseLabel)
 		  .append(">");
 		return sb.toString();
 	}

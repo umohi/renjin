@@ -15,6 +15,4 @@ public class ArrayType extends AbstractGimpleType {
 	public String toString() {
 		return componentType + "[]";
 	}
-	
-	
 }

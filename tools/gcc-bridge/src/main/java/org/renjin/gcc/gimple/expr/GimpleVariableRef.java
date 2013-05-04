@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.expr;
 
-public class GimpleVariableRef extends GimpleLValue {
+public class GimpleVariableRef extends GimpleLValue implements SymbolRef {
 
 	private String name;
 	private int version;

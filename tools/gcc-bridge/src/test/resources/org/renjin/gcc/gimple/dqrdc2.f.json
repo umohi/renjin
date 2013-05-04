@@ -12721,7 +12721,10 @@
             }
           ]
         }
-      ]
+      ],
+      "returnType": {
+        "type": "void_type"
+      }
     }
   ]
 }

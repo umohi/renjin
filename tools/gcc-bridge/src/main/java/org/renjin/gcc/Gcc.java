@@ -10,10 +10,12 @@ import java.util.logging.Logger;
 import org.renjin.gcc.gimple.GimpleCompilationUnit;
 import org.renjin.gcc.gimple.GimpleParser;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 
 public class Gcc {
 
@@ -43,6 +45,7 @@ public class Gcc {
 		// to standard out
 
 		arguments.add("-fplugin=" + environment.toString(pluginLibrary));
+		arguments.add("-fplugin-arg-renjin-json-output-file=gimple.json");
 
 		for(File includeDir : includeDirectories) {
 			arguments.add("-I");
@@ -63,7 +66,7 @@ public class Gcc {
 		}
 
 		String stderr = new String(ByteStreams.toByteArray(gcc.getErrorStream()));
-		String json = new String(ByteStreams.toByteArray(gcc.getInputStream()));
+		String json = Files.toString(new File(environment.getWorkingDirectory(), "gimple.json"), Charsets.UTF_8);
 		
 		System.out.println(json);
 		

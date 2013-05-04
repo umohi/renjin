@@ -1,7 +1,5 @@
 package org.renjin.gcc.gimple.expr;
 
-import org.renjin.gcc.gimple.GimpleFunction;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

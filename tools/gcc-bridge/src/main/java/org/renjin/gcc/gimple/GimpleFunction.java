@@ -19,6 +19,7 @@ public class GimpleFunction {
 	private int id;
 	private String name;
 	private CallingConvention callingConvention;
+	private GimpleType returnType;
 	private List<GimpleBasicBlock> basicBlocks = Lists.newArrayList();
 	private List<GimpleParameter> parameters = Lists.newArrayList();
 	private List<GimpleVarDecl> variableDeclarations = Lists.newArrayList();
@@ -92,17 +93,6 @@ public class GimpleFunction {
 		}
 	}
 
-	public GimpleType returnType() {
-		for(GimpleBasicBlock bb : basicBlocks) {
-			for(GimpleIns ins : bb.getInstructions()) {
-				if(ins instanceof GimpleReturn) {
-					return getType( ((GimpleReturn)ins).getValue() );
-				}
-			}
-		}
-		return PrimitiveType.VOID_TYPE;
-	}
-
 	public List<GimpleParameter> getParameters() {
 		return parameters;
 	}
@@ -147,6 +137,14 @@ public class GimpleFunction {
 
 	public CallingConvention getCallingConvention() {
 		return callingConvention;
+	}
+
+	public GimpleType getReturnType() {
+		return returnType;
+	}
+
+	public void setReturnType(GimpleType returnType) {
+		this.returnType = returnType;
 	}
 
 }

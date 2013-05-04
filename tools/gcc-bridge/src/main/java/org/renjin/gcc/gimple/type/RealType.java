@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class RealType extends NumericType {
+public class RealType extends PrimitiveType {
 	private int precision;
 
 	/**

@@ -14,7 +14,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 	    @Type(value = PointerType.class, name = "pointer_type" ),
 	    @Type(value = ReferenceType.class, name = "reference_type"),
 	    @Type(value = ArrayType.class, name = "array_type"),
-	    @Type(value = BooleanType.class, name = "boolean_type" )}) 
+	    @Type(value = BooleanType.class, name = "boolean_type" ),
+	    @Type(value = FunctionType.class, name = "function_type" ),
+	    @Type(value = VoidType.class, name = "void_type")}) 
 public interface GimpleType {
 
 }

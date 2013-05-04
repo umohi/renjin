@@ -10,6 +10,7 @@ import org.renjin.gcc.gimple.expr.GimpleArrayRef;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
+import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
@@ -125,9 +126,13 @@ public class PrimitivePtrVar extends Variable {
     PrimitivePtrVar var = asPtr(operands.get(0));
     JimpleExpr bytesToIncrement = context.asNumericExpr(operands.get(1), JimpleType.INT);
     String positionsToIncrement = context.declareTemp(JimpleType.INT);
-    context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + valueSize());
+    context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf());
     assignPointer(var, new JimpleExpr(positionsToIncrement));
   }
+
+private int sizeOf() {
+	return gimpleType.getSize() / 8;
+}
 
   private void assignAddress(List<GimpleExpr> operands) {
     GimpleExpr operand = operands.get(0);
@@ -170,21 +175,9 @@ public class PrimitivePtrVar extends Variable {
     context.getBuilder().addStatement(jimpleOffsetName + " = " + var.jimpleOffsetName + " + " + offset);
   }
 
-  private int valueSize() {
-    switch (gimpleType) {
-      case DOUBLE_TYPE:
-        return 8;
-      case INT_TYPE:
-        return 4;
-      case CHAR:
-        return 1;
-    }
-    throw new UnsupportedOperationException(gimpleType.toString());
-  }
-
   private PrimitivePtrVar asPtr(GimpleExpr gimpleExpr) {
-    if(gimpleExpr instanceof GimpleVariableRef) {
-      Variable var = context.lookupVar((GimpleVariableRef) gimpleExpr);
+    if(gimpleExpr instanceof SymbolRef) {
+      Variable var = context.lookupVar(gimpleExpr);
       if(var instanceof PrimitivePtrVar) {
         return (PrimitivePtrVar) var;
       }

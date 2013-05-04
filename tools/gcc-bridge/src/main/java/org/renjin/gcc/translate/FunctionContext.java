@@ -13,6 +13,7 @@ import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
+import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleMethodBuilder;
@@ -29,7 +30,7 @@ public class FunctionContext {
   private TranslationContext translationContext;
   private GimpleFunction gimpleFunction;
   private JimpleMethodBuilder builder;
-  private Map<String, Variable> variables = Maps.newHashMap();
+  private Map<Integer, Variable> symbolTable = Maps.newHashMap();
 
   private int nextTempId = 0;
   private int nextLabelId = 1000;
@@ -47,8 +48,7 @@ public class FunctionContext {
           .resolveType(decl.getType())
           .createLocalVariable(this, decl.getName(), varUsage.getUsage(decl));
       
-      variables.put(decl.getName(), localVariable);
-
+      symbolTable.put(decl.getId(), localVariable);
       
       if(decl.getConstantValue() != null) {
         localVariable.initFromConstant(decl.getConstantValue());
@@ -60,7 +60,7 @@ public class FunctionContext {
       builder.addParameter(type.paramType(), param.getName());
       Variable variable = type.createLocalVariable(this, param.getName(), varUsage.getUsage(param));
       variable.initFromParameter();
-      variables.put(param.getName(), variable);
+      symbolTable.put(param.getId(), variable);
     }
   }
 
@@ -91,34 +91,30 @@ public class FunctionContext {
     return "trlabel" + (nextLabelId++) + "__";
   }
 
-  public Variable lookupVar(GimpleVariableRef var) {
-    return lookupVar(var.getName());
-  }
-
-  private Variable lookupVar(String name) {
-    Variable variable = variables.get(name);
+  private Variable lookupVar(int id) {
+    Variable variable = symbolTable.get(id);
     if(variable == null) {
-      throw new IllegalArgumentException("No such variable " + name);
+      throw new IllegalArgumentException("No such variable " + id);
     }
     return variable;
   }
 
 
   public Variable lookupVar(GimpleExpr gimpleExpr) {
-    if(gimpleExpr instanceof GimpleVariableRef) {
-      return lookupVar((GimpleVariableRef)gimpleExpr);
+    if(gimpleExpr instanceof SymbolRef) {
+      return lookupVar(((SymbolRef) gimpleExpr).getId());
     } else {
       throw new UnsupportedOperationException("Expected GimpleVar, got: " + gimpleExpr + " [" + gimpleExpr.getClass().getSimpleName() + "]");
     }
   }
 
   public Collection<Variable> getVariables() {
-    return variables.values();
+    return symbolTable.values();
   }
 
   public JimpleExpr asNumericExpr(GimpleExpr gimpleExpr, JimpleType type) {
-    if(gimpleExpr instanceof GimpleVariableRef) {
-      Variable variable = lookupVar((GimpleVariableRef)gimpleExpr);
+    if(gimpleExpr instanceof SymbolRef) {
+      Variable variable = lookupVar(gimpleExpr);
       return variable.asPrimitiveExpr(type);
     } else if (gimpleExpr instanceof GimpleConstant) {
       return asConstant(((GimpleConstant) gimpleExpr).getValue(), type);

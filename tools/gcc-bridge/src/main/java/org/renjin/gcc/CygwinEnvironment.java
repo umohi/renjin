@@ -11,7 +11,6 @@ import com.google.common.collect.Maps;
 public class CygwinEnvironment extends GccEnvironment {
 
   private String cygwinRoot = "c:\\cygwin";
-  private String cygdriveRoot = "c:\\cygdrive\\";
   private String tempFolderName;
   
   public CygwinEnvironment() {
