@@ -7,16 +7,15 @@ import org.renjin.gcc.translate.FunctionContext;
 
 /**
  * Marshalls a String literal to java.lang.String
- *
+ * 
  */
 public class StringConstantToStringMarshaller extends ParamMarshaller {
 
   @Override
-  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr,
-      CallParam param) {
-    if(expr instanceof GimpleConstant) {
+  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param) {
+    if (expr instanceof GimpleConstant) {
       Object value = ((GimpleConstant) expr).getValue();
-      if(value instanceof String && isStringParam(param)) {
+      if (value instanceof String && isStringParam(param)) {
         return JimpleExpr.stringLiteral((String) value);
       }
     }
@@ -24,11 +23,9 @@ public class StringConstantToStringMarshaller extends ParamMarshaller {
   }
 
   private boolean isStringParam(CallParam param) {
-    return param instanceof JvmObjectCallParam &&
-        ((JvmObjectCallParam) param).getParamClass().isAssignableFrom(String.class);
-    
+    return param instanceof JvmObjectCallParam
+        && ((JvmObjectCallParam) param).getParamClass().isAssignableFrom(String.class);
+
   }
 
-  
-  
 }

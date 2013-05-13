@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.var;
 
-
 import java.util.List;
 
 import org.renjin.gcc.gimple.GimpleOp;
@@ -27,9 +26,9 @@ public class StructVar extends Variable {
 
     context.getBuilder().addVarDecl(struct.getJimpleType(), jimpleName);
     context.getBuilder().addStatement(jimpleName + " = new " + struct.getJimpleType());
-    context.getBuilder().addStatement("specialinvoke " + jimpleName + ".<" + struct.getJimpleType() + ": void <init>()>()");
+    context.getBuilder().addStatement(
+        "specialinvoke " + jimpleName + ".<" + struct.getJimpleType() + ": void <init>()>()");
   }
-
 
   @Override
   public void assign(GimpleOp op, List<GimpleExpr> operands) {
@@ -38,7 +37,7 @@ public class StructVar extends Variable {
 
   @Override
   public void assignMember(String member, GimpleOp operator, List<GimpleExpr> operands) {
-    switch(operator) {
+    switch (operator) {
     case REAL_CST:
       doAssign(member, JimpleExpr.doubleConstant(operands.get(0)));
       break;
@@ -65,7 +64,6 @@ public class StructVar extends Variable {
   public JimpleExpr wrapPointer() {
     return new JimpleExpr(jimpleName);
   }
-
 
   @Override
   public JimpleExpr returnExpr() {

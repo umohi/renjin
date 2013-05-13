@@ -1,6 +1,5 @@
- package org.renjin.gcc.translate.call;
+package org.renjin.gcc.translate.call;
 
 public class UnmarshallUnsupported extends RuntimeException {
-  
 
 }

@@ -1,6 +1,5 @@
 package org.renjin.gcc;
 
-
 public class RStubs {
 
   public static double R_NaN = 0;

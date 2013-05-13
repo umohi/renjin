@@ -5,5 +5,5 @@ public class CallingConvention {
   public String mangleFunctionName(String declaredFunctionName) {
     return declaredFunctionName;
   }
-  
+
 }

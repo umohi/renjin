@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate;
 
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.renjin.gcc.gimple.type.FunctionPointerType;
@@ -10,7 +9,6 @@ import org.renjin.gcc.translate.call.MethodRef;
 
 import java.util.List;
 import java.util.Set;
-
 
 public class FunPtrTable {
 
@@ -28,14 +26,14 @@ public class FunPtrTable {
   public FunSignature signature(FunctionPointerType type) {
     JimpleType returnType = context.resolveType(type.getReturnType()).returnType();
     List<JimpleType> paramTypes = Lists.newArrayList();
-    for(GimpleType paramType : type.getArguments()) {
+    for (GimpleType paramType : type.getArguments()) {
       paramTypes.add(context.resolveType(paramType).paramType());
     }
     return new FunSignature(returnType, paramTypes);
   }
 
   private String getInterfaceName(FunSignature signature) {
-    if(!interfaces.contains(signature)) {
+    if (!interfaces.contains(signature)) {
       addInterface(signature);
     }
     return PACKAGE_NAME + "." + signature.interfaceName();
@@ -63,9 +61,9 @@ public class FunPtrTable {
     applyMethod.setReturnType(signature.getReturnType());
 
     int paramIndex = 0;
-    for(JimpleType paramType : signature.getParameterTypes()) {
+    for (JimpleType paramType : signature.getParameterTypes()) {
       applyMethod.addParameter(paramType, "p" + paramIndex);
-      paramIndex ++;
+      paramIndex++;
     }
 
     interfaces.add(signature);
@@ -74,7 +72,7 @@ public class FunPtrTable {
   public String getInvokerClassName(MethodRef method) {
     String invokerName = invokerName(method);
 
-    if(!invokers.contains(method)) {
+    if (!invokers.contains(method)) {
 
       JimpleClassBuilder invokerClass = context.getJimpleOutput().newClass();
       invokerClass.setClassName(invokerName);
@@ -86,24 +84,22 @@ public class FunPtrTable {
       applyMethod.setReturnType(method.getReturnType());
 
       int paramIndex = 0;
-      for(JimpleType type : method.getParameterTypes()) {
+      for (JimpleType type : method.getParameterTypes()) {
         applyMethod.addParameter(type, "p" + paramIndex);
         paramIndex++;
       }
 
       StringBuilder call = new StringBuilder();
-      call.append("staticinvoke ")
-          .append(method.signature())
-          .append("(");
-      for(paramIndex=0;paramIndex!=method.getParameterTypes().size();++paramIndex) {
-        if(paramIndex > 0) {
+      call.append("staticinvoke ").append(method.signature()).append("(");
+      for (paramIndex = 0; paramIndex != method.getParameterTypes().size(); ++paramIndex) {
+        if (paramIndex > 0) {
           call.append(", ");
         }
         call.append("p").append(paramIndex);
       }
       call.append(")");
 
-      if(method.getReturnType().toString().equals("void")) {
+      if (method.getReturnType().toString().equals("void")) {
         applyMethod.addStatement(call.toString());
         applyMethod.addStatement("return");
       } else {

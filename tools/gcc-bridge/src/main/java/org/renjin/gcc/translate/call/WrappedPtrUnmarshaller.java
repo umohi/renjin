@@ -11,17 +11,14 @@ import org.renjin.gcc.translate.var.Variable;
 
 public class WrappedPtrUnmarshaller extends CallUnmarshaller {
 
-  
-  
   @Override
-  public boolean unmarshall(FunctionContext context, GimpleLValue lhs,
-      JimpleType returnType, JimpleExpr callExpr) {
-    
-    if(lhs instanceof GimpleVariableRef) {
+  public boolean unmarshall(FunctionContext context, GimpleLValue lhs, JimpleType returnType, JimpleExpr callExpr) {
+
+    if (lhs instanceof GimpleVariableRef) {
       Variable var = context.lookupVar(lhs);
-      if(var instanceof PrimitivePtrVar) {
+      if (var instanceof PrimitivePtrVar) {
         PrimitivePtrVar ptrVar = (PrimitivePtrVar) var;
-        if(returnType.isPointerWrapper()) {
+        if (returnType.isPointerWrapper()) {
           String temp = context.getBuilder().addTempVarDecl(returnType);
           context.getBuilder().addStatement(temp + " = " + callExpr);
           ptrVar.assignFromWrapper(new JimpleExpr(temp));
@@ -30,19 +27,19 @@ public class WrappedPtrUnmarshaller extends CallUnmarshaller {
       }
     }
     return false;
-    
+
   }
 
   public boolean accept(FunctionContext context, GimpleExpr lhs, MethodRef method) {
-    if( ! (lhs instanceof GimpleVariableRef) ) {
+    if (!(lhs instanceof GimpleVariableRef)) {
       return false;
     }
     Variable var = context.lookupVar(lhs);
     return var instanceof PrimitivePtrVar && method.getReturnType().isPointerWrapper();
   }
-  
+
   public void unmarshall() {
-    
+
   }
-  
+
 }

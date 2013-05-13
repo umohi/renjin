@@ -1,6 +1,5 @@
 package org.renjin.gcc.jimple;
 
-
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -13,7 +12,7 @@ public abstract class AbstractClassBuilder {
   private final List<JimpleMethodBuilder> methods = Lists.newArrayList();
 
   public String getFqcn() {
-    if(packageName == null) {
+    if (packageName == null) {
       return className;
     } else {
       return packageName + "." + className;
@@ -47,7 +46,6 @@ public abstract class AbstractClassBuilder {
     fields.add(field);
     return field;
   }
-
 
   public List<JimpleFieldBuilder> getFields() {
     return fields;

@@ -18,63 +18,60 @@ import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import com.google.common.collect.Maps;
 
 /**
- * Finds all variables which are addressed (&x or x[0]) within a function
- * body. 
- *
+ * Finds all variables which are addressed (&x or x[0]) within a function body.
+ * 
  */
 public class VarUsageInspector extends GimpleVisitor {
 
   private Map<String, VarUsage> usageMap = Maps.newHashMap();
-  
+
   public VarUsageInspector(GimpleFunction fn) {
     fn.visitIns(this);
   }
-  
+
   private VarUsage getUsage(String var) {
     VarUsage usage = usageMap.get(var);
-    if(usage == null) {
+    if (usage == null) {
       usage = new VarUsage();
       usageMap.put(var, usage);
     }
     return usage;
   }
-  
 
   public VarUsage getUsage(GimpleParameter param) {
     return getUsage(param.getName());
   }
-  
+
   public VarUsage getUsage(GimpleVariableRef var) {
     return getUsage(var.getName());
   }
-  
+
   public VarUsage getUsage(GimpleVarDecl var) {
     return getUsage(var.getName());
   }
-    
+
   private VarUsage getUsage(GimpleExpr var) {
-    return getUsage((GimpleVariableRef)var);
+    return getUsage((GimpleVariableRef) var);
   }
-  
+
   private void visitOperand(GimpleExpr expr) {
-    if(expr instanceof GimpleAddressOf) {
+    if (expr instanceof GimpleAddressOf) {
       visitAddressOf((GimpleAddressOf) expr);
     }
   }
 
   private void visitAddressOf(GimpleAddressOf expr) {
-    if(expr.getValue() instanceof GimpleVariableRef) {
+    if (expr.getValue() instanceof GimpleVariableRef) {
       getUsage(expr.getValue()).setAddressed(true);
     }
   }
 
-
   private void visitOperands(List<GimpleExpr> expressions) {
-    for(GimpleExpr expr : expressions) {
+    for (GimpleExpr expr : expressions) {
       visitOperand(expr);
     }
-  }  
-  
+  }
+
   @Override
   public void visitAssignment(GimpleAssign assignment) {
     visitOperands(assignment.getOperands());
@@ -94,6 +91,5 @@ public class VarUsageInspector extends GimpleVisitor {
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
     visitOperand(gimpleSwitch.getExpr());
   }
-
 
 }

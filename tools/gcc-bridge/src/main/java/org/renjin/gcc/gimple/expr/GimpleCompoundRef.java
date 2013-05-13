@@ -1,6 +1,5 @@
 package org.renjin.gcc.gimple.expr;
 
-
 public class GimpleCompoundRef extends GimpleLValue {
 
   private final GimpleVariableRef var;

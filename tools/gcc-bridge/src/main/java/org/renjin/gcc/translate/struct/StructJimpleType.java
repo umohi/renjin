@@ -4,8 +4,8 @@ import org.renjin.gcc.jimple.JimpleType;
 
 /**
  * 
- * Reference to a JVM class that will be constructed
- * for a struct, but does not yet exist.
+ * Reference to a JVM class that will be constructed for a struct, but does not
+ * yet exist.
  */
 public class StructJimpleType extends JimpleType {
 
@@ -15,10 +15,10 @@ public class StructJimpleType extends JimpleType {
     super();
     this.fqcn = fqcn;
   }
-  
+
   @Override
   public String toString() {
     return fqcn;
   }
-  
+
 }

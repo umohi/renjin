@@ -11,21 +11,20 @@ import org.renjin.gcc.translate.var.Variable;
 public class StructPtrMarshaller extends ParamMarshaller {
 
   @Override
-  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr,
-      CallParam param) {
-   
-    if(expr instanceof GimpleAddressOf) {
+  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param) {
+
+    if (expr instanceof GimpleAddressOf) {
       GimpleExpr innerValue = ((GimpleAddressOf) expr).getValue();
-      if(innerValue instanceof GimpleVariableRef) {
+      if (innerValue instanceof GimpleVariableRef) {
         Variable var = context.lookupVar(innerValue);
-        if(var instanceof StructVar) {
+        if (var instanceof StructVar) {
           StructVar structVar = (StructVar) var;
           return structVar.wrapPointer();
         }
       }
     }
     throw new CannotMarshallException();
- 
+
   }
 
 }

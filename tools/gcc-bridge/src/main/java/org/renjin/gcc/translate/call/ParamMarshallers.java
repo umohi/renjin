@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 public class ParamMarshallers {
 
   private List<ParamMarshaller> marshallers = Lists.newArrayList();
-  
+
   public ParamMarshallers() {
     marshallers.add(new PrimitiveParamMarshaller());
     marshallers.add(new WrappedPtrParamMarshaller());
@@ -20,17 +20,17 @@ public class ParamMarshallers {
     marshallers.add(new StringConstantToCharPtrMarshaller());
     marshallers.add(new StructPtrMarshaller());
   }
-  
+
   public JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param) {
-    for(ParamMarshaller marshaller : marshallers) {
+    for (ParamMarshaller marshaller : marshallers) {
       try {
         return marshaller.marshall(context, expr, param);
-      } catch(CannotMarshallException e) {
+      } catch (CannotMarshallException e) {
         continue;
       }
     }
-    throw new UnsupportedOperationException(String.format(
-        "Unsupported parameter marshalling: [%s: %s] => [%s]", expr.toString(), expr.getClass().getSimpleName(), param.toString()));
+    throw new UnsupportedOperationException(String.format("Unsupported parameter marshalling: [%s: %s] => [%s]",
+        expr.toString(), expr.getClass().getSimpleName(), param.toString()));
   }
-  
+
 }

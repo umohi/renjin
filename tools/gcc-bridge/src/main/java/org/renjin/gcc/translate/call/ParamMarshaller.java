@@ -7,5 +7,5 @@ import org.renjin.gcc.translate.FunctionContext;
 public abstract class ParamMarshaller {
 
   public abstract JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param);
-  
+
 }

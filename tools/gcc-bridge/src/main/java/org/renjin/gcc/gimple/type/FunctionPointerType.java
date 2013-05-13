@@ -1,6 +1,5 @@
 package org.renjin.gcc.gimple.type;
 
-
 import com.google.common.base.Joiner;
 
 import java.util.Collections;
@@ -31,13 +30,17 @@ public class FunctionPointerType implements GimpleType {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     FunctionPointerType that = (FunctionPointerType) o;
 
-    if (!arguments.equals(that.arguments)) return false;
-    if (!returnType.equals(that.returnType)) return false;
+    if (!arguments.equals(that.arguments))
+      return false;
+    if (!returnType.equals(that.returnType))
+      return false;
 
     return true;
   }

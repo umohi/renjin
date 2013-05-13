@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate;
 
-
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.call.CallParam;
@@ -36,33 +35,33 @@ public class FunSignature {
   }
 
   private GccFunction methodRef() {
-    return new GccFunction(FunPtrTable.PACKAGE_NAME + "." + interfaceName(), "apply", getReturnType(), getParameterTypes());
+    return new GccFunction(FunPtrTable.PACKAGE_NAME + "." + interfaceName(), "apply", getReturnType(),
+        getParameterTypes());
   }
-
 
   public List<CallParam> getParams() {
     return methodRef().getParams();
   }
-  
+
   public String interfaceName() {
     StringBuilder sb = new StringBuilder("FunPtr");
     sb.append(typeAbbrev(returnType));
-    for(JimpleType paramType : parameterTypes) {
+    for (JimpleType paramType : parameterTypes) {
       sb.append(typeAbbrev(paramType));
     }
     return sb.toString();
   }
 
   private String typeAbbrev(JimpleType type) {
-    if(type.toString().equals("double")) {
+    if (type.toString().equals("double")) {
       return "D";
-    } else if(type.toString().equals("int")) {
+    } else if (type.toString().equals("int")) {
       return "I";
-    } else if(type.toString().equals("void")) {
+    } else if (type.toString().equals("void")) {
       return "V";
-    } else if(type.toString().equals("org.renjin.gcc.runtime.DoublePtr")) {
+    } else if (type.toString().equals("org.renjin.gcc.runtime.DoublePtr")) {
       return "d";
-    } else if(type.toString().equals("org.renjin.gcc.runtime.Ptr")) {
+    } else if (type.toString().equals("org.renjin.gcc.runtime.Ptr")) {
       return "v";
     } else {
       throw new UnsupportedOperationException(type.toString());
@@ -71,13 +70,17 @@ public class FunSignature {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     FunSignature that = (FunSignature) o;
 
-    if (!parameterTypes.equals(that.parameterTypes)) return false;
-    if (!returnType.equals(that.returnType)) return false;
+    if (!parameterTypes.equals(that.parameterTypes))
+      return false;
+    if (!returnType.equals(that.returnType))
+      return false;
 
     return true;
   }

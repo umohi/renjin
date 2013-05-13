@@ -22,7 +22,7 @@ public class JimpleClassBuilder extends AbstractClassBuilder {
     w.println("public class " + getFqcn() + " extends java.lang.Object" + implementsText());
     w.startBlock();
 
-    for(JimpleFieldBuilder field : getFields()) {
+    for (JimpleFieldBuilder field : getFields()) {
       field.write(w);
     }
 
@@ -34,7 +34,7 @@ public class JimpleClassBuilder extends AbstractClassBuilder {
     w.println("return;");
     w.closeBlock();
 
-    for(JimpleMethodBuilder method : getMethods()) {
+    for (JimpleMethodBuilder method : getMethods()) {
       w.println();
       method.write(w);
     }
@@ -43,13 +43,13 @@ public class JimpleClassBuilder extends AbstractClassBuilder {
   }
 
   private String implementsText() {
-    if(interfaces.isEmpty()) {
+    if (interfaces.isEmpty()) {
       return "";
     } else {
       StringBuilder sb = new StringBuilder(" implements ");
       boolean needsComma = false;
-      for(String interfaceName : interfaces) {
-        if(needsComma) {
+      for (String interfaceName : interfaces) {
+        if (needsComma) {
           sb.append(", ");
         }
         sb.append(interfaceName);
@@ -61,6 +61,5 @@ public class JimpleClassBuilder extends AbstractClassBuilder {
   public JimpleOutput getOutput() {
     return output;
   }
-
 
 }

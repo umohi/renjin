@@ -13,7 +13,6 @@ import org.renjin.gcc.translate.var.StructPtrVar;
 import org.renjin.gcc.translate.var.StructVar;
 import org.renjin.gcc.translate.var.Variable;
 
-
 public class StructTypeTranslator extends TypeTranslator {
 
   private GimpleStructType structType;
@@ -21,10 +20,10 @@ public class StructTypeTranslator extends TypeTranslator {
   private Struct struct;
 
   public StructTypeTranslator(TranslationContext translationContext, GimpleType type) {
-    if(type instanceof PointerType) {
+    if (type instanceof PointerType) {
       this.structType = (GimpleStructType) ((PointerType) type).getBaseType();
       this.pointer = true;
-    } else if(type instanceof GimpleStructType) {
+    } else if (type instanceof GimpleStructType) {
       this.structType = (GimpleStructType) type;
       this.pointer = false;
     } else {
@@ -46,7 +45,7 @@ public class StructTypeTranslator extends TypeTranslator {
 
   @Override
   public Variable createLocalVariable(FunctionContext functionContext, String gimpleName, VarUsage usage) {
-    if(pointer) {
+    if (pointer) {
       return new StructPtrVar(functionContext, gimpleName, struct);
     } else {
       return new StructVar(functionContext, gimpleName, struct);

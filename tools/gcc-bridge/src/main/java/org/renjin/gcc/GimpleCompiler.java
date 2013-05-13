@@ -36,7 +36,7 @@ public class GimpleCompiler {
   public void setPackageName(String name) {
     this.packageName = name;
   }
-  
+
   public void setJimpleOutputDirectory(File directory) {
     this.jimpleOutputDirectory = directory;
   }
@@ -50,7 +50,7 @@ public class GimpleCompiler {
   }
 
   public MethodTable getMethodTable() {
-    return methodTable; 
+    return methodTable;
   }
 
   public void compile(List<GimpleFunction> functions) throws Exception {
@@ -72,14 +72,14 @@ public class GimpleCompiler {
   public void setVerbose(boolean verbose) {
     this.verbose = verbose;
   }
-  
+
   public void addSootClassPaths(List<File> classPaths) {
     this.classPaths.addAll(classPaths);
   }
 
   private void compileJimple(Set<String> classNames) throws IOException, InterruptedException {
     List<String> options = Lists.newArrayList();
-    if(verbose) {
+    if (verbose) {
       options.add("-v");
     }
     options.add("-pp");
@@ -95,20 +95,20 @@ public class GimpleCompiler {
     LOGGER.info("Running Soot " + Joiner.on(" ").join(options));
 
     soot.G.reset();
-    soot.Main.main(options.toArray(new String[0]));  }
+    soot.Main.main(options.toArray(new String[0]));
+  }
 
   private String sootClassPath() {
     StringBuilder paths = new StringBuilder();
     paths.append(jimpleOutputDirectory.getAbsolutePath());
-    for(File path : classPaths) {
+    for (File path : classPaths) {
       paths.append(File.pathSeparatorChar);
       paths.append(path.getAbsolutePath());
     }
     return paths.toString();
   }
 
-  protected JimpleOutput translate(List<GimpleFunction> functions)
-      throws IOException {
+  protected JimpleOutput translate(List<GimpleFunction> functions) throws IOException {
 
     JimpleOutput jimple = new JimpleOutput();
 
@@ -117,7 +117,7 @@ public class GimpleCompiler {
     mainClass.setPackageName(packageName);
 
     TranslationContext context = new TranslationContext(mainClass, methodTable, functions);
-    for(GimpleFunction function : functions) {
+    for (GimpleFunction function : functions) {
       FunctionTranslator translator = new FunctionTranslator(context);
       translator.translate(function);
     }
@@ -127,6 +127,5 @@ public class GimpleCompiler {
   private File getPackageFolder() {
     return new File(outputDirectory, packageName.replace('.', File.separatorChar));
   }
-
 
 }

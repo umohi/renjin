@@ -20,27 +20,27 @@ public class CallTranslator {
 
   private ParamMarshallers paramMarshallers = new ParamMarshallers();
   private CallUnmarshallers callUnmarshallers = new CallUnmarshallers();
-  
+
   private List<CallUnmarshaller> returnUnmarshallers;
   private FunctionContext context;
   private GimpleCall call;
-  
+
   public CallTranslator(FunctionContext context, GimpleCall call) {
     this.context = context;
     this.call = call;
-    
+
     returnUnmarshallers = Lists.newArrayList();
     returnUnmarshallers.add(new WrappedPtrUnmarshaller());
   }
-  
+
   public void translate() {
     GimpleExpr functionExpr = call.getFunction();
-    if(functionExpr instanceof GimpleExternal) {
+    if (functionExpr instanceof GimpleExternal) {
       translateStaticCall();
-      
-    } else if(functionExpr instanceof GimpleVariableRef) {
-      translateFunctionPointerCall();    
-    
+
+    } else if (functionExpr instanceof GimpleVariableRef) {
+      translateFunctionPointerCall();
+
     } else {
       throw new UnsupportedOperationException(functionExpr.toString());
     }
@@ -49,35 +49,33 @@ public class CallTranslator {
   private void translateStaticCall() {
     MethodRef method = context.resolveMethod(call);
     JimpleExpr callExpr = composeCallExpr(method);
-    
+
     callUnmarshallers.unmarshall(context, call.getLhs(), method.getReturnType(), callExpr);
   }
-  
 
   private void translateFunctionPointerCall() {
     FunSignature funPtr = getFunPtrInterface();
     FunPtrVar var = getFunPtrVar();
-   
+
     StringBuilder expr = new StringBuilder();
-    expr.append("interfaceinvoke ").append(var.getJimpleVariable()).append(".")
-      .append(funPtr.jimpleSignature());
-    
+    expr.append("interfaceinvoke ").append(var.getJimpleVariable()).append(".").append(funPtr.jimpleSignature());
+
     marshalParamList(expr, funPtr.getParams());
-    
-    callUnmarshallers.unmarshall(context, call.getLhs(), funPtr.getReturnType(), new JimpleExpr(expr.toString())); 
+
+    callUnmarshallers.unmarshall(context, call.getLhs(), funPtr.getReturnType(), new JimpleExpr(expr.toString()));
   }
 
   private FunPtrVar getFunPtrVar() {
     Variable var = context.lookupVar(call.getFunction());
-    if(!(var instanceof FunPtrVar)) {
+    if (!(var instanceof FunPtrVar)) {
       throw new UnsupportedOperationException("Function value must be a FunPtrVar, got: " + var);
     }
-    return (FunPtrVar)var;
+    return (FunPtrVar) var;
   }
 
   private FunSignature getFunPtrInterface() {
     GimpleType type = context.getGimpleVariableType(call.getFunction());
-    if(!(type instanceof FunctionPointerType)) {
+    if (!(type instanceof FunctionPointerType)) {
       throw new UnsupportedOperationException("Function value must be of type FunctionPointer, got: " + type);
     }
     return context.getTranslationContext().getFunctionPointerMethod((FunctionPointerType) type);
@@ -90,12 +88,11 @@ public class CallTranslator {
     return new JimpleExpr(callExpr.toString());
   }
 
-  private void marshalParamList(StringBuilder callExpr,
-      List<CallParam> params) {
+  private void marshalParamList(StringBuilder callExpr, List<CallParam> params) {
     callExpr.append("(");
     boolean needsComma = false;
-    for(JimpleExpr param : marshallParams(params)) {
-      if(needsComma) {
+    for (JimpleExpr param : marshallParams(params)) {
+      if (needsComma) {
         callExpr.append(", ");
       }
       callExpr.append(param.toString());
@@ -106,10 +103,10 @@ public class CallTranslator {
 
   private List<JimpleExpr> marshallParams(List<CallParam> callParams) {
     List<JimpleExpr> exprs = Lists.newArrayList();
-    for(int i=0;i!=call.getParamCount();++i) {
+    for (int i = 0; i != call.getParamCount(); ++i) {
       exprs.add(paramMarshallers.marshall(context, call.getArguments().get(i), callParams.get(i)));
     }
     return exprs;
   }
- 
+
 }

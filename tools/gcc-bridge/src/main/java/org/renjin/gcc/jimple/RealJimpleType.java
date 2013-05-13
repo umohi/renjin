@@ -7,9 +7,9 @@ import org.renjin.gcc.runtime.Ptr;
 public class RealJimpleType extends JimpleType {
 
   private final Class clazz;
-  
+
   public RealJimpleType(Type type) {
-    if(type instanceof Class) {
+    if (type instanceof Class) {
       this.clazz = ((Class) type);
     } else {
       throw new UnsupportedOperationException(type.toString());
@@ -24,14 +24,12 @@ public class RealJimpleType extends JimpleType {
   public boolean isPointerWrapper() {
     return Ptr.class.isAssignableFrom(clazz);
   }
-  
-  
 
   @Override
   public Class asPrimitiveClass() {
-    if(!clazz.isPrimitive()) {
+    if (!clazz.isPrimitive()) {
       throw new UnsupportedOperationException();
-    } 
+    }
     return clazz;
   }
 
@@ -40,13 +38,11 @@ public class RealJimpleType extends JimpleType {
     return clazz.isPrimitive();
   }
 
-  
-  
   @Override
   public boolean isFunctionPointer() {
     return clazz.getClass().getName().startsWith("org.renjin.gcc.runtime.FunPtr");
   }
-  
+
   @Override
   public boolean isAssignableFrom(Class otherClass) {
     return clazz.isAssignableFrom(otherClass);
@@ -54,7 +50,7 @@ public class RealJimpleType extends JimpleType {
 
   @Override
   public String toString() {
-    if(clazz.isArray()) {
+    if (clazz.isArray()) {
       RealJimpleType componentType = new RealJimpleType(clazz.getComponentType());
       return componentType + "[]";
     } else {

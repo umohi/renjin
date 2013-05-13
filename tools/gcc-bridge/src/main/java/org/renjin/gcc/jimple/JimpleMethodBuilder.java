@@ -17,7 +17,7 @@ public class JimpleMethodBuilder {
   private List<JimpleParam> params = Lists.newArrayList();
   private List<JimpleBodyElement> body = Lists.newArrayList();
   private Set<JimpleModifiers> modifiers = Sets.newHashSet(JimpleModifiers.PUBLIC);
-  
+
   private int nextTempIndex = 1;
 
   JimpleMethodBuilder(AbstractClassBuilder classBuilder) {
@@ -77,21 +77,21 @@ public class JimpleMethodBuilder {
   }
 
   public void write(JimpleWriter w) {
-    if(modifiers.contains(JimpleModifiers.ABSTRACT)) {
+    if (modifiers.contains(JimpleModifiers.ABSTRACT)) {
       w.println(modifierList() + " " + returnType + " " + name + "(" + paramList() + ");");
     } else {
       w.println(modifierList() + " " + returnType + " " + name + "(" + paramList() + ")");
       w.startBlock();
 
-      for(JimpleVarDecl decl : varDecls) {
+      for (JimpleVarDecl decl : varDecls) {
         w.println(decl.toString() + ";");
       }
 
-      for(int i=0;i!=params.size();++i) {
+      for (int i = 0; i != params.size(); ++i) {
         w.println(params.get(i).getName() + " := @parameter" + i + ": " + params.get(i).getType() + ";");
       }
 
-      for(JimpleBodyElement bodyElement : body) {
+      for (JimpleBodyElement bodyElement : body) {
         bodyElement.write(w);
       }
 
@@ -101,8 +101,8 @@ public class JimpleMethodBuilder {
 
   private String paramList() {
     StringBuilder sb = new StringBuilder();
-    for(JimpleParam param : params) {
-      if(sb.length() > 0) {
+    for (JimpleParam param : params) {
+      if (sb.length() > 0) {
         sb.append(", ");
       }
       sb.append(param.getType());
@@ -112,13 +112,10 @@ public class JimpleMethodBuilder {
 
   private String modifierList() {
     StringBuilder sb = new StringBuilder();
-    JimpleModifiers order[] = new JimpleModifiers[] {
-            JimpleModifiers.PUBLIC,
-            JimpleModifiers.STATIC,
-            JimpleModifiers.ABSTRACT
-    };
-    for(JimpleModifiers modifier : order) {
-      if(this.modifiers.contains(modifier)) {
+    JimpleModifiers order[] = new JimpleModifiers[] { JimpleModifiers.PUBLIC, JimpleModifiers.STATIC,
+        JimpleModifiers.ABSTRACT };
+    for (JimpleModifiers modifier : order) {
+      if (this.modifiers.contains(modifier)) {
         sb.append(" ").append(modifier.name().toLowerCase());
       }
     }

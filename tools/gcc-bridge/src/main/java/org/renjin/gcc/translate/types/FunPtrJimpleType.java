@@ -10,19 +10,15 @@ public class FunPtrJimpleType extends JimpleType {
     super();
     this.fcqn = fcqn;
   }
-  
-  
-  
+
   @Override
   public boolean isFunctionPointer() {
     return true;
   }
 
-
-
   @Override
   public String toString() {
     return fcqn;
   }
-  
+
 }

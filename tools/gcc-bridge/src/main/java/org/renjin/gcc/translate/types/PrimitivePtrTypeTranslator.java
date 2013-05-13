@@ -12,14 +12,13 @@ import org.renjin.gcc.translate.VarUsage;
 import org.renjin.gcc.translate.var.PrimitivePtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
-
 public class PrimitivePtrTypeTranslator extends TypeTranslator {
 
   private JimpleType wrapperClass;
   private PrimitiveType primitiveType;
 
   public PrimitivePtrTypeTranslator(PointerType type) {
-    this.primitiveType = (PrimitiveType)type.getBaseType();
+    this.primitiveType = (PrimitiveType) type.getBaseType();
     this.wrapperClass = PrimitiveTypes.getWrapperType(primitiveType);
   }
 

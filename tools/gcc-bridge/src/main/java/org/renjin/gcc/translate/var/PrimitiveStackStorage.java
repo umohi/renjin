@@ -8,7 +8,7 @@ import org.renjin.gcc.translate.types.PrimitiveTypes;
 
 /**
  * Writes jimple instructions to store and retrieve a single primitive numeric
- * value in a local JVM variable, allocated on the stack. 
+ * value in a local JVM variable, allocated on the stack.
  */
 public class PrimitiveStackStorage implements PrimitiveStorage {
 
@@ -18,13 +18,13 @@ public class PrimitiveStackStorage implements PrimitiveStorage {
   public PrimitiveStackStorage(FunctionContext context, PrimitiveType type, String gimpleName) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
-    
+
     context.getBuilder().addVarDecl(PrimitiveTypes.get(type), jimpleName);
   }
 
   @Override
   public void assign(JimpleExpr expr) {
-    context.getBuilder().addStatement(jimpleName + " = " + expr);    
+    context.getBuilder().addStatement(jimpleName + " = " + expr);
   }
 
   @Override

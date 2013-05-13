@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.types;
 
-
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
@@ -33,11 +32,10 @@ public class PrimitiveTypeTranslator extends TypeTranslator {
     return PrimitiveTypes.get(type);
   }
 
-
   @Override
   public Variable createLocalVariable(FunctionContext functionContext, String gimpleName, VarUsage usage) {
     PrimitiveStorage storage;
-    if(usage.isAddressed()) {
+    if (usage.isAddressed()) {
       storage = new PrimitiveHeapStorage(functionContext, type, gimpleName);
     } else {
       storage = new PrimitiveStackStorage(functionContext, type, gimpleName);

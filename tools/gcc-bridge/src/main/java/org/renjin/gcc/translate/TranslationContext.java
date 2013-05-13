@@ -29,7 +29,6 @@ import org.renjin.gcc.translate.types.TypeTranslator;
 
 import com.google.common.collect.Lists;
 
-
 public class TranslationContext {
   private JimpleClassBuilder mainClass;
   private MethodTable methodTable;
@@ -51,17 +50,16 @@ public class TranslationContext {
 
   public MethodRef resolveMethod(String name) {
     MethodRef ref = resolveInternally(name);
-    if(ref != null) {
+    if (ref != null) {
       return ref;
     }
     return methodTable.resolve(name);
   }
 
-
   public MethodRef resolveMethod(GimpleCall call, CallingConvention callingConvention) {
 
     String methodName;
-    if(call.getFunction() instanceof GimpleExternal) {
+    if (call.getFunction() instanceof GimpleExternal) {
       methodName = ((GimpleExternal) call.getFunction()).getName();
     } else {
       throw new UnsupportedOperationException(call.toString());
@@ -70,8 +68,8 @@ public class TranslationContext {
   }
 
   private MethodRef resolveInternally(String name) {
-    for(GimpleFunction function : functions) {
-      if(function.getName().equals(name)) {
+    for (GimpleFunction function : functions) {
+      if (function.getName().equals(name)) {
         return asRef(function);
       }
     }
@@ -81,7 +79,7 @@ public class TranslationContext {
   private MethodRef asRef(GimpleFunction function) {
     JimpleType returnType = resolveType(function.getReturnType()).returnType();
     List<JimpleType> paramTypes = Lists.newArrayList();
-    for(GimpleParameter param : function.getParameters()) {
+    for (GimpleParameter param : function.getParameters()) {
       paramTypes.add(resolveType(param.getType()).paramType());
     }
     return new GccFunction(mainClass.getFqcn(), function.getName(), returnType, paramTypes);
@@ -92,15 +90,15 @@ public class TranslationContext {
   }
 
   public TypeTranslator resolveType(GimpleType type) {
-    if(type instanceof PrimitiveType) {
+    if (type instanceof PrimitiveType) {
       return new PrimitiveTypeTranslator((PrimitiveType) type);
-    } else if(type instanceof PointerType && ((PointerType) type).getBaseType() instanceof PrimitiveType) {
+    } else if (type instanceof PointerType && ((PointerType) type).getBaseType() instanceof PrimitiveType) {
       return new PrimitivePtrTypeTranslator((PointerType) type);
-    } else if(type instanceof PointerType && ((PointerType) type).getBaseType() instanceof GimpleStructType) {
+    } else if (type instanceof PointerType && ((PointerType) type).getBaseType() instanceof GimpleStructType) {
       return new StructTypeTranslator(this, type);
-    } else if(type instanceof FunctionPointerType) {
-      return new FunPtrTranslator(this, (FunctionPointerType)type);
-    } else if(type instanceof GimpleStructType) {
+    } else if (type instanceof FunctionPointerType) {
+      return new FunPtrTranslator(this, (FunctionPointerType) type);
+    } else if (type instanceof GimpleStructType) {
       return new StructTypeTranslator(this, type);
     } else {
       throw new UnsupportedOperationException(type.toString());

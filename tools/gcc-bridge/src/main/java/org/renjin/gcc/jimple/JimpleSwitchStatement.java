@@ -1,6 +1,5 @@
 package org.renjin.gcc.jimple;
 
-
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -38,11 +37,11 @@ public class JimpleSwitchStatement extends JimpleBodyElement {
   public void write(JimpleWriter w) {
     w.println("lookupswitch(" + switchExpr + ")");
     w.startBlock();
-    for(Branch branch : branches) {
-      if(branch.isDefault()) {
+    for (Branch branch : branches) {
+      if (branch.isDefault()) {
         w.println("default: goto " + branch.target + ";");
       } else {
-        w.println("case " + branch.value + ": goto " + branch.target + ";") ;
+        w.println("case " + branch.value + ": goto " + branch.target + ";");
       }
     }
     w.closeBlockWithSemicolon();

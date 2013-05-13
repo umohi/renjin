@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.struct;
 
-
 import com.google.common.collect.Maps;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.gimple.type.GimpleType;
@@ -11,8 +10,7 @@ import org.renjin.gcc.translate.TranslationContext;
 import java.util.Map;
 
 /**
- * Represents a "struct" that is constructed from
- * Gcc output.
+ * Represents a "struct" that is constructed from Gcc output.
  */
 public class GccStruct extends Struct {
   private TranslationContext context;
@@ -38,11 +36,11 @@ public class GccStruct extends Struct {
     // the members and types from the Gimple
 
     MemberFinder finder = new MemberFinder(name);
-    for(GimpleFunction function : context.getFunctions()) {
+    for (GimpleFunction function : context.getFunctions()) {
       finder.visit(function);
     }
 
-    for(Map.Entry<String, GimpleType> member : finder.getMembers().entrySet()) {
+    for (Map.Entry<String, GimpleType> member : finder.getMembers().entrySet()) {
       JimpleType type = context.resolveType(member.getValue()).paramType();
       types.put(member.getKey(), type);
 
@@ -55,14 +53,13 @@ public class GccStruct extends Struct {
 
   @Override
   public JimpleExpr memberRef(JimpleExpr instanceExpr, String member, JimpleType jimpleType) {
-    return new JimpleExpr(instanceExpr + ".<" + structClass.getFqcn() + ": " + types.get(member) +
-            " " + member + ">");
+    return new JimpleExpr(instanceExpr + ".<" + structClass.getFqcn() + ": " + types.get(member) + " " + member + ">");
   }
 
   @Override
   public void assignMember(FunctionContext context, JimpleExpr instance, String member, JimpleExpr jimpleExpr) {
-    context.getBuilder().addStatement(instance + ".<" + structClass.getFqcn() + ": " +
-            types.get(member) + " " + member + "> = " + jimpleExpr);
+    context.getBuilder().addStatement(
+        instance + ".<" + structClass.getFqcn() + ": " + types.get(member) + " " + member + "> = " + jimpleExpr);
   }
 
   @Override

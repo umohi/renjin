@@ -1,6 +1,5 @@
 package org.renjin.gcc.gimple;
 
-
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 
 import java.util.List;

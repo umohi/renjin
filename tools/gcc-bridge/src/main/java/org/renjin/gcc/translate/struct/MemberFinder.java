@@ -34,25 +34,25 @@ public class MemberFinder extends GimpleVisitor {
     GimpleLValue lhs = assignment.getLHS();
     GimpleExpr rhs = assignment.getOperands().get(0);
 
-    if(assignment.getOperator() == GimpleOp.COMPONENT_REF) {
-      if(structName(rhs).equals(structName)) {
+    if (assignment.getOperator() == GimpleOp.COMPONENT_REF) {
+      if (structName(rhs).equals(structName)) {
         members.put(structMember(rhs), typeFromExpr(lhs));
       }
-    } else if(lhs instanceof GimpleCompoundRef) {
-      if(structName(lhs).equals(structName)) {
+    } else if (lhs instanceof GimpleCompoundRef) {
+      if (structName(lhs).equals(structName)) {
         members.put(structMember(lhs), typeFromExpr(rhs));
       }
     }
   }
 
   private GimpleType typeFromExpr(GimpleExpr expr) {
-    if(expr instanceof GimpleVariableRef) {
+    if (expr instanceof GimpleVariableRef) {
       return function.getVariableType(((GimpleVariableRef) expr).getName());
-    } else if(expr instanceof GimpleConstant) {
+    } else if (expr instanceof GimpleConstant) {
       Object value = ((GimpleConstant) expr).getValue();
-      if(value instanceof Double) {
+      if (value instanceof Double) {
         return PrimitiveType.DOUBLE_TYPE;
-      } else if(value instanceof Integer) {
+      } else if (value instanceof Integer) {
         return PrimitiveType.INT_TYPE;
       }
     }
@@ -60,7 +60,7 @@ public class MemberFinder extends GimpleVisitor {
   }
 
   private String structName(GimpleExpr expr) {
-    if(expr instanceof GimpleCompoundRef) {
+    if (expr instanceof GimpleCompoundRef) {
       GimpleCompoundRef ref = (GimpleCompoundRef) expr;
       GimpleType type = function.getVariableType(ref.getVar().getName());
       return structName(type);
@@ -69,18 +69,17 @@ public class MemberFinder extends GimpleVisitor {
   }
 
   private String structName(GimpleType type) {
-    if(type instanceof GimpleStructType) {
+    if (type instanceof GimpleStructType) {
       return ((GimpleStructType) type).getName();
-    } else if(type instanceof PointerType) {
+    } else if (type instanceof PointerType) {
       return structName(((PointerType) type).getBaseType());
     } else {
       throw new UnsupportedOperationException(type.toString());
     }
   }
 
-
   private String structMember(GimpleExpr expr) {
-    if(expr instanceof GimpleCompoundRef) {
+    if (expr instanceof GimpleCompoundRef) {
       GimpleCompoundRef ref = (GimpleCompoundRef) expr;
       return ref.getMember();
     }

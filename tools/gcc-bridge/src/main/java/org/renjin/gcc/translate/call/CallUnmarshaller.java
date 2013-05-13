@@ -8,5 +8,5 @@ import org.renjin.gcc.translate.FunctionContext;
 public abstract class CallUnmarshaller {
 
   public abstract boolean unmarshall(FunctionContext context, GimpleLValue lhs, JimpleType type, JimpleExpr callExpr);
-  
+
 }

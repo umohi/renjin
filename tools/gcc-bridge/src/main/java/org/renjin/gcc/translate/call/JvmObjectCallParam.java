@@ -7,11 +7,11 @@ import org.renjin.gcc.jimple.JimpleType;
  */
 public class JvmObjectCallParam extends CallParam {
   private JimpleType paramClass;
-  
+
   public JvmObjectCallParam(JimpleType paramType) {
     this.paramClass = paramType;
   }
-  
+
   public JimpleType getParamClass() {
     return paramClass;
   }

@@ -35,27 +35,26 @@ public class FunctionContext {
   private int nextTempId = 0;
   private int nextLabelId = 1000;
 
-  public FunctionContext(TranslationContext translationContext,
-                         GimpleFunction gimpleFunction, JimpleMethodBuilder builder) {
+  public FunctionContext(TranslationContext translationContext, GimpleFunction gimpleFunction,
+      JimpleMethodBuilder builder) {
     this.gimpleFunction = gimpleFunction;
     this.translationContext = translationContext;
     this.builder = builder;
-    
+
     VarUsageInspector varUsage = new VarUsageInspector(gimpleFunction);
 
-    for(GimpleVarDecl decl : gimpleFunction.getVariableDeclarations()) {
-      Variable localVariable = translationContext
-          .resolveType(decl.getType())
-          .createLocalVariable(this, decl.getName(), varUsage.getUsage(decl));
-      
+    for (GimpleVarDecl decl : gimpleFunction.getVariableDeclarations()) {
+      Variable localVariable = translationContext.resolveType(decl.getType()).createLocalVariable(this, decl.getName(),
+          varUsage.getUsage(decl));
+
       symbolTable.put(decl.getId(), localVariable);
-      
-      if(decl.getConstantValue() != null) {
+
+      if (decl.getConstantValue() != null) {
         localVariable.initFromConstant(decl.getConstantValue());
       }
     }
 
-    for(GimpleParameter param : gimpleFunction.getParameters()) {
+    for (GimpleParameter param : gimpleFunction.getParameters()) {
       TypeTranslator type = translationContext.resolveType(param.getType());
       builder.addParameter(type.paramType(), param.getName());
       Variable variable = type.createLocalVariable(this, param.getName(), varUsage.getUsage(param));
@@ -64,15 +63,14 @@ public class FunctionContext {
     }
   }
 
-
   public MethodRef resolveMethod(GimpleCall call) {
     return translationContext.resolveMethod(call, getCallingConvention());
   }
-  
+
   public CallingConvention getCallingConvention() {
     return gimpleFunction.getCallingConvention();
   }
-  
+
   public String declareTemp(JimpleType type) {
     String name = "_tmp" + (nextTempId++);
     builder.addVarDecl(type, name);
@@ -93,18 +91,18 @@ public class FunctionContext {
 
   private Variable lookupVar(int id) {
     Variable variable = symbolTable.get(id);
-    if(variable == null) {
+    if (variable == null) {
       throw new IllegalArgumentException("No such variable " + id);
     }
     return variable;
   }
 
-
   public Variable lookupVar(GimpleExpr gimpleExpr) {
-    if(gimpleExpr instanceof SymbolRef) {
+    if (gimpleExpr instanceof SymbolRef) {
       return lookupVar(((SymbolRef) gimpleExpr).getId());
     } else {
-      throw new UnsupportedOperationException("Expected GimpleVar, got: " + gimpleExpr + " [" + gimpleExpr.getClass().getSimpleName() + "]");
+      throw new UnsupportedOperationException("Expected GimpleVar, got: " + gimpleExpr + " ["
+          + gimpleExpr.getClass().getSimpleName() + "]");
     }
   }
 
@@ -113,7 +111,7 @@ public class FunctionContext {
   }
 
   public JimpleExpr asNumericExpr(GimpleExpr gimpleExpr, JimpleType type) {
-    if(gimpleExpr instanceof SymbolRef) {
+    if (gimpleExpr instanceof SymbolRef) {
       Variable variable = lookupVar(gimpleExpr);
       return variable.asPrimitiveExpr(type);
     } else if (gimpleExpr instanceof GimpleConstant) {
@@ -138,23 +136,22 @@ public class FunctionContext {
   }
 
   private JimpleExpr asConstant(Object value, JimpleType type) {
-    if(!(value instanceof Number)) {
+    if (!(value instanceof Number)) {
       throw new UnsupportedOperationException("value: " + value + " (" + value.getClass() + ")");
     }
-    Number number = (Number)value;
-    if(type.equals(JimpleType.DOUBLE)) {
+    Number number = (Number) value;
+    if (type.equals(JimpleType.DOUBLE)) {
       return JimpleExpr.doubleConstant(number.doubleValue());
-      
-    } else if(type.equals(JimpleType.FLOAT)) {
-        return JimpleExpr.floatConstant(number.floatValue());
-     
-    } else if(type.equals(JimpleType.INT) ||
-        type.equals(JimpleType.BOOLEAN)) {
+
+    } else if (type.equals(JimpleType.FLOAT)) {
+      return JimpleExpr.floatConstant(number.floatValue());
+
+    } else if (type.equals(JimpleType.INT) || type.equals(JimpleType.BOOLEAN)) {
       return JimpleExpr.integerConstant(number.intValue());
-      
-    } else if(type.equals(JimpleType.LONG)) {
+
+    } else if (type.equals(JimpleType.LONG)) {
       return JimpleExpr.longConstant(number.longValue());
-    
+
     } else {
       throw new UnsupportedOperationException("type: " + type);
     }

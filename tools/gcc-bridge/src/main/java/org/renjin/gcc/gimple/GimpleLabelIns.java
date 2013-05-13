@@ -1,6 +1,5 @@
 package org.renjin.gcc.gimple;
 
-
 public class GimpleLabelIns extends GimpleIns {
 
   private final GimpleLabel label;

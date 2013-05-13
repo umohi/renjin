@@ -1,6 +1,5 @@
 package org.renjin.gcc.gimple.type;
 
-
 public class GimpleStructType implements GimpleType {
   private final String name;
 

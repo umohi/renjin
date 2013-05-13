@@ -17,7 +17,7 @@ public class PrimitiveCallParam extends CallParam {
   public JimpleType getType() {
     return new RealJimpleType(type);
   }
-  
+
   @Override
   public String toString() {
     return "PrimitiveCallParam: " + type;

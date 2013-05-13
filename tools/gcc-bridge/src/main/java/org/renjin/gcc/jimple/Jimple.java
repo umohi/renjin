@@ -1,6 +1,5 @@
 package org.renjin.gcc.jimple;
 
-
 import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.GimpleStructType;
@@ -28,11 +27,11 @@ public class Jimple {
   }
 
   public static String constant(Object value) {
-    if(value instanceof Number) {
+    if (value instanceof Number) {
       return value.toString();
-    } else if(value instanceof Boolean) {
+    } else if (value instanceof Boolean) {
       return value.toString();
-    } else if(value instanceof String) {
+    } else if (value instanceof String) {
       return "\"" + value + "\"";
     } else {
       throw new UnsupportedOperationException("constant: " + value);

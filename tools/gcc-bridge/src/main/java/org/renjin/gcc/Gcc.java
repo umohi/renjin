@@ -19,69 +19,68 @@ import com.google.common.io.Files;
 
 public class Gcc {
 
-	private GccEnvironment environment;
-	private File pluginLibrary = new File("/home/alexander/dev/renjin-git/tools/gcc-plugin/renjin.so");
-	
-	private List<File> includeDirectories = Lists.newArrayList();
+  private GccEnvironment environment;
+  private File pluginLibrary = new File("/home/alexander/dev/renjin-git/tools/gcc-plugin/renjin.so");
 
-	private static final Logger LOGGER = Logger.getLogger(Gcc.class.getName());
+  private List<File> includeDirectories = Lists.newArrayList();
 
-	public Gcc() {
-		if(Strings.nullToEmpty(System.getProperty("os.name")).toLowerCase().contains("windows")) {
-			environment = new CygwinEnvironment();
-		} else {
-			environment = new UnixEnvironment();
-		}
-	}
+  private static final Logger LOGGER = Logger.getLogger(Gcc.class.getName());
 
-	public GimpleCompilationUnit compileToGimple(File source) throws IOException {
+  public Gcc() {
+    if (Strings.nullToEmpty(System.getProperty("os.name")).toLowerCase().contains("windows")) {
+      environment = new CygwinEnvironment();
+    } else {
+      environment = new UnixEnvironment();
+    }
+  }
 
-		List<String> arguments = Lists.newArrayList();
-		arguments.add("-c"); // compile only, do not link
-		arguments.add("-S"); // stop at assembly generation
-		//    command.add("-O9"); // highest optimization
+  public GimpleCompilationUnit compileToGimple(File source) throws IOException {
 
-		// Enable our plugin which dumps the Gimple as JSON
-		// to standard out
+    List<String> arguments = Lists.newArrayList();
+    arguments.add("-c"); // compile only, do not link
+    arguments.add("-S"); // stop at assembly generation
+    // command.add("-O9"); // highest optimization
 
-		arguments.add("-fplugin=" + environment.toString(pluginLibrary));
-		arguments.add("-fplugin-arg-renjin-json-output-file=gimple.json");
+    // Enable our plugin which dumps the Gimple as JSON
+    // to standard out
 
-		for(File includeDir : includeDirectories) {
-			arguments.add("-I");
-			arguments.add(environment.toString(includeDir));
-		}
+    arguments.add("-fplugin=" + environment.toString(pluginLibrary));
+    arguments.add("-fplugin-arg-renjin-json-output-file=gimple.json");
 
-		arguments.add(environment.toString(source));
+    for (File includeDir : includeDirectories) {
+      arguments.add("-I");
+      arguments.add(environment.toString(includeDir));
+    }
 
-		LOGGER.info("Executing " + Joiner.on(" ").join(arguments));
+    arguments.add(environment.toString(source));
 
+    LOGGER.info("Executing " + Joiner.on(" ").join(arguments));
 
-		Process gcc = environment.startGcc(arguments);
+    Process gcc = environment.startGcc(arguments);
 
-		try {
-			gcc.waitFor();
-		} catch (InterruptedException e) {
-			throw new GccException("Compiler interrupted");
-		}
+    try {
+      gcc.waitFor();
+    } catch (InterruptedException e) {
+      throw new GccException("Compiler interrupted");
+    }
 
-		String stderr = new String(ByteStreams.toByteArray(gcc.getErrorStream()));
-		String json = Files.toString(new File(environment.getWorkingDirectory(), "gimple.json"), Charsets.UTF_8);
-		
-		System.out.println(json);
-		
-		if(gcc.exitValue() != 0) {
-			throw new GccException("Compilation failed:\n" + stderr);
-		} else {
-			java.lang.System.err.println(stderr);
-		}
+    String stderr = new String(ByteStreams.toByteArray(gcc.getErrorStream()));
+    String json = Files.toString(new File(environment.getWorkingDirectory(), "gimple.json"), Charsets.UTF_8);
 
-		GimpleParser parser = new GimpleParser();
-		return parser.parse(new StringReader(json));
-	}
+    System.out.println(json);
 
-	public void addIncludeDirectory(File path) {
-		includeDirectories.add(path);
-	}
+    if (gcc.exitValue() != 0) {
+      throw new GccException("Compilation failed:\n" + stderr);
+    } else {
+      java.lang.System.err.println(stderr);
+    }
+
+    GimpleParser parser = new GimpleParser();
+    return parser.parse(new StringReader(json));
+  }
+
+  public void addIncludeDirectory(File path) {
+    includeDirectories.add(path);
+  }
 
 }

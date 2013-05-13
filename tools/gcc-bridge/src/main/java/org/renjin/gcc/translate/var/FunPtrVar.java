@@ -33,35 +33,34 @@ public class FunPtrVar extends Variable {
   @Override
   public void assign(GimpleOp op, List<GimpleExpr> operands) {
     switch (op) {
-      case INTEGER_CST:
-        assignNull(operands.get(0));
-        break;
+    case INTEGER_CST:
+      assignNull(operands.get(0));
+      break;
 
-      case NOP_EXPR:
-        assignPointer(operands.get(0));
-        break;
+    case NOP_EXPR:
+      assignPointer(operands.get(0));
+      break;
 
-      case ADDR_EXPR:
-        assignPointer(operands.get(0));
-        break;
+    case ADDR_EXPR:
+      assignPointer(operands.get(0));
+      break;
 
-      default:
-        throw new UnsupportedOperationException(op + " " + operands);
+    default:
+      throw new UnsupportedOperationException(op + " " + operands);
     }
   }
 
   private void assignPointer(GimpleExpr param) {
-    if(param instanceof GimpleExternal) {
+    if (param instanceof GimpleExternal) {
       assignNewInvoker((GimpleExternal) param);
 
-//    } else if(param instanceof GimpleVar) {
-//      assignExistingPointer((GimpleVar) param);
+      // } else if(param instanceof GimpleVar) {
+      // assignExistingPointer((GimpleVar) param);
 
     } else {
       throw new UnsupportedOperationException(param.toString());
     }
   }
-
 
   private void assignNewInvoker(GimpleExternal param) {
     MethodRef method = context.getTranslationContext().resolveMethod(((GimpleExternal) param).getName());
@@ -73,11 +72,11 @@ public class FunPtrVar extends Variable {
   }
 
   private void assignNull(GimpleExpr gimpleExpr) {
-    if(!(gimpleExpr instanceof GimpleConstant)) {
+    if (!(gimpleExpr instanceof GimpleConstant)) {
       throw new UnsupportedOperationException("Expected GimpleConstant, got " + gimpleExpr);
     }
     Object value = ((GimpleConstant) gimpleExpr).getValue();
-    if(!(value instanceof Number) || ((Number) value).intValue() != 0) {
+    if (!(value instanceof Number) || ((Number) value).intValue() != 0) {
       throw new UnsupportedOperationException("Can only assign 0 to function pointer");
     }
     context.getBuilder().addStatement(Jimple.id(jimpleName) + " = null");
@@ -86,7 +85,7 @@ public class FunPtrVar extends Variable {
   public JimpleExpr getJimpleVariable() {
     return new JimpleExpr(jimpleName);
   }
-  
+
   @Override
   public JimpleExpr returnExpr() {
     return new JimpleExpr(jimpleName);

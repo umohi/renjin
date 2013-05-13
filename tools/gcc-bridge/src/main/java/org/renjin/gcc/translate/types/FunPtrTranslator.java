@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.types;
 
-
 import org.renjin.gcc.gimple.type.FunctionPointerType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
@@ -10,7 +9,6 @@ import org.renjin.gcc.translate.var.FunPtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
 public class FunPtrTranslator extends TypeTranslator {
-
 
   private TranslationContext context;
   private FunctionPointerType type;

@@ -9,7 +9,7 @@ public abstract class GccEnvironment {
   public abstract Process startGcc(List<String> arguments) throws IOException;
 
   public abstract File getWorkingDirectory();
-  
+
   public String toString(File file) {
     return file.getAbsolutePath();
   }

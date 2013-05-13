@@ -1,15 +1,12 @@
 package org.renjin.gcc.gimple;
 
-
 public class GimpleVisitor {
 
   public void visitAssignment(GimpleAssign assignment) {
 
   }
 
-
   public void visitCall(GimpleCall gimpleCall) {
-
 
   }
 
@@ -19,7 +16,6 @@ public class GimpleVisitor {
 
   public void visitReturn(GimpleReturn gimpleReturn) {
 
-
   }
 
   public void blockStart(GimpleBasicBlock bb) {
@@ -28,16 +24,13 @@ public class GimpleVisitor {
 
   public void visitGoto(GimpleGoto gotoIns) {
 
-
   }
 
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
 
-
   }
 
   public void visitLabelIns(GimpleLabelIns labelIns) {
-
 
   }
 }

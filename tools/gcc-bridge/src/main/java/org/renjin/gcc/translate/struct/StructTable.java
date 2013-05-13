@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.struct;
 
-
 import com.google.common.collect.Maps;
 import org.renjin.gcc.translate.TranslationContext;
 
@@ -17,7 +16,7 @@ public class StructTable {
   }
 
   public Struct resolveStruct(String name) {
-    if(map.containsKey(name)) {
+    if (map.containsKey(name)) {
       return map.get(name);
     } else {
       GccStruct struct = new GccStruct(context, name);

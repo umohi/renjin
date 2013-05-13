@@ -16,135 +16,135 @@ import java.util.List;
 import java.util.Map;
 
 public class GimpleFunction {
-	private int id;
-	private String name;
-	private CallingConvention callingConvention;
-	private GimpleType returnType;
-	private List<GimpleBasicBlock> basicBlocks = Lists.newArrayList();
-	private List<GimpleParameter> parameters = Lists.newArrayList();
-	private List<GimpleVarDecl> variableDeclarations = Lists.newArrayList();
-	private Map<String, GimpleType> typeMap = Maps.newHashMap();
+  private int id;
+  private String name;
+  private CallingConvention callingConvention;
+  private GimpleType returnType;
+  private List<GimpleBasicBlock> basicBlocks = Lists.newArrayList();
+  private List<GimpleParameter> parameters = Lists.newArrayList();
+  private List<GimpleVarDecl> variableDeclarations = Lists.newArrayList();
+  private Map<String, GimpleType> typeMap = Maps.newHashMap();
 
-	public GimpleFunction() {
-		this.callingConvention = new F77CallingConvention();
-	}
-	
-	public void setCallingConvention(CallingConvention callingConvention) {
-		this.callingConvention = callingConvention;
-	}
+  public GimpleFunction() {
+    this.callingConvention = new F77CallingConvention();
+  }
 
-	public int getId() {
-		return id;
-	}
+  public void setCallingConvention(CallingConvention callingConvention) {
+    this.callingConvention = callingConvention;
+  }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+  public int getId() {
+    return id;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void addParameter(GimpleParameter parameter) {
-		parameters.add(parameter);
-		typeMap.put(parameter.getName(), parameter.getType());
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public GimpleBasicBlock addBasicBlock(String label) {
-		if(!label.toLowerCase().startsWith("bb ")) {
-			throw new IllegalArgumentException("Expected label in the form 'BB 999', got: '"  + label + "'");
-		}
-		GimpleBasicBlock bb = new GimpleBasicBlock();
-		basicBlocks.add(bb);
-		return bb;
-	}
+  public void addParameter(GimpleParameter parameter) {
+    parameters.add(parameter);
+    typeMap.put(parameter.getName(), parameter.getType());
+  }
 
-	public void addVarDecl(GimpleVarDecl decl) {
-		variableDeclarations.add(decl);
-		typeMap.put(decl.getName(), decl.getType());
-	}
+  public GimpleBasicBlock addBasicBlock(String label) {
+    if (!label.toLowerCase().startsWith("bb ")) {
+      throw new IllegalArgumentException("Expected label in the form 'BB 999', got: '" + label + "'");
+    }
+    GimpleBasicBlock bb = new GimpleBasicBlock();
+    basicBlocks.add(bb);
+    return bb;
+  }
 
-	public boolean hasVariable(String name) {
-		return typeMap.containsKey(name);
-	}
+  public void addVarDecl(GimpleVarDecl decl) {
+    variableDeclarations.add(decl);
+    typeMap.put(decl.getName(), decl.getType());
+  }
 
-	public GimpleType getVariableType(String name) {
-		if(typeMap.containsKey(name)) {
-			return typeMap.get(name);
-		}
-		throw new IllegalArgumentException(name);
-	}
+  public boolean hasVariable(String name) {
+    return typeMap.containsKey(name);
+  }
 
-	public List<GimpleVarDecl> getVariableDeclarations() {
-		return variableDeclarations;
-	}
+  public GimpleType getVariableType(String name) {
+    if (typeMap.containsKey(name)) {
+      return typeMap.get(name);
+    }
+    throw new IllegalArgumentException(name);
+  }
 
-	public GimpleType getType(GimpleExpr expr) {
-		if(expr instanceof GimpleVariableRef) {
-			return getVariableType(((GimpleVariableRef) expr).getName());
-		} else if(expr == GimpleNull.INSTANCE) {
-			return PrimitiveType.VOID_TYPE;
-		} else {
-			throw new UnsupportedOperationException("don't know how to deduce type for '" + expr + "'");
-		}
-	}
+  public List<GimpleVarDecl> getVariableDeclarations() {
+    return variableDeclarations;
+  }
 
-	public List<GimpleParameter> getParameters() {
-		return parameters;
-	}
+  public GimpleType getType(GimpleExpr expr) {
+    if (expr instanceof GimpleVariableRef) {
+      return getVariableType(((GimpleVariableRef) expr).getName());
+    } else if (expr == GimpleNull.INSTANCE) {
+      return PrimitiveType.VOID_TYPE;
+    } else {
+      throw new UnsupportedOperationException("don't know how to deduce type for '" + expr + "'");
+    }
+  }
 
-	public void setBasicBlocks(List<GimpleBasicBlock> basicBlocks) {
-		this.basicBlocks = basicBlocks;
-	}
+  public List<GimpleParameter> getParameters() {
+    return parameters;
+  }
 
-	public void setParameters(List<GimpleParameter> parameters) {
-		this.parameters = parameters;
-	}
+  public void setBasicBlocks(List<GimpleBasicBlock> basicBlocks) {
+    this.basicBlocks = basicBlocks;
+  }
 
-	public void visitIns(GimpleVisitor visitor) {
-		for(GimpleBasicBlock bb : basicBlocks) {
-			visitor.blockStart(bb);
-			for(GimpleIns ins : bb.getInstructions()) {
-				ins.visit(visitor);
-			}
-		}
-	}
+  public void setParameters(List<GimpleParameter> parameters) {
+    this.parameters = parameters;
+  }
 
-	public List<GimpleBasicBlock> getBasicBlocks() {
-		return basicBlocks;
-	}
+  public void visitIns(GimpleVisitor visitor) {
+    for (GimpleBasicBlock bb : basicBlocks) {
+      visitor.blockStart(bb);
+      for (GimpleIns ins : bb.getInstructions()) {
+        ins.visit(visitor);
+      }
+    }
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(name).append(" (");
-		Joiner.on(", ").appendTo(sb, parameters);
-		sb.append(")\n");
-		sb.append("{\n");
-		for(GimpleVarDecl decl : variableDeclarations) {
-			sb.append(decl).append("\n");
-		}
-		for(GimpleBasicBlock bb : basicBlocks) {
-			sb.append(bb.toString());
-		}
-		sb.append("}\n");
-		return sb.toString();
-	}
+  public List<GimpleBasicBlock> getBasicBlocks() {
+    return basicBlocks;
+  }
 
-	public CallingConvention getCallingConvention() {
-		return callingConvention;
-	}
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name).append(" (");
+    Joiner.on(", ").appendTo(sb, parameters);
+    sb.append(")\n");
+    sb.append("{\n");
+    for (GimpleVarDecl decl : variableDeclarations) {
+      sb.append(decl).append("\n");
+    }
+    for (GimpleBasicBlock bb : basicBlocks) {
+      sb.append(bb.toString());
+    }
+    sb.append("}\n");
+    return sb.toString();
+  }
 
-	public GimpleType getReturnType() {
-		return returnType;
-	}
+  public CallingConvention getCallingConvention() {
+    return callingConvention;
+  }
 
-	public void setReturnType(GimpleType returnType) {
-		this.returnType = returnType;
-	}
+  public GimpleType getReturnType() {
+    return returnType;
+  }
+
+  public void setReturnType(GimpleType returnType) {
+    this.returnType = returnType;
+  }
 
 }
