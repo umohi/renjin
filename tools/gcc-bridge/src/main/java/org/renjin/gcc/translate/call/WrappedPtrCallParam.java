@@ -6,4 +6,9 @@ package org.renjin.gcc.translate.call;
  */
 public class WrappedPtrCallParam extends CallParam {
 
+  @Override
+  public String toString() {
+    return null;
+    
+  }
 }

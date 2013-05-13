@@ -4,6 +4,7 @@ import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.JimpleExpr;
+import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
@@ -16,7 +17,7 @@ public class StringConstantToCharPtrMarshaller extends ParamMarshaller {
     String value = ParamUtils.isStringConstant(expr);
     if (value != null && param instanceof WrappedPtrCallParam) {
 
-      String temp = context.getBuilder().addTempVarDecl(PrimitiveTypes.getWrapperType(PrimitiveType.CHAR));
+      String temp = context.getBuilder().addTempVarDecl(new RealJimpleType(CharPtr.class));
       StringBuilder stmt = new StringBuilder();
       stmt.append(temp)
           .append(

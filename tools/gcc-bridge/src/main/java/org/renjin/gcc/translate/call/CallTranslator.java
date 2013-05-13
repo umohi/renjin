@@ -3,8 +3,10 @@ package org.renjin.gcc.translate.call;
 import java.util.List;
 
 import org.renjin.gcc.gimple.GimpleCall;
+import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
+import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.type.FunctionPointerType;
 import org.renjin.gcc.gimple.type.GimpleType;
@@ -35,7 +37,8 @@ public class CallTranslator {
 
   public void translate() {
     GimpleExpr functionExpr = call.getFunction();
-    if (functionExpr instanceof GimpleExternal) {
+    if (functionExpr instanceof GimpleAddressOf && 
+        ((GimpleAddressOf) functionExpr).getValue() instanceof GimpleFunctionRef) {
       translateStaticCall();
 
     } else if (functionExpr instanceof GimpleVariableRef) {

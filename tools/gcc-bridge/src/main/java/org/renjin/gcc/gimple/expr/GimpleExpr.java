@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = GimpleArrayRef.class, name = "array_ref"), @Type(value = GimpleAddressOf.class, name = "addr_expr"),
     @Type(value = GimpleIntegerConstant.class, name = "integer_cst"),
     @Type(value = GimpleRealConstant.class, name = "real_cst"),
+    @Type(value = GimpleStringConstant.class, name = "string_cst"),
     @Type(value = GimpleFunctionRef.class, name = "function_decl"),
     @Type(value = GimpleConstantRef.class, name = "const_decl")
 

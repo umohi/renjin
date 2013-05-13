@@ -8,6 +8,7 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleArrayRef;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
+import org.renjin.gcc.gimple.expr.GimpleStringConstant;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.PrimitiveType;
@@ -134,9 +135,11 @@ public class PrimitivePtrVar extends Variable {
       GimpleExpr value = ((GimpleAddressOf) operand).getValue();
       if (value instanceof GimpleArrayRef) {
         assignArrayElement((GimpleArrayRef) value);
+      } else if(value instanceof GimpleStringConstant) {
+        assignStringConstant((GimpleStringConstant) value);
+      } else {
+        throw new UnsupportedOperationException(operand.toString());
       }
-    } else if (isStringConstant(operand)) {
-      assignStringConstant((GimpleConstant) operand);
     } else if (operand instanceof GimpleVariableRef) {
       assignPointer(asPtr(operand), JimpleExpr.integerConstant(0));
     } else {
@@ -144,9 +147,8 @@ public class PrimitivePtrVar extends Variable {
     }
   }
 
-  private void assignStringConstant(GimpleConstant operand) {
-    String literal = (String) operand.getValue();
-    // TODO: should be null terminated
+  private void assignStringConstant(GimpleStringConstant operand) {
+    String literal = operand.getValue();
     String stringVar = context.getBuilder().addTempVarDecl(new RealJimpleType(String.class));
     context.getBuilder().addStatement(stringVar + " = " + JimpleExpr.stringLiteral(literal));
     context.getBuilder().addStatement(

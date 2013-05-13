@@ -12,6 +12,8 @@ import org.renjin.gcc.runtime.IntPtr;
 
 public class PrimitiveTypes {
 
+
+  
   public static JimpleType get(PrimitiveType type) {
     if (type instanceof RealType) {
       if (((RealType) type).getPrecision() == 64) {
@@ -20,10 +22,14 @@ public class PrimitiveTypes {
         return JimpleType.FLOAT;
       }
     } else if (type instanceof IntegerType) {
-      if (((IntegerType) type).getPrecision() == 64) {
-        return JimpleType.LONG;
-      } else if (((IntegerType) type).getPrecision() == 32) {
+      int precision = ((IntegerType) type).getPrecision();
+      switch(precision) {
+      case 8:
+        return JimpleType.CHAR;
+      case 32:
         return JimpleType.INT;
+      case 64:
+        return JimpleType.LONG;
       }
     } else if (type instanceof BooleanType) {
       return JimpleType.BOOLEAN;
@@ -39,10 +45,14 @@ public class PrimitiveTypes {
         return new RealJimpleType(float[].class);
       }
     } else if (type instanceof IntegerType) {
-      if (((IntegerType) type).getPrecision() == 64) {
-        return new RealJimpleType(long[].class);
-      } else if (((IntegerType) type).getPrecision() == 32) {
+      int precision = ((IntegerType) type).getPrecision();
+      switch(precision) {
+      case 8:
+        return new RealJimpleType(char[].class);
+      case 32:
         return new RealJimpleType(int[].class);
+      case 64:
+        return new RealJimpleType(long[].class);
       }
     } else if (type instanceof BooleanType) {
       return new RealJimpleType(boolean[].class);
@@ -58,10 +68,14 @@ public class PrimitiveTypes {
         // TODO
       }
     } else if (type instanceof IntegerType) {
-      if (((IntegerType) type).getPrecision() == 64) {
-        // TODO
-      } else if (((IntegerType) type).getPrecision() == 32) {
+      int precision = ((IntegerType) type).getPrecision();
+      switch(precision) {
+      case 8:
+        return new RealJimpleType(CharPtr.class);
+      case 32:
         return new RealJimpleType(IntPtr.class);
+      case 64: 
+        // TODO:
       }
     } else if (type instanceof BooleanType) {
       // TODO

@@ -67,6 +67,14 @@ public class JimpleExpr {
   public static JimpleExpr stringLiteral(String value) {
     StringBuilder expr = new StringBuilder();
     expr.append('"');
+    for(int i=0;i!=value.length();++i) {
+      int cp = value.codePointAt(i);
+      if(cp >= 32 && cp <= 126) {
+        expr.appendCodePoint(cp);
+      } else {
+        expr.append(String.format("\\u%04x", cp));
+      }
+    }
     // TODO: escape
     expr.append(value);
     expr.append('"');

@@ -7,7 +7,10 @@ import org.renjin.gcc.CallingConvention;
 import org.renjin.gcc.gimple.GimpleCall;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.gimple.GimpleParameter;
+import org.renjin.gcc.gimple.expr.GimpleAddressOf;
+import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
+import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.type.FunctionPointerType;
 import org.renjin.gcc.gimple.type.GimpleStructType;
 import org.renjin.gcc.gimple.type.GimpleType;
@@ -58,13 +61,18 @@ public class TranslationContext {
 
   public MethodRef resolveMethod(GimpleCall call, CallingConvention callingConvention) {
 
-    String methodName;
-    if (call.getFunction() instanceof GimpleExternal) {
-      methodName = ((GimpleExternal) call.getFunction()).getName();
-    } else {
-      throw new UnsupportedOperationException(call.toString());
-    }
-    return resolveMethod(callingConvention.mangleFunctionName(methodName));
+    return resolveMethod(callingConvention.mangleFunctionName(functionName(call)));
+  }
+
+  private String functionName(GimpleCall call) {
+    if (call.getFunction() instanceof GimpleAddressOf) {
+      
+      GimpleExpr functionValue = ((GimpleAddressOf) call.getFunction()).getValue();
+      if(functionValue instanceof GimpleFunctionRef) {
+        return ((GimpleFunctionRef) functionValue).getName();
+      } 
+    } 
+    throw new UnsupportedOperationException(call.toString());
   }
 
   private MethodRef resolveInternally(String name) {

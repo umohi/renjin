@@ -249,8 +249,8 @@ public class PrimitiveVar extends Variable {
   }
 
   private PrimitivePtrVar asPointer(GimpleExpr expr) {
-    if (expr instanceof GimpleVariableRef) {
-      Variable var = context.lookupVar((GimpleVariableRef) expr);
+    if (expr instanceof SymbolRef) {
+      Variable var = context.lookupVar(expr);
       if (var instanceof PrimitivePtrVar) {
         return (PrimitivePtrVar) var;
       }

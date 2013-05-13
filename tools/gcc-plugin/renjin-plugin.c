@@ -126,13 +126,35 @@ void json_field(const char *name) {
 
 void json_string_field(const char *name, const char *value) {
   json_field(name);
-  fprintf(json_f, "\"%s\"", value);
+  json_string(value, strlen(value));
+}
+
+void json_string_field2(const char *name, const char *value, int length) {
+  json_field(name);
+  json_string(value, length);
+}
+
+void json_string(const char *value, int length) {
+  putc('"', json_f);
+  while (--length >= 0) {
+    char ch = *value++;
+	  if (ch >= ' ' && ch < 127) {
+	    if(ch == '\\' || ch == '"') {
+	      putc('\\', json_f);
+	    }
+      putc(ch, json_f);
+    } else {
+	    fprintf(json_f, "\\u%04x", ch);	      
+    }
+  }
+  putc('"', json_f);
 }
 
 void json_int(int value) {
   json_pre_value();
   fprintf(json_f, "%d", value);
 }
+
 void json_int_field(const char *name, int value) {
   json_field(name);
   json_int(value);
@@ -262,6 +284,11 @@ static void dump_op(tree op) {
       json_field("type");
       dump_type(TREE_TYPE(op));
 	    break;
+	  case STRING_CST:
+	    json_string_field2("value", 
+	      TREE_STRING_POINTER(op),
+        TREE_STRING_LENGTH (op));
+      break;
 	    
 	  case MEM_REF:
 	    json_field("pointer");
