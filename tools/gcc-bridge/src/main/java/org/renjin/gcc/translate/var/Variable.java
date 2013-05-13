@@ -13,7 +13,7 @@ public abstract class Variable {
   public abstract void assign(GimpleOp op, List<GimpleExpr> operands);
 
   public GimpleType getGimpleType() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented in " + getClass().getSimpleName());
   }
 
   public JimpleExpr asPrimitiveExpr(JimpleType type) {

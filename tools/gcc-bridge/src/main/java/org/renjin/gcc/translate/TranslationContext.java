@@ -11,7 +11,7 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
-import org.renjin.gcc.gimple.type.FunctionPointerType;
+import org.renjin.gcc.gimple.type.FunctionType;
 import org.renjin.gcc.gimple.type.GimpleStructType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
@@ -20,7 +20,6 @@ import org.renjin.gcc.jimple.JimpleClassBuilder;
 import org.renjin.gcc.jimple.JimpleOutput;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.call.GccFunction;
-import org.renjin.gcc.translate.call.JvmMethodRef;
 import org.renjin.gcc.translate.call.MethodRef;
 import org.renjin.gcc.translate.struct.Struct;
 import org.renjin.gcc.translate.struct.StructTable;
@@ -100,28 +99,30 @@ public class TranslationContext {
   public TypeTranslator resolveType(GimpleType type) {
     if (type instanceof PrimitiveType) {
       return new PrimitiveTypeTranslator((PrimitiveType) type);
-    } else if (type instanceof PointerType && ((PointerType) type).getBaseType() instanceof PrimitiveType) {
-      return new PrimitivePtrTypeTranslator((PointerType) type);
-    } else if (type instanceof PointerType && ((PointerType) type).getBaseType() instanceof GimpleStructType) {
-      return new StructTypeTranslator(this, type);
-    } else if (type instanceof FunctionPointerType) {
-      return new FunPtrTranslator(this, (FunctionPointerType) type);
+    } else if (type instanceof PointerType) {
+      GimpleType baseType = ((PointerType) type).getBaseType();
+      if(baseType instanceof PrimitiveType) {
+        return new PrimitivePtrTypeTranslator((PointerType) type);
+      } else if (baseType instanceof GimpleStructType) {
+        return new StructTypeTranslator(this, type);
+      } else if (baseType instanceof FunctionType) {
+        return new FunPtrTranslator(this, (FunctionType) baseType);
+      }
     } else if (type instanceof GimpleStructType) {
       return new StructTypeTranslator(this, type);
-    } else {
-      throw new UnsupportedOperationException(type.toString());
-    }
+    } 
+    throw new UnsupportedOperationException(type.toString());
   }
 
   public JimpleOutput getJimpleOutput() {
     return mainClass.getOutput();
   }
 
-  public String getFunctionPointerInterfaceName(FunctionPointerType type) {
+  public String getFunctionPointerInterfaceName(FunctionType type) {
     return funPtrTable.getInterfaceName(type);
   }
 
-  public FunSignature getFunctionPointerMethod(FunctionPointerType type) {
+  public FunSignature getFunctionPointerMethod(FunctionType type) {
     return funPtrTable.methodRef(type);
   }
 

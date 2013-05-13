@@ -158,6 +158,16 @@ public class FunctionContext {
   }
 
   public GimpleType getGimpleVariableType(GimpleExpr expr) {
-    return gimpleFunction.getType(expr);
+    if(expr instanceof SymbolRef) {
+      Variable variable = symbolTable.get(((SymbolRef) expr).getId());
+      if(variable == null) { 
+        throw new IllegalArgumentException(expr.toString());
+      }
+      return variable.getGimpleType();
+    } else if(expr instanceof GimpleConstant) {
+      return ((GimpleConstant) expr).getType();
+    } else {
+      throw new UnsupportedOperationException(expr.toString());
+    }
   }
 }

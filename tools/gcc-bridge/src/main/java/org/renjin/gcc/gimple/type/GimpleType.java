@@ -12,4 +12,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = VoidType.class, name = "void_type") })
 public interface GimpleType {
 
+  boolean isPointerTo(Class<? extends GimpleType> clazz);
+  
+  /**
+   * @return the base type if this is a pointer type
+   * @throws UnsupportedOperationException if this is not a pointer type
+   */
+  <X extends GimpleType> X getBaseType();
 }

@@ -1,6 +1,6 @@
 package org.renjin.gcc.translate.types;
 
-import org.renjin.gcc.gimple.type.FunctionPointerType;
+import org.renjin.gcc.gimple.type.FunctionType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TranslationContext;
@@ -11,10 +11,10 @@ import org.renjin.gcc.translate.var.Variable;
 public class FunPtrTranslator extends TypeTranslator {
 
   private TranslationContext context;
-  private FunctionPointerType type;
+  private FunctionType type;
   private String interfaceName;
 
-  public FunPtrTranslator(TranslationContext context, FunctionPointerType type) {
+  public FunPtrTranslator(TranslationContext context, FunctionType type) {
     this.context = context;
     this.type = type;
     this.interfaceName = context.getFunctionPointerInterfaceName(type);

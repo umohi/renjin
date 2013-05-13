@@ -1,14 +1,19 @@
 package org.renjin.gcc.translate;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import org.renjin.gcc.gimple.type.FunctionPointerType;
-import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.jimple.*;
-import org.renjin.gcc.translate.call.MethodRef;
-
 import java.util.List;
 import java.util.Set;
+
+import org.renjin.gcc.gimple.type.FunctionType;
+import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.jimple.JimpleClassBuilder;
+import org.renjin.gcc.jimple.JimpleInterfaceBuilder;
+import org.renjin.gcc.jimple.JimpleMethodBuilder;
+import org.renjin.gcc.jimple.JimpleModifiers;
+import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.translate.call.MethodRef;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class FunPtrTable {
 
@@ -23,10 +28,10 @@ public class FunPtrTable {
     this.context = context;
   }
 
-  public FunSignature signature(FunctionPointerType type) {
+  public FunSignature signature(FunctionType type) {
     JimpleType returnType = context.resolveType(type.getReturnType()).returnType();
     List<JimpleType> paramTypes = Lists.newArrayList();
-    for (GimpleType paramType : type.getArguments()) {
+    for (GimpleType paramType : type.getArgumentTypes()) {
       paramTypes.add(context.resolveType(paramType).paramType());
     }
     return new FunSignature(returnType, paramTypes);
@@ -43,11 +48,11 @@ public class FunPtrTable {
     return getInterfaceName(new FunSignature(ref));
   }
 
-  public String getInterfaceName(FunctionPointerType type) {
+  public String getInterfaceName(FunctionType type) {
     return getInterfaceName(signature(type));
   }
 
-  public FunSignature methodRef(FunctionPointerType type) {
+  public FunSignature methodRef(FunctionType type) {
     return signature(type);
   }
 

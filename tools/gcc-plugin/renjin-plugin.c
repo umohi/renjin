@@ -124,15 +124,6 @@ void json_field(const char *name) {
   json_context_stack[json_context_head].needs_comma = 1;
 }
 
-void json_string_field(const char *name, const char *value) {
-  json_field(name);
-  json_string(value, strlen(value));
-}
-
-void json_string_field2(const char *name, const char *value, int length) {
-  json_field(name);
-  json_string(value, length);
-}
 
 void json_string(const char *value, int length) {
   putc('"', json_f);
@@ -149,6 +140,17 @@ void json_string(const char *value, int length) {
   }
   putc('"', json_f);
 }
+
+void json_string_field(const char *name, const char *value) {
+  json_field(name);
+  json_string(value, strlen(value));
+}
+
+void json_string_field2(const char *name, const char *value, int length) {
+  json_field(name);
+  json_string(value, length);
+}
+
 
 void json_int(int value) {
   json_pre_value();
@@ -201,6 +203,44 @@ void json_end_object() {
 
 /* Post pass */
 
+static void dump_type(tree type);
+
+static void dump_function_type(tree type) {
+  json_field("returnType");
+  dump_type(TREE_TYPE(type));
+      
+  // The TYPE_ARG_TYPES are a TREE_LIST of the argument types. 
+  // The TREE_VALUE of each node in this list is the type of the 
+  // corresponding argument; the TREE_PURPOSE is an expression 
+  // for the default argument value, if any. If the last node in 
+  // the list is void_list_node (a TREE_LIST node whose TREE_VALUE 
+  // is the void_type_node), then functions of this type do not 
+  // take variable arguments. 
+  // Otherwise, they do take a variable number of arguments.  
+  
+  int variable_arguments;
+
+  tree last_arg = TYPE_ARG_TYPES(type);
+  tree next_arg = TREE_CHAIN(last_arg);
+
+  json_array_field("argumentTypes");
+  while(next_arg != NULL_TREE) {
+    dump_type(TREE_VALUE(last_arg));
+    last_arg = next_arg;
+    next_arg = TREE_CHAIN(next_arg);
+  }
+  if(TREE_CODE(TREE_VALUE(last_arg)) == VOID_TYPE) {
+    variable_arguments = 0;
+  } else {
+    variable_arguments = 1;
+    dump_type(TREE_VALUE(last_arg));
+  }
+  json_end_array();
+  
+  json_bool_field("variableArguments", variable_arguments);
+  
+}
+
 
 static void dump_type(tree type) {
   json_start_object();
@@ -238,17 +278,8 @@ static void dump_type(tree type) {
     break;
     
   case FUNCTION_TYPE:
-    json_field("returnType");
-    dump_type(TREE_TYPE(type));
-    
-    tree arg = TYPE_ARG_TYPES(type);
-    if(arg != NULL_TREE) {
-      json_array_field("argumentTypes");
-      while(arg != NULL_TREE) {
-        dump_type(TREE_VALUE(arg));
-        arg = TREE_CHAIN(arg);      
-      }
-    }
+    dump_function_type(type);
+    break;
     
   }
   json_end_object();

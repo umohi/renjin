@@ -42,7 +42,7 @@ public abstract class MethodRef {
       if (paramType.isPrimitive()) {
         params.add(new PrimitiveCallParam(paramType.asPrimitiveClass()));
       } else if (paramType.isPointerWrapper()) {
-        params.add(new WrappedPtrCallParam());
+        params.add(new WrappedPtrCallParam(paramType));
       } else if (paramType.isFunctionPointer()) {
         params.add(new FunPtrCallParam());
       } else {

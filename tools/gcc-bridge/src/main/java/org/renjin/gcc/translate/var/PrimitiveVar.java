@@ -138,7 +138,7 @@ public class PrimitiveVar extends Variable {
 
   @Override
   public boolean isReal() {
-    return gimpleType == PrimitiveType.DOUBLE_TYPE;
+    return gimpleType instanceof RealType;
   }
 
   private void assignBoolean(GimpleOp op, List<GimpleExpr> operands) {
@@ -210,7 +210,7 @@ public class PrimitiveVar extends Variable {
   }
 
   private void assignCompoundRef(GimpleCompoundRef compoundRef) {
-    Variable var = context.lookupVar((SymbolRef) compoundRef.getVar());
+    Variable var = context.lookupVar(compoundRef.getVar());
     storage.assign(var.memberRef(compoundRef.getMember(), PrimitiveTypes.get(gimpleType)));
   }
 

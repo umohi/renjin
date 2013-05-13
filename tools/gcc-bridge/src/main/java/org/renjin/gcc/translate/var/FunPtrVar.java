@@ -1,10 +1,17 @@
 package org.renjin.gcc.translate.var;
 
+import java.nio.channels.UnsupportedAddressTypeException;
+import java.util.List;
+
 import org.renjin.gcc.gimple.GimpleOp;
+import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
-import org.renjin.gcc.gimple.type.FunctionPointerType;
+import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
+import org.renjin.gcc.gimple.type.FunctionType;
+import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
@@ -12,23 +19,32 @@ import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.call.MethodRef;
 import org.renjin.gcc.translate.types.FunPtrJimpleType;
 
-import java.util.List;
-
 public class FunPtrVar extends Variable {
 
   private String jimpleName;
-  private FunctionPointerType type;
+  private FunctionType type;
   private FunctionContext context;
   private JimpleType jimpleType;
+  private FunctionType functionType;
 
-  public FunPtrVar(FunctionContext context, String gimpleName, FunctionPointerType type) {
+  public FunPtrVar(FunctionContext context, String gimpleName, FunctionType type) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
     this.type = type;
     this.jimpleType = new FunPtrJimpleType(context.getTranslationContext().getFunctionPointerInterfaceName(type));
-
+    this.functionType = type;
+    
     context.getBuilder().addVarDecl(jimpleType, jimpleName);
   }
+  
+  
+
+  @Override
+  public GimpleType getGimpleType() {
+    return new PointerType(functionType);
+  }
+
+
 
   @Override
   public void assign(GimpleOp op, List<GimpleExpr> operands) {
@@ -51,9 +67,13 @@ public class FunPtrVar extends Variable {
   }
 
   private void assignPointer(GimpleExpr param) {
-    if (param instanceof GimpleExternal) {
-      assignNewInvoker((GimpleExternal) param);
-
+    if (param instanceof GimpleAddressOf) {
+      GimpleExpr value = ((GimpleAddressOf) param).getValue();
+      if(value instanceof GimpleFunctionRef) { 
+        assignNewInvoker((GimpleFunctionRef) value);
+      } else {
+        throw new UnsupportedOperationException(param.toString());
+      }
       // } else if(param instanceof GimpleVar) {
       // assignExistingPointer((GimpleVar) param);
 
@@ -62,8 +82,8 @@ public class FunPtrVar extends Variable {
     }
   }
 
-  private void assignNewInvoker(GimpleExternal param) {
-    MethodRef method = context.getTranslationContext().resolveMethod(((GimpleExternal) param).getName());
+  private void assignNewInvoker(GimpleFunctionRef param) {
+    MethodRef method = context.getTranslationContext().resolveMethod(param.getName());
     JimpleType invokerType = context.getTranslationContext().getInvokerType(method);
     String ptr = context.declareTemp(invokerType);
     context.getBuilder().addStatement(ptr + " = new " + invokerType);

@@ -5,10 +5,10 @@ import java.util.List;
 import org.renjin.gcc.gimple.GimpleCall;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
-import org.renjin.gcc.gimple.type.FunctionPointerType;
+import org.renjin.gcc.gimple.expr.SymbolRef;
+import org.renjin.gcc.gimple.type.FunctionType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunSignature;
@@ -41,7 +41,7 @@ public class CallTranslator {
         ((GimpleAddressOf) functionExpr).getValue() instanceof GimpleFunctionRef) {
       translateStaticCall();
 
-    } else if (functionExpr instanceof GimpleVariableRef) {
+    } else if (functionExpr instanceof SymbolRef) {
       translateFunctionPointerCall();
 
     } else {
@@ -78,10 +78,10 @@ public class CallTranslator {
 
   private FunSignature getFunPtrInterface() {
     GimpleType type = context.getGimpleVariableType(call.getFunction());
-    if (!(type instanceof FunctionPointerType)) {
+    if (!type.isPointerTo(FunctionType.class)) {
       throw new UnsupportedOperationException("Function value must be of type FunctionPointer, got: " + type);
     }
-    return context.getTranslationContext().getFunctionPointerMethod((FunctionPointerType) type);
+    return context.getTranslationContext().getFunctionPointerMethod((FunctionType)type.getBaseType());
   }
 
   private JimpleExpr composeCallExpr(MethodRef method) {

@@ -4,9 +4,20 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class FunctionType {
+public class FunctionType extends AbstractGimpleType {
   private GimpleType returnType;
+  private int size;
   private List<GimpleType> argumentTypes = Lists.newArrayList();
+  private boolean variableArguments;
+  
+  
+  public int getSize() {
+    return size;
+  }
+
+  public void setSize(int size) {
+    this.size = size;
+  }
 
   public GimpleType getReturnType() {
     return returnType;
@@ -19,4 +30,14 @@ public class FunctionType {
   public List<GimpleType> getArgumentTypes() {
     return argumentTypes;
   }
+
+  public boolean isVariableArguments() {
+    return variableArguments;
+  }
+
+  public void setVariableArguments(boolean variableArguments) {
+    this.variableArguments = variableArguments;
+  }
+  
+  
 }

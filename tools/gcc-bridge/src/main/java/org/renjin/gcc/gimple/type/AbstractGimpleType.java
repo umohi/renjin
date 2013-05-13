@@ -10,4 +10,14 @@ public class AbstractGimpleType implements GimpleType {
   public void setSize(int size) {
     this.size = size;
   }
+
+  @Override
+  public boolean isPointerTo(Class<? extends GimpleType> clazz) {
+    return false;
+  }
+
+  @Override
+  public <X extends GimpleType> X getBaseType() {
+    throw new UnsupportedOperationException("this is not pointer type (" + getClass().getSimpleName() + ")");
+  }
 }
