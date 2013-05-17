@@ -5,6 +5,7 @@ import java.util.List;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.expr.Expr;
 
 import com.google.common.collect.Lists;
 
@@ -21,7 +22,7 @@ public class ParamMarshallers {
     marshallers.add(new StructPtrMarshaller());
   }
 
-  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param) {
+  public JimpleExpr marshall(FunctionContext context, Expr expr, CallParam param) {
     for (ParamMarshaller marshaller : marshallers) {
       try {
         return marshaller.marshall(context, expr, param);

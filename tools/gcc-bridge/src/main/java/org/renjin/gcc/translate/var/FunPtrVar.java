@@ -1,13 +1,8 @@
 package org.renjin.gcc.translate.var;
 
-import java.nio.channels.UnsupportedAddressTypeException;
-import java.util.List;
-
-import org.renjin.gcc.gimple.GimpleOp;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.type.FunctionType;
 import org.renjin.gcc.gimple.type.GimpleType;
@@ -16,13 +11,13 @@ import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.assign.NullAssignable;
 import org.renjin.gcc.translate.call.MethodRef;
 import org.renjin.gcc.translate.types.FunPtrJimpleType;
 
-public class FunPtrVar extends Variable {
+public class FunPtrVar extends Variable implements NullAssignable {
 
   private String jimpleName;
-  private FunctionType type;
   private FunctionContext context;
   private JimpleType jimpleType;
   private FunctionType functionType;
@@ -30,14 +25,12 @@ public class FunPtrVar extends Variable {
   public FunPtrVar(FunctionContext context, String gimpleName, FunctionType type) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
-    this.type = type;
-    this.jimpleType = new FunPtrJimpleType(context.getTranslationContext().getFunctionPointerInterfaceName(type));
+      this.jimpleType = new FunPtrJimpleType(context.getTranslationContext().getFunctionPointerInterfaceName(type));
     this.functionType = type;
     
     context.getBuilder().addVarDecl(jimpleType, jimpleName);
   }
-  
-  
+   
 
   @Override
   public GimpleType getGimpleType() {
@@ -45,26 +38,6 @@ public class FunPtrVar extends Variable {
   }
 
 
-
-  @Override
-  public void assign(GimpleOp op, List<GimpleExpr> operands) {
-    switch (op) {
-    case INTEGER_CST:
-      assignNull(operands.get(0));
-      break;
-
-    case NOP_EXPR:
-      assignPointer(operands.get(0));
-      break;
-
-    case ADDR_EXPR:
-      assignPointer(operands.get(0));
-      break;
-
-    default:
-      throw new UnsupportedOperationException(op + " " + operands);
-    }
-  }
 
   private void assignPointer(GimpleExpr param) {
     if (param instanceof GimpleAddressOf) {
@@ -101,6 +74,14 @@ public class FunPtrVar extends Variable {
     }
     context.getBuilder().addStatement(Jimple.id(jimpleName) + " = null");
   }
+  
+  
+
+  @Override
+  public void setToNull() {
+    context.getBuilder().addStatement(Jimple.id(jimpleName) + " = null"); 
+  }
+
 
   public JimpleExpr getJimpleVariable() {
     return new JimpleExpr(jimpleName);

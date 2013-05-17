@@ -16,6 +16,7 @@ import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 
 import com.google.common.collect.Maps;
+import org.renjin.gcc.gimple.expr.SymbolRef;
 
 /**
  * Finds all variables which are addressed (&x or x[0]) within a function body.
@@ -23,35 +24,23 @@ import com.google.common.collect.Maps;
  */
 public class VarUsageInspector extends GimpleVisitor {
 
-  private Map<String, VarUsage> usageMap = Maps.newHashMap();
+  private Map<Integer, VarUsage> usageMap = Maps.newHashMap();
 
   public VarUsageInspector(GimpleFunction fn) {
     fn.visitIns(this);
   }
 
-  private VarUsage getUsage(String var) {
-    VarUsage usage = usageMap.get(var);
+  public VarUsage getUsage(int symbolId) {
+    VarUsage usage = usageMap.get(symbolId);
     if (usage == null) {
       usage = new VarUsage();
-      usageMap.put(var, usage);
+      usageMap.put(symbolId, usage);
     }
     return usage;
   }
 
-  public VarUsage getUsage(GimpleParameter param) {
-    return getUsage(param.getName());
-  }
-
-  public VarUsage getUsage(GimpleVariableRef var) {
-    return getUsage(var.getName());
-  }
-
-  public VarUsage getUsage(GimpleVarDecl var) {
-    return getUsage(var.getName());
-  }
-
-  private VarUsage getUsage(GimpleExpr var) {
-    return getUsage((GimpleVariableRef) var);
+  public VarUsage getUsage(SymbolRef ref) {
+    return getUsage(ref.getId());
   }
 
   private void visitOperand(GimpleExpr expr) {
@@ -61,8 +50,8 @@ public class VarUsageInspector extends GimpleVisitor {
   }
 
   private void visitAddressOf(GimpleAddressOf expr) {
-    if (expr.getValue() instanceof GimpleVariableRef) {
-      getUsage(expr.getValue()).setAddressed(true);
+    if (expr.getValue() instanceof SymbolRef) {
+      getUsage(((SymbolRef) expr.getValue()).getId()).setAddressed(true);
     }
   }
 

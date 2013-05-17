@@ -1,33 +1,23 @@
 package org.renjin.gcc.translate.call;
 
 import org.renjin.gcc.gimple.expr.GimpleLValue;
-import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.var.PrimitiveVar;
-import org.renjin.gcc.translate.var.Variable;
+import org.renjin.gcc.translate.assign.PrimitiveAssignable;
+import org.renjin.gcc.translate.expr.Expr;
 
 public class PrimitiveUnmarshaller extends CallUnmarshaller {
 
   public boolean unmarshall(FunctionContext context, GimpleLValue lhs, JimpleType type, JimpleExpr callExpr) {
     if (type.isPrimitive()) {
-      PrimitiveVar var = isPrimitiveVar(context, lhs);
-      if (var != null) {
-        var.assign(callExpr);
+      Expr lhsExpr = context.resolveExpr(lhs);
+      if(lhsExpr instanceof PrimitiveAssignable) {
+        ((PrimitiveAssignable) lhsExpr).assignPrimitiveValue(callExpr);
         return true;
       }
     }
     return false;
   }
 
-  private PrimitiveVar isPrimitiveVar(FunctionContext context, GimpleLValue lhs) {
-    if (lhs instanceof GimpleVariableRef) {
-      Variable var = context.lookupVar(lhs);
-      if (var instanceof PrimitiveVar) {
-        return (PrimitiveVar) var;
-      }
-    }
-    return null;
-  }
 }

@@ -1,60 +1,55 @@
 package org.renjin.gcc.translate.var;
 
+import java.util.List;
+
 import org.renjin.gcc.gimple.GimpleOp;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.gimple.type.IndirectType;
+import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.jimple.JimpleExpr;
-import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.expr.AbstractExpr;
+import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.IndirectExpr;
 
-import java.util.List;
+public abstract class Variable extends AbstractExpr {
 
-public abstract class Variable {
-
-  public abstract void assign(GimpleOp op, List<GimpleExpr> operands);
 
   public GimpleType getGimpleType() {
     throw new UnsupportedOperationException("not implemented in " + getClass().getSimpleName());
-  }
-
-  public JimpleExpr asPrimitiveExpr(JimpleType type) {
-    throw new UnsupportedOperationException(this + " does not have a primitive representation");
-  }
-
-  public JimpleType getPrimitiveType() {
-    throw new UnsupportedOperationException(this + " does not have a primitive representation");
   }
 
   public void initFromParameter() {
 
   }
 
-  public void initFromConstant(Object value) {
-    throw new UnsupportedOperationException();
+  public abstract JimpleExpr returnExpr();
+
+  @Override
+  public Expr addressOf() {
+    throw new UnsupportedOperationException(toString() + " (" + getClass().getSimpleName() + ")");
   }
 
-  public void assignMember(String member, GimpleOp operator, List<GimpleExpr> operands) {
-    throw new UnsupportedOperationException(this + " does not support member assignment");
+  @Override
+  public Expr value() {
+    throw new UnsupportedOperationException(getClass().getSimpleName() + ": " + toString());
   }
 
-  public JimpleExpr memberRef(String member, JimpleType jimpleType) {
-    throw new UnsupportedOperationException(this + " does not support member assignment");
+  @Override
+  public JimpleExpr asPrimitiveValue(FunctionContext context) {
+    throw new UnsupportedOperationException(getClass().getSimpleName());
+
+  }
+
+  @Override
+  public GimpleType type() {
+    return getGimpleType();
   }
 
   public JimpleExpr wrapPointer() {
-    throw new UnsupportedOperationException(this + " is not addressable");
-  }
-
-  public boolean isReal() {
-    throw new UnsupportedOperationException(this + " does not have a numeric representation");
-  }
-
-  public JimpleExpr asPrimitiveArrayRef(JimpleExpr index) {
-    throw new UnsupportedOperationException(this + " cannot be referenced as a primitive array");
-  }
-
-  public void assignIndirect(GimpleOp operator, List<GimpleExpr> operands) {
     throw new UnsupportedOperationException();
   }
 
-  public abstract JimpleExpr returnExpr();
+
 }

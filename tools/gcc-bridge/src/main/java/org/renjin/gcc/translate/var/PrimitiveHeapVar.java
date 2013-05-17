@@ -1,10 +1,17 @@
 package org.renjin.gcc.translate.var;
 
+import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.gimple.type.IndirectType;
+import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.assign.PrimitiveAssignable;
+import org.renjin.gcc.translate.expr.AbstractExpr;
+import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.IndirectExpr;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
 /**
@@ -13,12 +20,12 @@ import org.renjin.gcc.translate.types.PrimitiveTypes;
  * can be addressed and passed by reference to other methods.
  * 
  */
-public class PrimitiveHeapStorage implements PrimitiveStorage {
+public class PrimitiveHeapVar extends Variable implements PrimitiveAssignable {
   private FunctionContext context;
   private String jimpleName;
   private PrimitiveType type;
 
-  public PrimitiveHeapStorage(FunctionContext context, PrimitiveType type, String gimpleName) {
+  public PrimitiveHeapVar(FunctionContext context, PrimitiveType type, String gimpleName) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
     this.type = type;
@@ -28,12 +35,21 @@ public class PrimitiveHeapStorage implements PrimitiveStorage {
   }
 
   @Override
-  public void assign(JimpleExpr expr) {
+  public void assignPrimitiveValue(JimpleExpr expr) {
     context.getBuilder().addStatement(jimpleName + "[0] = " + expr);
   }
 
   @Override
-  public JimpleExpr asNumericExpr() {
+  public JimpleExpr asPrimitiveValue(FunctionContext context) {
+    return jimple();
+  }
+
+  @Override
+  public JimpleExpr returnExpr() {
+    return jimple();
+  }
+
+  public JimpleExpr jimple() {
     return new JimpleExpr(jimpleName + "[0]");
   }
 
@@ -48,5 +64,39 @@ public class PrimitiveHeapStorage implements PrimitiveStorage {
 
     return new JimpleExpr(tempWrapper);
   }
+    
 
+  @Override
+  public GimpleType type() {
+    return type;
+  }
+
+  @Override
+  public String toString() {
+    return "heap:" + jimpleName;
+  }
+
+  @Override
+  public Expr addressOf() {
+    return new PointerTo();
+  }
+
+  private class PointerTo extends AbstractExpr implements IndirectExpr {
+
+    @Override
+    public JimpleExpr backingArray() {
+      return new JimpleExpr(jimpleName);
+    }
+
+    @Override
+    public JimpleExpr backingArrayIndex() {
+      return JimpleExpr.integerConstant(0);
+    }
+
+    @Override
+    public IndirectType type() {
+      return new PointerType(PrimitiveHeapVar.this.type());
+    }
+  }
+  
 }

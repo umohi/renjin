@@ -11,11 +11,13 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
+import org.renjin.gcc.gimple.type.ArrayType;
 import org.renjin.gcc.gimple.type.FunctionType;
-import org.renjin.gcc.gimple.type.GimpleStructType;
 import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.gimple.type.IndirectType;
 import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
+import org.renjin.gcc.gimple.type.RecordType;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
 import org.renjin.gcc.jimple.JimpleOutput;
 import org.renjin.gcc.jimple.JimpleType;
@@ -99,16 +101,23 @@ public class TranslationContext {
   public TypeTranslator resolveType(GimpleType type) {
     if (type instanceof PrimitiveType) {
       return new PrimitiveTypeTranslator((PrimitiveType) type);
-    } else if (type instanceof PointerType) {
-      GimpleType baseType = ((PointerType) type).getBaseType();
+    } else if (type instanceof IndirectType) {
+      GimpleType baseType = type.getBaseType();
+      
+      // treat pointers to an array as simply pointers to the underlying type
+      if(baseType instanceof ArrayType) {
+        baseType = ((ArrayType) baseType).getComponentType();
+        type = new PointerType(baseType);
+      }
+      
       if(baseType instanceof PrimitiveType) {
-        return new PrimitivePtrTypeTranslator((PointerType) type);
-      } else if (baseType instanceof GimpleStructType) {
+        return new PrimitivePtrTypeTranslator((IndirectType) type);
+      } else if (baseType instanceof RecordType) {
         return new StructTypeTranslator(this, type);
       } else if (baseType instanceof FunctionType) {
         return new FunPtrTranslator(this, (FunctionType) baseType);
-      }
-    } else if (type instanceof GimpleStructType) {
+      } 
+    } else if (type instanceof RecordType) {
       return new StructTypeTranslator(this, type);
     } 
     throw new UnsupportedOperationException(type.toString());
@@ -134,8 +143,8 @@ public class TranslationContext {
     return functions;
   }
 
-  public Struct resolveStruct(String name) {
-    return structTable.resolveStruct(name);
+  public Struct resolveStruct(RecordType recordType) {
+    return structTable.resolveStruct(recordType);
   }
 
   public JimpleType getInvokerType(MethodRef method) {

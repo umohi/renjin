@@ -1,27 +1,22 @@
 package org.renjin.gcc.translate;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
+import org.renjin.gcc.CallingConvention;
 import org.renjin.gcc.gimple.GimpleCall;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.GimpleVarDecl;
-import org.renjin.gcc.gimple.expr.GimpleArrayRef;
-import org.renjin.gcc.gimple.expr.GimpleConstant;
-import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleExternal;
-import org.renjin.gcc.gimple.expr.GimpleVariableRef;
-import org.renjin.gcc.gimple.expr.SymbolRef;
+import org.renjin.gcc.gimple.expr.*;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleMethodBuilder;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.call.MethodRef;
+import org.renjin.gcc.translate.expr.*;
 import org.renjin.gcc.translate.types.TypeTranslator;
 import org.renjin.gcc.translate.var.Variable;
-import org.renjin.gcc.CallingConvention;
 
 import com.google.common.collect.Maps;
 
@@ -45,19 +40,15 @@ public class FunctionContext {
 
     for (GimpleVarDecl decl : gimpleFunction.getVariableDeclarations()) {
       Variable localVariable = translationContext.resolveType(decl.getType()).createLocalVariable(this, decl.getName(),
-          varUsage.getUsage(decl));
+          varUsage.getUsage(decl.getId()));
 
       symbolTable.put(decl.getId(), localVariable);
-
-      if (decl.getConstantValue() != null) {
-        localVariable.initFromConstant(decl.getConstantValue());
-      }
     }
 
     for (GimpleParameter param : gimpleFunction.getParameters()) {
       TypeTranslator type = translationContext.resolveType(param.getType());
       builder.addParameter(type.paramType(), param.getName());
-      Variable variable = type.createLocalVariable(this, param.getName(), varUsage.getUsage(param));
+      Variable variable = type.createLocalVariable(this, param.getName(), varUsage.getUsage(param.getId()));
       variable.initFromParameter();
       symbolTable.put(param.getId(), variable);
     }
@@ -110,53 +101,6 @@ public class FunctionContext {
     return symbolTable.values();
   }
 
-  public JimpleExpr asNumericExpr(GimpleExpr gimpleExpr, JimpleType type) {
-    if (gimpleExpr instanceof SymbolRef) {
-      Variable variable = lookupVar(gimpleExpr);
-      return variable.asPrimitiveExpr(type);
-    } else if (gimpleExpr instanceof GimpleConstant) {
-      return asConstant(((GimpleConstant) gimpleExpr).getValue(), type);
-    } else if (gimpleExpr instanceof GimpleExternal) {
-      return fromField((GimpleExternal) gimpleExpr);
-    } else if (gimpleExpr instanceof GimpleArrayRef) {
-      return numericFromArrayRef((GimpleArrayRef) gimpleExpr);
-    } else {
-      throw new UnsupportedOperationException(gimpleExpr.toString());
-    }
-  }
-
-  private JimpleExpr numericFromArrayRef(GimpleArrayRef ref) {
-    JimpleExpr index = asNumericExpr(ref.getIndex(), JimpleType.INT);
-    return lookupVar(ref.getArray()).asPrimitiveArrayRef(index);
-  }
-
-  private JimpleExpr fromField(GimpleExternal external) {
-    Field field = translationContext.findField(external);
-    return JimpleExpr.staticFieldReference(field);
-  }
-
-  private JimpleExpr asConstant(Object value, JimpleType type) {
-    if (!(value instanceof Number)) {
-      throw new UnsupportedOperationException("value: " + value + " (" + value.getClass() + ")");
-    }
-    Number number = (Number) value;
-    if (type.equals(JimpleType.DOUBLE)) {
-      return JimpleExpr.doubleConstant(number.doubleValue());
-
-    } else if (type.equals(JimpleType.FLOAT)) {
-      return JimpleExpr.floatConstant(number.floatValue());
-
-    } else if (type.equals(JimpleType.INT) || type.equals(JimpleType.BOOLEAN)) {
-      return JimpleExpr.integerConstant(number.intValue());
-
-    } else if (type.equals(JimpleType.LONG)) {
-      return JimpleExpr.longConstant(number.longValue());
-
-    } else {
-      throw new UnsupportedOperationException("type: " + type);
-    }
-  }
-
   public GimpleType getGimpleVariableType(GimpleExpr expr) {
     if(expr instanceof SymbolRef) {
       Variable variable = symbolTable.get(((SymbolRef) expr).getId());
@@ -170,4 +114,30 @@ public class FunctionContext {
       throw new UnsupportedOperationException(expr.toString());
     }
   }
+
+  public Expr resolveExpr(GimpleExpr gimpleExpr) {
+    if(gimpleExpr instanceof GimpleMemRef) {
+      return resolveExpr(((GimpleMemRef) gimpleExpr).getPointer()).value();
+    } else if(gimpleExpr instanceof SymbolRef) {
+      return lookupVar(gimpleExpr);
+    } else if(gimpleExpr instanceof GimpleStringConstant) {
+      return new StringConstant((GimpleStringConstant) gimpleExpr);
+    } else if(gimpleExpr instanceof GimpleConstant) {
+      return new PrimitiveConstant(this, (GimpleConstant) gimpleExpr);
+    } else if(gimpleExpr instanceof GimpleAddressOf) {
+      return resolveExpr(((GimpleAddressOf) gimpleExpr).getValue()).addressOf();
+    } else if(gimpleExpr instanceof GimpleFunctionRef) {
+      return new FunctionExpr(translationContext.resolveMethod(((GimpleFunctionRef) gimpleExpr).getName()));
+    } else if(gimpleExpr instanceof GimpleArrayRef) {
+      GimpleArrayRef arrayRef = (GimpleArrayRef) gimpleExpr;
+      return resolveExpr(arrayRef.getArray()).elementAt(resolveExpr(arrayRef.getIndex()));
+    } else if(gimpleExpr instanceof GimpleComponentRef) {
+      GimpleComponentRef componentRef = (GimpleComponentRef) gimpleExpr;
+      return resolveExpr(componentRef.getValue()).member(componentRef.getMember());
+    } else if(gimpleExpr instanceof GimpleConstantRef) {
+      return resolveExpr(((GimpleConstantRef) gimpleExpr).getValue());
+    }
+    throw new UnsupportedOperationException(gimpleExpr.toString());
+  }
+
 }

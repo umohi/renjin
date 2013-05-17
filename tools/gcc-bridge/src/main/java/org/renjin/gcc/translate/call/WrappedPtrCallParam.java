@@ -3,7 +3,7 @@ package org.renjin.gcc.translate.call;
 import org.renjin.gcc.jimple.JimpleType;
 
 /**
- * A call parameter of primtive pointer type (double*, int*, etc) that is
+ * A call parameter of primitive pointer type (double*, int*, etc) that is
  * wrapped in a DblPtr or IntPtr.
  */
 public class WrappedPtrCallParam extends CallParam {

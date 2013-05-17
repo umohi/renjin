@@ -2,7 +2,7 @@ package org.renjin.gcc.jimple;
 
 import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.expr.GimpleVariableRef;
-import org.renjin.gcc.gimple.type.GimpleStructType;
+import org.renjin.gcc.gimple.type.RecordType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;

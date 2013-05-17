@@ -13,7 +13,7 @@ import org.renjin.gcc.gimple.GimpleSwitch;
 import org.renjin.gcc.gimple.GimpleVisitor;
 import org.renjin.gcc.gimple.GimpleGoto;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
-import org.renjin.gcc.gimple.expr.GimpleCompoundRef;
+import org.renjin.gcc.gimple.expr.GimpleComponentRef;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
@@ -91,26 +91,8 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitAssignment(GimpleAssign assignment) {
-    try {
-      if (assignment.getLHS() instanceof SymbolRef) {
-        context.lookupVar(assignment.getLHS()).assign(assignment.getOperator(), assignment.getOperands());
-
-      } else if (assignment.getLHS() instanceof GimpleCompoundRef) {
-        GimpleCompoundRef ref = (GimpleCompoundRef) assignment.getLHS();
-        Variable var = context.lookupVar(ref.getVar());
-        var.assignMember(ref.getMember(), assignment.getOperator(), assignment.getOperands());
-
-      } else if (assignment.getLHS() instanceof GimpleMemRef) {
-        GimpleMemRef indirectRef = (GimpleMemRef) assignment.getLHS();
-        Variable var = context.lookupVar(indirectRef.getPointer());
-        var.assignIndirect(assignment.getOperator(), assignment.getOperands());
-
-      } else {
-        throw new UnsupportedOperationException("lhs: " + assignment.getLHS());
-      }
-    } catch (Exception e) {
-      throw new TranslationException("Exception translating " + assignment, e);
-    }
+    AssignmentTranslator translator = new AssignmentTranslator(context);
+    translator.translate(assignment);
   }
 
   @Override
@@ -148,27 +130,13 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitCall(GimpleCall call) {
+    try {
     new CallTranslator(context, call).translate();
-    // try {
-    //
-    // JimpleExpr callExpr = translateCallExpr(call);
-    //
-    // if(call.getLhs() instanceof GimpleVar) {
-    // Variable lhs = context.lookupVar(call.getLhs());
-    // assignCallResult(lhs, callExpr);
-    //
-    // } else if(call.getLhs() == null) {
-    // builder.addStatement(callExpr.toString());
-    //
-    // } else {
-    // throw new UnsupportedOperationException("Lvalue: " + call.getLhs());
-    // }
-    //
-    //
-    // } catch(Exception e) {
-    // throw new TranslationException("Exception thrown while translating call "
-    // + call, e);
-    // }
+      } catch(Exception e) {
+      throw new TranslationException("Exception thrown while translating call "
+      + call, e);
+      }
+
   }
 
   //

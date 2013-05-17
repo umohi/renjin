@@ -4,10 +4,8 @@ import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.VarUsage;
-import org.renjin.gcc.translate.var.PrimitiveHeapStorage;
-import org.renjin.gcc.translate.var.PrimitiveStackStorage;
-import org.renjin.gcc.translate.var.PrimitiveStorage;
-import org.renjin.gcc.translate.var.PrimitiveVar;
+import org.renjin.gcc.translate.var.PrimitiveHeapVar;
+import org.renjin.gcc.translate.var.PrimitiveStackVar;
 import org.renjin.gcc.translate.var.Variable;
 
 public class PrimitiveTypeTranslator extends TypeTranslator {
@@ -34,12 +32,10 @@ public class PrimitiveTypeTranslator extends TypeTranslator {
 
   @Override
   public Variable createLocalVariable(FunctionContext functionContext, String gimpleName, VarUsage usage) {
-    PrimitiveStorage storage;
     if (usage.isAddressed()) {
-      storage = new PrimitiveHeapStorage(functionContext, type, gimpleName);
+      return new PrimitiveHeapVar(functionContext, type, gimpleName);
     } else {
-      storage = new PrimitiveStackStorage(functionContext, type, gimpleName);
+      return new PrimitiveStackVar(functionContext, type, gimpleName);
     }
-    return new PrimitiveVar(functionContext, type, storage);
   }
 }

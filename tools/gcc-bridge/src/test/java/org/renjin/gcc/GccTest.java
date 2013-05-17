@@ -1,26 +1,26 @@
 package org.renjin.gcc;
 
-import com.google.common.collect.Lists;
-import org.junit.Test;
-import org.renjin.gcc.gimple.GimpleCompilationUnit;
-import org.renjin.gcc.gimple.GimpleFunction;
-import org.renjin.gcc.gimple.GimpleParser;
-import org.renjin.gcc.runtime.CharPtr;
-import org.renjin.gcc.runtime.DoublePtr;
-
-import soot.JastAddJ.CompilationUnit;
+import static java.lang.Double.NaN;
+import static java.lang.Double.isNaN;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Double.NaN;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.renjin.gcc.gimple.GimpleCompilationUnit;
+import org.renjin.gcc.gimple.GimpleFunction;
+import org.renjin.gcc.runtime.CharPtr;
+import org.renjin.gcc.runtime.DoublePtr;
+
+import com.google.common.collect.Lists;
 
 public class GccTest {
 
@@ -58,6 +58,15 @@ public class GccTest {
     Class clazz = compile("funptr.c", "FunPtr");
     Method method = clazz.getMethod("sum_array", DoublePtr.class, int.class);
     Double result = (Double) method.invoke(null, new DoublePtr(1, 4, 16), 3);
+    assertThat(result, equalTo(273d));
+  }
+  
+  @Test
+  public void structTest() throws Exception {
+    Class clazz = compile("structs.c", "Structs");
+    Method method = clazz.getMethod("test_account_value");
+    Double result = (Double) method.invoke(null);
+    assertThat(result, equalTo(5000d));
     System.out.println(result);
   }
 
@@ -78,10 +87,9 @@ public class GccTest {
     int result = (Integer) method.invoke(null, 0);
 
     assertThat(result, equalTo(5));
-
   }
 
-  @Test
+  @Test  
   public void distBinary() throws Exception {
     Class clazz = compile("distbinary.c", "DistBinary");
   }
@@ -105,6 +113,29 @@ public class GccTest {
 
     assertThat(result, equalTo((int) 'e'));
   }
+  
+  @Test
+  public void fortranDoubleMax() throws Exception {
+    Class clazz = compile("max.f", "MaxTest");
+    Method method = clazz.getMethod("testmax", DoublePtr.class);
+    
+    DoublePtr x = new DoublePtr(-1);
+    method.invoke(null, x);
+
+    assertThat(x.unwrap(), equalTo(0d));
+    
+    x = new DoublePtr(Double.NaN);
+    method.invoke(null, x);
+    
+    System.out.println(x.unwrap());
+    
+    assertTrue(Double.isNaN(x.unwrap()));
+  }
+  
+  @Test
+  public void fortran() throws Exception {
+    Class clazz = compile("dqrdc2.f", "Dqrdc");
+  }
 
   @Test
   public void negate() throws Exception {
@@ -115,6 +146,7 @@ public class GccTest {
     assertThat((Double) method.invoke(null, -1.5), equalTo(1.5));
 
   }
+
 
   @Test
   public void fpComparison() throws Exception {

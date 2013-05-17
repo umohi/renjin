@@ -6,23 +6,9 @@ public class GimpleVarDecl {
   private int id;
   private GimpleType type;
   private String name;
-  private Object constantValue;
 
   public GimpleVarDecl() {
 
-  }
-
-  public GimpleVarDecl(GimpleType type, String name) {
-    super();
-    this.type = type;
-    this.name = name;
-    constantValue = null;
-  }
-
-  public GimpleVarDecl(GimpleType type, String name, Object constantValue) {
-    this.type = type;
-    this.name = name;
-    this.constantValue = constantValue;
   }
 
   public int getId() {
@@ -53,9 +39,6 @@ public class GimpleVarDecl {
     this.name = name;
   }
 
-  public Object getConstantValue() {
-    return constantValue;
-  }
 
   @Override
   public String toString() {

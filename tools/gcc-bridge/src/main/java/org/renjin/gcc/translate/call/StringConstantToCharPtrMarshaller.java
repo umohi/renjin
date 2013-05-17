@@ -7,27 +7,28 @@ import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
 public class StringConstantToCharPtrMarshaller extends ParamMarshaller {
 
   @Override
-  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param) {
+  public JimpleExpr marshall(FunctionContext context, Expr expr, CallParam param) {
 
-    String value = ParamUtils.isStringConstant(expr);
-    if (value != null && param instanceof WrappedPtrCallParam) {
-
-      String temp = context.getBuilder().addTempVarDecl(new RealJimpleType(CharPtr.class));
-      StringBuilder stmt = new StringBuilder();
-      stmt.append(temp)
-          .append(
-              " = staticinvoke<org.renjin.gcc.runtime.CharPtr: org.renjin.gcc.runtime.CharPtr fromString(java.lang.String)>")
-          .append("(").append(JimpleExpr.stringLiteral(value)).append(")");
-
-      context.getBuilder().addStatement(stmt.toString());
-
-      return new JimpleExpr(temp);
-    }
+//    String value = ParamUtils.isStringConstant(expr);
+//    if (value != null && param instanceof WrappedPtrCallParam) {
+//
+//      String temp = context.getBuilder().addTempVarDecl(new RealJimpleType(CharPtr.class));
+//      StringBuilder stmt = new StringBuilder();
+//      stmt.append(temp)
+//          .append(
+//              " = staticinvoke<org.renjin.gcc.runtime.CharPtr: org.renjin.gcc.runtime.CharPtr fromString(java.lang.String)>")
+//          .append("(").append(JimpleExpr.stringLiteral(value)).append(")");
+//
+//      context.getBuilder().addStatement(stmt.toString());
+//
+//      return new JimpleExpr(temp);
+//    }
     throw new CannotMarshallException();
   }
 

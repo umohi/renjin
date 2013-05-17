@@ -1,13 +1,13 @@
 package org.renjin.gcc.gimple.expr;
 
 public class GimpleIntegerConstant extends GimpleConstant {
-  private int value;
+  private long value;
 
-  public Integer getValue() {
+  public Long getValue() {
     return value;
   }
 
-  public void setValue(int value) {
+  public void setValue(long value) {
     this.value = value;
   }
 

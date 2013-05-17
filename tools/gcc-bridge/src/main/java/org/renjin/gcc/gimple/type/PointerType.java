@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class PointerType extends AbstractGimpleType {
+public class PointerType extends AbstractGimpleType implements IndirectType {
   private GimpleType baseType;
 
   public PointerType() {
@@ -29,7 +29,4 @@ public class PointerType extends AbstractGimpleType {
   public boolean isPointerTo(Class<? extends GimpleType> clazz) {
     return clazz.isAssignableFrom(baseType.getClass());
   }
-  
-  
-  
 }

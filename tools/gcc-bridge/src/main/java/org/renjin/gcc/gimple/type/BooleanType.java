@@ -6,4 +6,16 @@ public class BooleanType extends PrimitiveType {
   public String toString() {
     return "bool";
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof BooleanType;
+  }
+
+  @Override
+  public int hashCode() {
+    return 1;
+  }
+  
+  
 }

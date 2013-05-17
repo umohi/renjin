@@ -107,7 +107,7 @@ public class CallTranslator {
   private List<JimpleExpr> marshallParams(List<CallParam> callParams) {
     List<JimpleExpr> exprs = Lists.newArrayList();
     for (int i = 0; i != call.getParamCount(); ++i) {
-      exprs.add(paramMarshallers.marshall(context, call.getArguments().get(i), callParams.get(i)));
+      exprs.add(paramMarshallers.marshall(context, context.resolveExpr(call.getArguments().get(i)), callParams.get(i)));
     }
     return exprs;
   }

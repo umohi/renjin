@@ -2,7 +2,9 @@ package org.renjin.gcc.translate.struct;
 
 import com.google.common.collect.Maps;
 import org.renjin.gcc.gimple.GimpleFunction;
+import org.renjin.gcc.gimple.type.Field;
 import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.gimple.type.RecordType;
 import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TranslationContext;
@@ -19,39 +21,25 @@ public class GccStruct extends Struct {
 
   private Map<String, JimpleType> types = Maps.newHashMap();
 
-  public GccStruct(TranslationContext context, String name) {
+  public GccStruct(TranslationContext context, RecordType recordType) {
     this.context = context;
-    this.name = name;
+    this.name = recordType.getName();
     this.structClass = context.getJimpleOutput().newClass();
     this.structClass.setPackageName(context.getMainClass().getPackageName());
     this.structClass.setClassName(context.getMainClass().getClassName() + "$" + name);
 
-    inferMembers();
-  }
 
-  private void inferMembers() {
-    // the tree dump we get from GCC doesn't include struct layout.
-    // it may be possible to get dumps on this, or to write a plugin
-    // to dump the needed information, but we can also basically deduce
-    // the members and types from the Gimple
-
-    MemberFinder finder = new MemberFinder(name);
-    for (GimpleFunction function : context.getFunctions()) {
-      finder.visit(function);
-    }
-
-    for (Map.Entry<String, GimpleType> member : finder.getMembers().entrySet()) {
-      JimpleType type = context.resolveType(member.getValue()).paramType();
-      types.put(member.getKey(), type);
+    for (Field member : recordType.getFields()) {
+      JimpleType type = context.resolveType(member.getType()).paramType();
+      types.put(member.getName(), type);
 
       JimpleFieldBuilder field = structClass.newField();
-      field.setName(member.getKey());
+      field.setName(member.getName());
       field.setType(type);
       field.setModifiers(JimpleModifiers.PUBLIC);
     }
   }
 
-  @Override
   public JimpleExpr memberRef(JimpleExpr instanceExpr, String member, JimpleType jimpleType) {
     return new JimpleExpr(instanceExpr + ".<" + structClass.getFqcn() + ": " + types.get(member) + " " + member + ">");
   }

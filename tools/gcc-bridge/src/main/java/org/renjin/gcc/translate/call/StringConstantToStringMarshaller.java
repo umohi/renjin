@@ -4,6 +4,7 @@ import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.expr.Expr;
 
 /**
  * Marshalls a String literal to java.lang.String
@@ -12,13 +13,13 @@ import org.renjin.gcc.translate.FunctionContext;
 public class StringConstantToStringMarshaller extends ParamMarshaller {
 
   @Override
-  public JimpleExpr marshall(FunctionContext context, GimpleExpr expr, CallParam param) {
-    if (expr instanceof GimpleConstant) {
-      Object value = ((GimpleConstant) expr).getValue();
-      if (value instanceof String && isStringParam(param)) {
-        return JimpleExpr.stringLiteral((String) value);
-      }
-    }
+  public JimpleExpr marshall(FunctionContext context, Expr expr, CallParam param) {
+//    if (expr instanceof GimpleConstant) {
+//      Object value = ((GimpleConstant) expr).getValue();
+//      if (value instanceof String && isStringParam(param)) {
+//        return JimpleExpr.stringLiteral((String) value);
+//      }
+//    }
     throw new CannotMarshallException();
   }
 

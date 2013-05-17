@@ -241,6 +241,33 @@ static void dump_function_type(tree type) {
   
 }
 
+static void dump_record_type(tree type) {
+  
+  json_int_field("id", DEBUG_TEMP_UID (type));
+  
+  if(TYPE_NAME(type)) {
+    json_string_field("name", IDENTIFIER_POINTER(TYPE_NAME(type)));
+  }
+      
+  tree field =  TYPE_FIELDS(type);
+  json_array_field("fields");
+  while(field) {
+    json_start_object();
+    //json_string_field("code", tree_code_name[TREE_CODE(field)]);
+    if(DECL_NAME(field)) {
+      json_string_field("name", IDENTIFIER_POINTER(DECL_NAME(field)));
+    }
+    json_field("type");
+    dump_type(TREE_TYPE(field));
+
+    json_end_object();
+    
+    field = TREE_CHAIN(field);
+  }
+  json_end_array();
+
+}
+
 
 static void dump_type(tree type) {
   json_start_object();
@@ -281,6 +308,10 @@ static void dump_type(tree type) {
     dump_function_type(type);
     break;
     
+  case RECORD_TYPE:
+    dump_record_type(type);
+    break;
+    
   }
   json_end_object();
 
@@ -288,7 +319,7 @@ static void dump_type(tree type) {
 
 static void dump_op(tree op) {
  	REAL_VALUE_TYPE d;
- 	
+ 	 	
   if(op) {
     json_start_object();
     json_string_field("type", tree_code_name[TREE_CODE(op)]);
@@ -303,7 +334,12 @@ static void dump_op(tree op) {
         json_string_field("name", IDENTIFIER_POINTER(DECL_NAME(op)));
       } 
       break;  
-      
+
+    case CONST_DECL:
+      json_field("value");
+      dump_op(DECL_INITIAL(op));
+      break;
+          
     case INTEGER_CST:
       json_int_field("value", TREE_INT_CST_LOW (op));
       json_field("type");
@@ -315,10 +351,13 @@ static void dump_op(tree op) {
       json_field("type");
       dump_type(TREE_TYPE(op));
 	    break;
+	    
 	  case STRING_CST:
 	    json_string_field2("value", 
 	      TREE_STRING_POINTER(op),
         TREE_STRING_LENGTH (op));
+      json_field("type");
+      dump_type(TREE_TYPE(op));
       break;
 	    
 	  case MEM_REF:
@@ -333,6 +372,7 @@ static void dump_op(tree op) {
  	    json_field("index");
  	    dump_op(TREE_OPERAND(op, 1));
       break;
+      
     case ADDR_EXPR:
       json_field("value");
  	    dump_op(TREE_OPERAND(op, 0));
@@ -340,7 +380,15 @@ static void dump_op(tree op) {
  	  //  json_field("offset");
  	 //   dump_op(TREE_OPERAND(op, 1));
       break;
-	  
+    case COMPONENT_REF:
+      json_field("value");
+      dump_op(TREE_OPERAND(op, 0));
+      if(TREE_CODE(TREE_OPERAND(op, 1)) == FIELD_DECL) {
+        json_string_field("member",
+          IDENTIFIER_POINTER(DECL_NAME(TREE_OPERAND(op, 1))));
+      }
+      break;
+	    
     }
     
         
@@ -502,6 +550,11 @@ static void dump_local_decl(tree decl) {
   json_field("type");
   dump_type(TREE_TYPE(decl));
   
+  if(DECL_INITIAL(decl)) {
+    json_field("value");
+    dump_op(DECL_INITIAL(decl));
+  }
+  
   json_end_object();
 }
 
@@ -572,6 +625,19 @@ static unsigned int dump_function (void)
   return 0;
 }
 
+static void dump_type_decl (void *event_data, void *data)
+{
+  tree type = (tree) event_data;
+
+  json_start_object();
+  if(TYPE_NAME(type)) {
+    json_string_field("name", IDENTIFIER_POINTER (TYPE_NAME (type)));
+  }
+  json_string_field("type", tree_code_name[TREE_CODE (type)]);
+  json_end_object();
+}
+
+
 static void start_unit_callback (void *gcc_data, void *user_data)
 {
   json_start_object();
@@ -585,7 +651,7 @@ static void finish_unit_callback (void *gcc_data, void *user_data)
   json_end_object();
 }
 
-static struct gimple_opt_pass pass_dump_json =
+static struct gimple_opt_pass dump_functions_pass =
 {
     {
       GIMPLE_PASS,
@@ -604,6 +670,7 @@ static struct gimple_opt_pass pass_dump_json =
     }
 };
 
+
 /* Plugin initialization.  */
 
 int
@@ -613,7 +680,7 @@ plugin_init (struct plugin_name_args *plugin_info,
   struct register_pass_info pass_info;
   const char *plugin_name = plugin_info->base_name;
 
-  pass_info.pass = &pass_dump_json;
+  pass_info.pass = &dump_functions_pass;
   pass_info.reference_pass_name = "cfg";
   pass_info.ref_pass_instance_number = 1;
   pass_info.pos_op = PASS_POS_INSERT_AFTER;
@@ -634,10 +701,13 @@ plugin_init (struct plugin_name_args *plugin_info,
     } 
   }
 
+
   /* Register this new pass with GCC */
   register_callback (plugin_name, PLUGIN_PASS_MANAGER_SETUP, NULL,
                      &pass_info);
                      
+  //register_callback (plugin_name, PLUGIN_FINISH_TYPE, &dump_type_decl, NULL);
+
   register_callback ("start_unit", PLUGIN_START_UNIT, &start_unit_callback, NULL);
   register_callback ("finish_unit", PLUGIN_FINISH_UNIT, &finish_unit_callback, NULL);
 
