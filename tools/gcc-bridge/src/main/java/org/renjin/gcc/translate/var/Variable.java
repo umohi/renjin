@@ -47,9 +47,5 @@ public abstract class Variable extends AbstractExpr {
     return getGimpleType();
   }
 
-  public JimpleExpr wrapPointer() {
-    throw new UnsupportedOperationException();
-  }
-
 
 }

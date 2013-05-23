@@ -25,13 +25,9 @@ import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.gimple.type.VoidType;
-import org.renjin.gcc.jimple.Jimple;
-import org.renjin.gcc.jimple.JimpleGoto;
-import org.renjin.gcc.jimple.JimpleMethodBuilder;
-import org.renjin.gcc.jimple.JimpleModifiers;
-import org.renjin.gcc.jimple.JimpleSwitchStatement;
-import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.call.CallTranslator;
+import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 import org.renjin.gcc.translate.var.Variable;
 
@@ -42,7 +38,6 @@ public class FunctionTranslator extends GimpleVisitor {
 
   private TranslationContext translationContext;
   private JimpleMethodBuilder builder;
-  private GimpleFunction function;
 
   private FunctionContext context;
 
@@ -52,7 +47,6 @@ public class FunctionTranslator extends GimpleVisitor {
 
   public void translate(GimpleFunction function) {
     try {
-      this.function = function;
       this.builder = translationContext.getMainClass().newMethod();
       builder.setModifiers(JimpleModifiers.PUBLIC, JimpleModifiers.STATIC);
       builder.setName(function.getName());
@@ -68,9 +62,9 @@ public class FunctionTranslator extends GimpleVisitor {
 
   private JimpleType translateReturnType(GimpleType returnType) {
     if (returnType instanceof PrimitiveType) {
-      return PrimitiveTypes.get((PrimitiveType) returnType);
+      return PrimitiveTypes.get(returnType);
     } else if (returnType instanceof PointerType) {
-      GimpleType innerType = ((PointerType) returnType).getBaseType();
+      GimpleType innerType = returnType.getBaseType();
       if (innerType instanceof PrimitiveType) {
         return PrimitiveTypes.getWrapperType((PrimitiveType) innerType);
       }
@@ -100,11 +94,11 @@ public class FunctionTranslator extends GimpleVisitor {
     if (gimpleReturn.getValue() == null) {
       builder.addStatement("return");
     } else {
-      if (gimpleReturn.getValue() instanceof GimpleVariableRef) {
+      if (gimpleReturn.getValue() instanceof SymbolRef) {
         Variable var = context.lookupVar(gimpleReturn.getValue());
         builder.addStatement("return " + var.returnExpr());
       } else {
-        builder.addStatement("return " + translateExpr(gimpleReturn.getValue()));
+        throw new UnsupportedOperationException(gimpleReturn.getValue().toString());
       }
     }
   }
@@ -121,7 +115,8 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
-    JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(translateExpr(gimpleSwitch.getExpr()));
+    Expr switchExpr = context.resolveExpr(gimpleSwitch.getExpr());
+    JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(switchExpr.asPrimitiveValue(context).toString());
     for (GimpleSwitch.Branch branch : gimpleSwitch.getBranches()) {
       jimpleSwitch.addBranch(branch.getValue(), branch.getLabel().getName());
     }
@@ -136,78 +131,7 @@ public class FunctionTranslator extends GimpleVisitor {
       throw new TranslationException("Exception thrown while translating call "
       + call, e);
       }
-
   }
-
-  //
-  // private JimpleExpr translateCallExpr(GimpleCall call) {
-  // StringBuilder callExpr = new StringBuilder();
-  // MethodRef method;
-  // if(call.getFunction() instanceof GimpleExternal) {
-  // method = translationContext.resolveMethod(call,
-  // function.getCallingConvention());
-  // callExpr.append("staticinvoke").append(method.signature());
-  //
-  // } else if(call.getFunction() instanceof GimpleVar) {
-  // GimpleType type = function.getType(call.getFunction());
-  // if(!(type instanceof FunctionPointerType)) {
-  // throw new
-  // UnsupportedOperationException("Function value must be of type FunctionPointer, got: "
-  // + type);
-  // }
-  // method = translationContext.getFunctionPointerMethod((FunctionPointerType)
-  // type);
-  // callExpr.append("interfaceinvoke ");
-  // callExpr.append(translateExpr(call.getFunction()));
-  // callExpr.append(".");
-  // callExpr.append(method.signature());
-  // } else {
-  // throw new UnsupportedOperationException(call.getFunction().toString());
-  // }
-  //
-  // // check arity
-  // if(method.getParameterTypes().size() != call.getParamCount()) {
-  // throw new TranslationException("Argument count of " + method +
-  // " does not match call");
-  // }
-  //
-  // callExpr.append("(");
-  // for(int i=0;i!=call.getParams().size();++i) {
-  // JimpleType type = method.getParameterTypes().get(i);
-  // GimpleExpr param = call.getParams().get(i);
-  // if(i > 0) {
-  // callExpr.append(", ");
-  // }
-  // callExpr.append(marshallParam(type, param));
-  // }
-  // callExpr.append(")");
-  // return new JimpleExpr(callExpr.toString());
-  // }
-
-  // private String marshallParam(JimpleType type, GimpleExpr param) {
-  // if(type.toString().startsWith("org.renjin.gcc.runtime.FunPtr")) {
-  // return marshalFunctionPointer(param);
-  // } else {
-  // return translateExpr(param);
-  // }
-  // }
-  //
-  // private String marshalFunctionPointer(GimpleExpr param) {
-  // if(param instanceof GimpleExternal) {
-  // MethodRef method = translationContext.resolveMethod(((GimpleExternal)
-  // param).getName());
-  // String invokerClass = translationContext.getInvokerClass(method);
-  // String ptr = context.declareTemp(new RealJimpleType(invokerClass));
-  // builder.addStatement(ptr + " = new " + invokerClass);
-  // builder.addStatement("specialinvoke " + ptr + ".<" + invokerClass +
-  // ": void <init>()>()");
-  // return ptr;
-  // } else if(param instanceof GimpleVar) {
-  // return translateExpr(param);
-  // } else {
-  // throw new UnsupportedOperationException(param.toString());
-  // }
-  // }
 
   @Override
   public void visitConditional(GimpleConditional conditional) {
@@ -218,29 +142,4 @@ public class FunctionTranslator extends GimpleVisitor {
     }
   }
 
-  private String translateExpr(GimpleExpr expr) {
-    if (expr instanceof GimpleVariableRef) {
-      Variable var = context.lookupVar(expr);
-      return var.returnExpr().toString();
-    } else if (expr instanceof GimpleConstant) {
-      return Jimple.constant(((GimpleConstant) expr).getValue());
-    } else if (expr instanceof GimpleExternal) {
-      return resolveExternal((GimpleExternal) expr);
-    } else if (expr instanceof GimpleAddressOf) {
-      return translateAddressOf((GimpleAddressOf) expr);
-    } else {
-      throw new UnsupportedOperationException(expr.toString());
-    }
-  }
-
-  private String translateAddressOf(GimpleAddressOf expr) {
-    Variable var = context.lookupVar(expr.getValue());
-    return var.wrapPointer().toString();
-  }
-
-  private String resolveExternal(GimpleExternal external) {
-    Field field = translationContext.findField(external);
-    return "<" + field.getDeclaringClass().getName() + ": " + Jimple.type(field.getType()) + " " + external.getName()
-        + ">";
-  }
 }

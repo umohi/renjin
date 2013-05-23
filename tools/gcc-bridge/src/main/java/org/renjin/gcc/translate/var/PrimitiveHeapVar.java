@@ -6,7 +6,6 @@ import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
-import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.assign.PrimitiveAssignable;
 import org.renjin.gcc.translate.expr.AbstractExpr;
@@ -53,18 +52,6 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveAssignable {
     return new JimpleExpr(jimpleName + "[0]");
   }
 
-  @Override
-  public JimpleExpr wrapPointer() {
-    JimpleType wrapperType = PrimitiveTypes.getWrapperType(type);
-    String tempWrapper = context.declareTemp(wrapperType);
-    context.getBuilder().addStatement(tempWrapper + " = new " + wrapperType);
-    context.getBuilder().addStatement(
-        "specialinvoke " + tempWrapper + ".<" + wrapperType + ": void <init>(" + PrimitiveTypes.getArrayType(type)
-            + ")>(" + jimpleName + ")");
-
-    return new JimpleExpr(tempWrapper);
-  }
-    
 
   @Override
   public GimpleType type() {

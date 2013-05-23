@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.expr;
 
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 
@@ -40,9 +39,5 @@ public abstract class AbstractExpr implements Expr {
   public Expr member(String member) {
     throw new UnsupportedOperationException("Expression " + this + "  does not support members");
   }
-  
-  @Override
-  public boolean isNull() {
-    return false;
-  }
+
 }

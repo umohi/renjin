@@ -1,9 +1,7 @@
 package org.renjin.gcc.translate.var;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.TypeCheckError;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
@@ -83,7 +81,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     context.getBuilder().addStatement(jimpleOffsetName + " = 0");
   }
 
-  public JimpleExpr wrapPointer() {
+  private JimpleExpr wrapPointer() {
     JimpleType wrapperType = PrimitiveTypes.getWrapperType(gimpleType);
     String tempWrapper = context.declareTemp(wrapperType);
     context.getBuilder().addStatement(tempWrapper + " = new " + wrapperType);
@@ -127,12 +125,9 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
 
   public void assign(OffsetExpr offset) {
     if(offset.variable() != this) {
-      context.getBuilder().addStatement(jimpleArrayName + " = " + offset.variable().jimpleArrayName);
+      context.getBuilder().addStatement(jimpleArrayName + " = " + offset.backingArray());
     }
-    JimpleExpr bytesToIncrement = offset.offset.asPrimitiveValue(context);
-    String positionsToIncrement = context.declareTemp(JimpleType.INT);
-    context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf());
-    context.getBuilder().addStatement(jimpleOffsetName + " = " + offset.variable().jimpleOffsetName + " + " + positionsToIncrement);    
+    context.getBuilder().addStatement(jimpleOffsetName + " = " + offset.backingArrayIndex());
   }
 
   @Override

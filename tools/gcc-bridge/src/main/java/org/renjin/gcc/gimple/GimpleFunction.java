@@ -43,6 +43,11 @@ public class GimpleFunction {
     return name;
   }
 
+
+  public String getMangledName() {
+    return callingConvention.mangleFunctionName(name);
+  }
+
   public void setName(String name) {
     this.name = name;
   }
@@ -100,9 +105,9 @@ public class GimpleFunction {
   public GimpleType getReturnType() {
     return returnType;
   }
-
   public void setReturnType(GimpleType returnType) {
     this.returnType = returnType;
   }
 
+  
 }

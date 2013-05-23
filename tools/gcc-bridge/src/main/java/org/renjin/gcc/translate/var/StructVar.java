@@ -1,9 +1,5 @@
 package org.renjin.gcc.translate.var;
 
-import java.util.List;
-
-import org.renjin.gcc.gimple.GimpleOp;
-import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.RecordType;
 import org.renjin.gcc.jimple.Jimple;
@@ -34,11 +30,6 @@ public class StructVar extends Variable {
   @Override
   public Expr member(String member) {
     return new StructMember(struct, jimpleName, member);
-  }
-
-  @Override
-  public JimpleExpr wrapPointer() {
-    return new JimpleExpr(jimpleName);
   }
 
   @Override

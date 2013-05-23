@@ -71,6 +71,7 @@ public class AssignmentTranslator {
 
     case MINUS_EXPR:
       assignBinaryOp(lhs, "-", operands);
+      break;
 
     case RDIV_EXPR:
     case TRUNC_DIV_EXPR:

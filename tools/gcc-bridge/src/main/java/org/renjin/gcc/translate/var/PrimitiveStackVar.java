@@ -1,6 +1,5 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
@@ -24,11 +23,6 @@ public class PrimitiveStackVar extends Variable implements PrimitiveAssignable {
     this.jimpleName = Jimple.id(gimpleName);
 
     context.getBuilder().addVarDecl(PrimitiveTypes.get(type), jimpleName);
-  }
-
-  @Override
-  public JimpleExpr wrapPointer() {
-    throw new UnsupportedOperationException(jimpleName + " is not addressable, stored on stack");
   }
 
   @Override

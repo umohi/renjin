@@ -11,13 +11,7 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
-import org.renjin.gcc.gimple.type.ArrayType;
-import org.renjin.gcc.gimple.type.FunctionType;
-import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.gimple.type.PointerType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
-import org.renjin.gcc.gimple.type.RecordType;
+import org.renjin.gcc.gimple.type.*;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
 import org.renjin.gcc.jimple.JimpleOutput;
 import org.renjin.gcc.jimple.JimpleType;
@@ -78,7 +72,7 @@ public class TranslationContext {
 
   private MethodRef resolveInternally(String name) {
     for (GimpleFunction function : functions) {
-      if (function.getName().equals(name)) {
+      if (function.getMangledName().equals(name)) {
         return asRef(function);
       }
     }
@@ -86,7 +80,13 @@ public class TranslationContext {
   }
 
   private MethodRef asRef(GimpleFunction function) {
-    JimpleType returnType = resolveType(function.getReturnType()).returnType();
+    
+    JimpleType returnType;
+    if(function.getReturnType() instanceof VoidType) {
+      returnType = JimpleType.VOID;
+    } else {
+      returnType = resolveType(function.getReturnType()).returnType();
+    }
     List<JimpleType> paramTypes = Lists.newArrayList();
     for (GimpleParameter param : function.getParameters()) {
       paramTypes.add(resolveType(param.getType()).paramType());

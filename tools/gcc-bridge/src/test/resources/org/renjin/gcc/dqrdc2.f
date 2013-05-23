@@ -105,6 +105,8 @@ c
       lup = min0(n,p)
       k = p + 1
       do 200 l = 1, lup
+
+        call dumpx(x)
 c
 c     previous version only cycled l to lup
 c
@@ -145,7 +147,11 @@ c
 c
 c           compute the householder transformation for column l.
 c
+
+
+            call prenrmxl(n-l+1,x(l,l),1)
             nrmxl = dnrm2(n-l+1,x(l,l),1)
+            call dump_nrmxl(nrmxl)
             if (nrmxl .eq. 0.0d0) go to 180
                if (x(l,l) .ne. 0.0d0) nrmxl = dsign(nrmxl,x(l,l))
                call dscal(n-l+1,1.0d0/nrmxl,x(l,l),1)
@@ -158,12 +164,14 @@ c
                if (p .lt. lp1) go to 170
                do 160 j = lp1, p
                   t = -ddot(n-l+1,x(l,l),1,x(l,j),1)/x(l,l)
+                  call dumpt(t)
+
                   call daxpy(n-l+1,t,x(l,l),1,x(l,j),1)
                   if (qraux(j) .eq. 0.0d0) go to 150
                      tt = 1.0d0 - (dabs(x(l,j))/qraux(j))**2
                      tt = dmax1(tt,0.0d0)
                      t = tt
-c
+c                                     rst
 c modified 9/99 by BDR. Re-compute norms if there is large reduction
 c The tolerance here is on the squared norm
 c In this version we need accurate norms, so re-compute often.

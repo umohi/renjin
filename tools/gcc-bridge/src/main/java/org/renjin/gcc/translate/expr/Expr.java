@@ -5,6 +5,7 @@ import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 
 public interface Expr {
+
   public Expr addressOf();
   
   public Expr value();
@@ -20,6 +21,5 @@ public interface Expr {
   public Expr pointerPlus(Expr resolveExpr) ;
 
   public Expr member(String member) ;
-  
-  public boolean isNull();
+
 }
