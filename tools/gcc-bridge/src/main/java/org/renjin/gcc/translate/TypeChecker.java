@@ -7,11 +7,14 @@ import org.renjin.gcc.translate.expr.Expr;
 
 public class TypeChecker {
 
-  public static void assertMatch(Expr a, Expr b) {
-    if(!a.type().equals(b.type())) {
-      throw new IllegalArgumentException(String.format("Types do not match: %s:%s <> %s:%s",
-          a.toString(), a.type().toString(),
-          b.toString(), b.type().toString()));
+  public static void assertSameType(Expr expr, Expr... otherExprs) {
+    
+    for(Expr other : otherExprs) {
+      if(!expr.type().equals(other.type())) {
+        throw new IllegalArgumentException(String.format("Types do not match: %s:%s <> %s:%s",
+            expr.toString(), expr.type().toString(),
+            other.toString(), other.type().toString()));
+      }
     }
   }
   

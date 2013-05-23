@@ -131,7 +131,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     }
     JimpleExpr bytesToIncrement = offset.offset.asPrimitiveValue(context);
     String positionsToIncrement = context.declareTemp(JimpleType.INT);
-    context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf() + "L");
+    context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf());
     context.getBuilder().addStatement(jimpleOffsetName + " = " + offset.variable().jimpleOffsetName + " + " + positionsToIncrement);    
   }
 
@@ -178,7 +178,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
       if(offsetType == OffsetType.BYTES) {
         JimpleExpr bytesToIncrement = offset.asPrimitiveValue(context);
         String positionsToIncrement = context.declareTemp(JimpleType.INT);
-        context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf() + "L");
+        context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf());
         return new JimpleExpr(jimpleOffsetName + " + " + positionsToIncrement);    
       } else {
         return new JimpleExpr(jimpleOffsetName + " + " + offset.asPrimitiveValue(context));    
@@ -229,7 +229,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     private Expr index;
 
     public ArrayElementExpr(Expr index) {
-      if(TypeChecker.isInt(index.type())) {
+      if(!TypeChecker.isInt(index.type())) {
         throw new UnsupportedOperationException();
       }
       this.index = index;

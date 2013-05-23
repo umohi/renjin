@@ -9,6 +9,7 @@ import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.types.PrimitiveTypes;
 
 public class PrimitiveAssigner implements Assigner {
 
@@ -16,13 +17,24 @@ public class PrimitiveAssigner implements Assigner {
   public boolean assign(FunctionContext context, Expr lhs, Expr rhs) {
     if(lhs instanceof PrimitiveAssignable && typesCompatible(lhs.type(), rhs.type())) {
       JimpleExpr jimpleExpr = rhs.asPrimitiveValue(context);
-      if(lhs.type() instanceof RealType && rhs.type() instanceof IntegerType) {
-        jimpleExpr = JimpleExpr.cast(jimpleExpr, JimpleType.DOUBLE);
+      if(requiresCast(lhs, rhs)) {
+        jimpleExpr = JimpleExpr.cast(jimpleExpr, PrimitiveTypes.get(lhs.type()));
       }
       ((PrimitiveAssignable) lhs).assignPrimitiveValue(jimpleExpr);
       return true;
     }
     return false;
+  }
+
+  private boolean requiresCast(Expr lhs, Expr rhs) {
+    // we need to insert a cast if the *jimple* types of the arguments
+    // differ. (this is different than the gimple types
+    // not matching, because we ignore signed/unsigned right now)
+
+    JimpleType ltype = PrimitiveTypes.get(lhs.type());
+    JimpleType rtype = PrimitiveTypes.get(rhs.type());
+    
+    return !ltype.equals(rtype);
   }
 
   private boolean typesCompatible(GimpleType lhs, GimpleType rhs) {

@@ -10,4 +10,9 @@ public class GimpleConstantRef extends GimpleExpr {
   public void setValue(GimpleConstant value) {
     this.value = value;
   }
+  
+  @Override
+  public String toString() {
+    return value.toString();
+  }
 }

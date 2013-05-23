@@ -32,8 +32,8 @@ public class RStubs {
   }
 
 
-  public static void ddot_(IntPtr n, DoublePtr dx, IntPtr incx, DoublePtr dy, IntPtr incy) {
-    BLAS.getInstance().ddot(n.unwrap(), array(dx), incx.unwrap(), array(dy), incy.unwrap());
+  public static double ddot_(IntPtr n, DoublePtr dx, IntPtr incx, DoublePtr dy, IntPtr incy) {
+    return BLAS.getInstance().ddot(n.unwrap(), array(dx), incx.unwrap(), array(dy), incy.unwrap());
   }
 
 

@@ -3,7 +3,6 @@ package org.renjin.gcc.translate;
 import java.util.List;
 
 import org.renjin.gcc.gimple.GimpleAssign;
-import org.renjin.gcc.gimple.GimpleOp;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.BooleanType;
 import org.renjin.gcc.gimple.type.GimpleType;
@@ -133,11 +132,15 @@ public class AssignmentTranslator {
 
 
   private void assignNegated(Expr lhs, Expr expr) {
+    TypeChecker.assertSameType(lhs, expr);
+    
     assignPrimitive(lhs, new JimpleExpr("neg " + expr.asPrimitiveValue(context)));
   }
 
   private void assignBinaryOp(Expr lhs, String operator, List<Expr> operands) {
 
+    TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
+    
     JimpleExpr a = operands.get(0).asPrimitiveValue(context);
     JimpleExpr b = operands.get(1).asPrimitiveValue(context);
 
@@ -204,6 +207,8 @@ public class AssignmentTranslator {
   }
 
   private void assignBitNot(Expr lhs, Expr op) {
+    TypeChecker.assertSameType(lhs, op);
+
     assignPrimitive(lhs, JimpleExpr.binaryInfix("^", op.asPrimitiveValue(context), JimpleExpr.integerConstant(-1)));
   }
 
@@ -228,7 +233,7 @@ public class AssignmentTranslator {
     Expr x = operands.get(0);
     Expr y = operands.get(1);
 
-    TypeChecker.assertMatch(x, y);
+    TypeChecker.assertSameType(x, y);
 
     if(TypeChecker.isDouble(x.type())) {
       //assignPrimitive(lhs, JimpleExpr.integerConstant(0));
@@ -243,9 +248,12 @@ public class AssignmentTranslator {
 
 
   private void assignAbs(Expr lhs, Expr expr) {
+    
+    TypeChecker.assertSameType(lhs, expr);
+    
     assignPrimitive(lhs, new JimpleExpr(String.format("staticinvoke <java.lang.Math: %s>(%s)",
-        absMethodForType(expr.type()),
-        expr.asPrimitiveValue(context))));
+            absMethodForType(expr.type()),
+            expr.asPrimitiveValue(context))));
     
   }
 
@@ -264,9 +272,8 @@ public class AssignmentTranslator {
   }
 
   private void assignMax(Expr lhs, List<Expr> operands) {
-    TypeChecker.assertMatch(operands.get(0), operands.get(1));
-    TypeChecker.assertMatch(operands.get(0), lhs);    
-    
+    TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
+
     String signature = "{t} max({t}, {t})"
             .replace("{t}", TypeChecker.primitiveJvmTypeName(lhs.type()));
     

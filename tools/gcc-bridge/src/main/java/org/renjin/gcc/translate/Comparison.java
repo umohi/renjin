@@ -23,7 +23,7 @@ public class Comparison {
 
 
   public JimpleExpr toCondition(FunctionContext context) {
-    TypeChecker.assertMatch(a, b);
+    TypeChecker.assertSameType(a, b);
 
     if(a.type() instanceof RealType) {
       switch (op) {

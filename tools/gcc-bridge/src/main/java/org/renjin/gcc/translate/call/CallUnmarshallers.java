@@ -23,6 +23,11 @@ public class CallUnmarshallers {
     if (lhs == null) {
       context.getBuilder().addStatement(callExpr.toString());
     } else {
+      
+      if(returnType.equals(JimpleType.VOID)) {
+        throw new UnsupportedOperationException("Call signature mismatch: " +
+                "caller expects return value from void-valued method");
+      }
 
       for (CallUnmarshaller unmarshaller : unmarshallers) {
         if (unmarshaller.unmarshall(context, lhs, returnType, callExpr)) {

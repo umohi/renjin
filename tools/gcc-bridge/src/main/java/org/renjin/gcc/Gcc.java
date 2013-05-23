@@ -37,6 +37,14 @@ public class Gcc {
   public GimpleCompilationUnit compileToGimple(File source) throws IOException {
 
     List<String> arguments = Lists.newArrayList();
+    
+    // cross compile to i386 so that our pointers are 32-bits 
+    // rather than 64-bit. We use arrays to back pointers,
+    // and java arrays can only be indexed by 32-bit integers
+                      
+    arguments.add("-m32");
+    
+    
     arguments.add("-c"); // compile only, do not link
     arguments.add("-S"); // stop at assembly generation
     // command.add("-O9"); // highest optimization

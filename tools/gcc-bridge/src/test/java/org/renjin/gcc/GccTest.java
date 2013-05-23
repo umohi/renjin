@@ -21,6 +21,7 @@ import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.runtime.DoublePtr;
 
 import com.google.common.collect.Lists;
+import org.renjin.gcc.runtime.IntPtr;
 
 public class GccTest {
 
@@ -135,6 +136,21 @@ public class GccTest {
   @Test
   public void fortran() throws Exception {
     Class clazz = compile("dqrdc2.f", "Dqrdc");
+  }
+
+  @Test
+  public void fortran2darrays() throws Exception {
+    Class clazz = compile("2darray.f", "ArrayTest");
+
+    Method method = clazz.getMethod("test", DoublePtr.class, IntPtr.class);
+    
+    DoublePtr x = new DoublePtr(new double[9]);
+    
+    method.invoke(null, x, new IntPtr(3));
+    
+    assertThat(x.array[0], equalTo(1d));
+    assertThat(x.array[4], equalTo(2d));
+    assertThat(x.array[8], equalTo(3d));
   }
 
   @Test

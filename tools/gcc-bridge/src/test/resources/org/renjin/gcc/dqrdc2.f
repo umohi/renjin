@@ -141,35 +141,54 @@ c
             k = k - 1
             go to 80
   120    continue
-c ALEX: GOOD UP TO THIS POINT
-
          if (l .eq. n) go to 190
 c
 c           compute the householder transformation for column l.
 c
-            nrmxl = 0.0d0
-c            nrmxl = dnrm2(n-l+1,x(l,l),1)
+            nrmxl = dnrm2(n-l+1,x(l,l),1)
             if (nrmxl .eq. 0.0d0) go to 180
-c               if (x(l,l) .ne. 0.0d0) nrmxl = dsign(nrmxl,x(l,l))
-c               call dscal(n-l+1,1.0d0/nrmxl,x(l,l),1)
-c               x(l,l) = 1.0d0 + x(l,l)
+               if (x(l,l) .ne. 0.0d0) nrmxl = dsign(nrmxl,x(l,l))
+               call dscal(n-l+1,1.0d0/nrmxl,x(l,l),1)
+               x(l,l) = 1.0d0 + x(l,l)
 c
 c              apply the transformation to the remaining columns,
 c              updating the norms.
 c
                lp1 = l + 1
-c               if (p .lt. lp1) go to 170
-
+               if (p .lt. lp1) go to 170
+               do 160 j = lp1, p
+                  t = -ddot(n-l+1,x(l,l),1,x(l,j),1)/x(l,l)
+                  call daxpy(n-l+1,t,x(l,l),1,x(l,j),1)
+                  if (qraux(j) .eq. 0.0d0) go to 150
+                     tt = 1.0d0 - (dabs(x(l,j))/qraux(j))**2
+                     tt = dmax1(tt,0.0d0)
+                     t = tt
+c
+c modified 9/99 by BDR. Re-compute norms if there is large reduction
+c The tolerance here is on the squared norm
+c In this version we need accurate norms, so re-compute often.
+c  work(j,1) is only updated in one case: looks like a bug -- no longer used
+c
+c                     tt = 1.0d0 + 0.05d0*tt*(qraux(j)/work(j,1))**2
+c                     if (tt .eq. 1.0d0) go to 130
+                     if (dabs(t) .lt. 1d-6) go to 130
+                        qraux(j) = qraux(j)*dsqrt(t)
+                     go to 140
+  130                continue
+                        qraux(j) = dnrm2(n-l,x(l+1,j),1)
+                        work(j,1) = qraux(j)
+  140                continue
+  150             continue
+  160          continue
   170          continue
 c
 c              save the transformation.
 c
-c               qraux(l) = x(l,l)
-               x(l,l) = 432.0  ## this is the line that is killing us...
+               qraux(l) = x(l,l)
+               x(l,l) = -nrmxl
   180       continue
   190    continue
-c ALEX: GOOD AFTER THIS POINT
   200 continue
-c      k = min0(k - 1, n)
+      k = min0(k - 1, n)
       return
       end

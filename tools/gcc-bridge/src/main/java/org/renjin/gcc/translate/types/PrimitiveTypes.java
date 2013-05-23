@@ -1,20 +1,18 @@
 package org.renjin.gcc.translate.types;
 
-import org.renjin.gcc.gimple.type.BooleanType;
-import org.renjin.gcc.gimple.type.IntegerType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
-import org.renjin.gcc.gimple.type.RealType;
+import org.renjin.gcc.gimple.type.*;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.runtime.DoublePtr;
 import org.renjin.gcc.runtime.IntPtr;
+import org.renjin.gcc.runtime.LongPtr;
 
 public class PrimitiveTypes {
 
 
   
-  public static JimpleType get(PrimitiveType type) {
+  public static JimpleType get(GimpleType type) {
     if (type instanceof RealType) {
       if (((RealType) type).getPrecision() == 64) {
         return JimpleType.DOUBLE;
@@ -75,7 +73,7 @@ public class PrimitiveTypes {
       case 32:
         return new RealJimpleType(IntPtr.class);
       case 64: 
-        // TODO:
+        return new RealJimpleType(LongPtr.class);
       }
     } else if (type instanceof BooleanType) {
       // TODO
