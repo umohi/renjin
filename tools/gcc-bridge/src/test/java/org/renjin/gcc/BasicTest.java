@@ -5,6 +5,7 @@ import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.runtime.DoublePtr;
 import org.renjin.gcc.runtime.IntPtr;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -63,6 +64,16 @@ public class BasicTest extends AbstractGccTest {
   }
 
   @Test
+  public void arraysNonZeroLowerBound() throws Exception {
+    Class clazz = compile("lbound.f", "LBound");
+
+    Method test = clazz.getMethod("test", DoublePtr.class, IntPtr.class);
+    DoublePtr x = new DoublePtr(0,0,0,0);
+    test.invoke(null, x, new IntPtr(4));
+
+  }
+  
+  @Test
   public void calls() throws Exception {
 
     Class clazz = compile("calls.c", "Calls");
@@ -84,6 +95,21 @@ public class BasicTest extends AbstractGccTest {
   @Test  
   public void distBinary() throws Exception {
     Class clazz = compile("distbinary.c", "DistBinary");
+  }
+
+  @Test
+  public void logicalMod() throws  Exception {
+    Class clazz = compile("logical.f", "Logical");
+
+    clazz.getMethod("runtest").invoke(null);
+
+    Method iftest = clazz.getMethod("iftest", IntPtr.class, IntPtr.class);
+    IntPtr x = new IntPtr(0);
+
+    iftest.invoke(null, new IntPtr(12), x);
+
+    assertThat(x.unwrap(), equalTo(1));
+
   }
 
   @Test

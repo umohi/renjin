@@ -9,6 +9,7 @@ import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.GimpleVarDecl;
 import org.renjin.gcc.gimple.expr.*;
 import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleMethodBuilder;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
@@ -26,8 +27,6 @@ public class FunctionContext {
   private JimpleMethodBuilder builder;
   private Map<Integer, Variable> symbolTable = Maps.newHashMap();
 
-
-  private int nextTempId = 0;
   private int nextLabelId = 1000;
 
   public FunctionContext(TranslationContext translationContext, GimpleFunction gimpleFunction,
@@ -64,13 +63,17 @@ public class FunctionContext {
   }
 
   public String declareTemp(JimpleType type) {
-    String name = "_tmp" + (nextTempId++);
-    builder.addVarDecl(type, name);
-    return name;
+    return getBuilder().addTempVarDecl(type);
   }
 
   public String declareTemp(Class clazz) {
     return declareTemp(new RealJimpleType(clazz));
+  }
+
+  public JimpleExpr declareTemp(JimpleType type, JimpleExpr value) {
+    String tempVar = declareTemp(type);
+    getBuilder().addAssignment(tempVar, value);
+    return new JimpleExpr(tempVar);
   }
 
   public JimpleMethodBuilder getBuilder() {
@@ -147,4 +150,5 @@ public class FunctionContext {
     }
     throw new UnsupportedOperationException(gimpleExpr.toString());
   }
+
 }

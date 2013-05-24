@@ -158,7 +158,7 @@ public class AssignmentTranslator {
 
   private void assignTruthNot(Expr lhs, Expr op) {
     JimpleExpr expr = op.translateToPrimitive(context);
-    JimpleExpr condition = new JimpleExpr(expr + " != 0");
+    JimpleExpr condition = new JimpleExpr(expr + " == 0");
     assignBoolean(lhs, condition);
   }
 

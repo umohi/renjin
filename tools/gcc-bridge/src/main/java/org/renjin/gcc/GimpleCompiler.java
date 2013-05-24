@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.renjin.gcc.gimple.GimpleCompilationUnit;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
 import org.renjin.gcc.jimple.JimpleOutput;
@@ -129,4 +130,22 @@ public class GimpleCompiler {
     return new File(outputDirectory, packageName.replace('.', File.separatorChar));
   }
 
+  public void compileSources(List<File> sources) throws Exception {
+
+    Gcc gcc = new Gcc();
+    List<GimpleFunction> functions = Lists.newArrayList();
+
+    for (File source : sources) {
+      GimpleCompilationUnit gimple = gcc.compileToGimple(source);
+
+      CallingConvention callingConvention = CallingConventions.fromFile(source);
+      for (GimpleFunction function : gimple.getFunctions()) {
+        function.setCallingConvention(callingConvention);
+      }
+
+      functions.addAll(gimple.getFunctions());
+    }
+
+    compile(functions);
+  }
 }

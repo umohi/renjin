@@ -17,6 +17,6 @@ public class PointerWrapperMarshaller implements Marshaller {
     if(expr instanceof IndirectExpr) {
       return PtrWrapperUtils.wrapPointer(context, (IndirectExpr) expr);
     }
-    throw new UnsupportedOperationException(expr.toString());
+    throw new UnsupportedOperationException(expr.toString() + " (" + expr.getClass().getSimpleName() + ")");
   }
 }

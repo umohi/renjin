@@ -15,17 +15,19 @@ public abstract class AbstractExpr implements Expr {
   
   @Override
   public Expr memref() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("Expression " + this + " (" + getClass().getSimpleName() + ") does not" +
+            " support dereferencing");
   }
   
   @Override
   public JimpleExpr translateToPrimitive(FunctionContext context) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("Expression " + this + " (" + getClass().getSimpleName() + ") cannot " +
+            "be expressed as a primitive");
   }
 
   @Override
   public Expr elementAt(Expr index) {
-    throw new UnsupportedOperationException(this + " is not an array");
+    throw new UnsupportedOperationException(this + " (" + getClass().getSimpleName() + ") is not an array");
   }
   
   @Override

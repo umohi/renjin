@@ -1,6 +1,8 @@
 package org.renjin.gcc;
 
+import org.junit.Assert;
 import org.netlib.blas.BLAS;
+import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.runtime.DoublePtr;
 import org.renjin.gcc.runtime.IntPtr;
 
@@ -48,6 +50,21 @@ public class RStubs {
   public static void prenrmxl_(IntPtr n, DoublePtr x, IntPtr incx) {
     System.out.println(String.format("n=%s, x=%s, incx=%s", n, x, incx));
   }
+  
+  public static double magicnumber_(CharPtr x, int ldx) {
+    if(x.array[x.offset] == 'Z') {
+      return 42;
+    } else {
+      return -1;
+    }
+  }
 
+  public static void asserttrue_(boolean x) {
+    Assert.assertTrue(x);
+  }
+
+  public static void assertfalse_(boolean x) {
+    Assert.assertFalse(x);
+  }
 
 }

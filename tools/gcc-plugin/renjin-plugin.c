@@ -295,13 +295,17 @@ static void dump_type(tree type) {
     json_field("componentType");
     dump_type(TREE_TYPE(type));
     
-    /*if(TYPE_DOMAIN(type)) {
+    if(TYPE_DOMAIN(type)) {
       tree domain = TYPE_DOMAIN(type);
-      json_array_field("domain");
+      json_field("lbound");
       json_int(TREE_INT_CST_LOW(TYPE_MIN_VALUE(domain)));
-      json_int(TREE_INT_CST_LOW(TYPE_MAX_VALUE(domain)));
-      json_end_array();
-    }*/
+
+      if(TYPE_MAX_VALUE(domain)) {      
+        json_field("ubound");
+        json_int(TREE_INT_CST_LOW(TYPE_MAX_VALUE(domain)));
+      }
+      
+    }
     break;
     
   case FUNCTION_TYPE:

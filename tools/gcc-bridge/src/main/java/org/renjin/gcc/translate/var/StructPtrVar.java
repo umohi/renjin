@@ -4,6 +4,7 @@ import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.RecordType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.struct.Struct;
 
 public class StructPtrVar extends Variable {
@@ -21,6 +22,11 @@ public class StructPtrVar extends Variable {
     this.context = context;
 
     context.getBuilder().addVarDecl(struct.getJimpleType(), jimpleName);
+  }
+
+  @Override
+  public void writeAssignment(FunctionContext context, Expr rhs) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

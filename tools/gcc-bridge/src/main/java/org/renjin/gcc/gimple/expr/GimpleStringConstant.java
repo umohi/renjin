@@ -1,5 +1,8 @@
 package org.renjin.gcc.gimple.expr;
 
+import org.renjin.gcc.gimple.type.ArrayType;
+import org.renjin.gcc.gimple.type.GimpleType;
+
 public class GimpleStringConstant extends GimpleConstant {
 
   private String value;
@@ -12,7 +15,20 @@ public class GimpleStringConstant extends GimpleConstant {
   public String getValue() {
     return value;
   }
-  
+
+  @Override
+  public void setType(GimpleType type) {
+    if(!(type instanceof ArrayType)) {
+      throw new RuntimeException("Expected array type for StringConstant, got: " + type);
+    }
+    super.setType(type);
+  }
+
+  @Override
+  public ArrayType getType() {
+    return (ArrayType) super.getType();
+  }
+
   public String literal() {
     StringBuilder literal = new StringBuilder();
     literal.append("\"");

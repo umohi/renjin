@@ -41,6 +41,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
 
     context.getBuilder().addVarDecl(arrayType, jimpleArrayName);
     context.getBuilder().addVarDecl(JimpleType.INT, jimpleOffsetName);
+
   }
 
   @Override

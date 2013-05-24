@@ -77,6 +77,15 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValu
     public IndirectType type() {
       return new PointerType(PrimitiveHeapVar.this.type());
     }
+
+    @Override
+    public Expr memref() {
+      return PrimitiveHeapVar.this;
+    }
+
+    @Override
+    public String toString() {
+      return "&" + PrimitiveHeapVar.this.toString();
+    }
   }
-  
 }

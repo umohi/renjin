@@ -14,25 +14,14 @@ import java.util.List;
 public class Build {
 
   public static void main(String[] args) throws Exception {
-
-    Gcc gcc = new Gcc();
-    List<GimpleFunction> functions = Lists.newArrayList();
-
-    for(File source : findSources()) {
-      String gimple = gcc.compileToGimple(source);
-      System.out.println(gimple);
-
-      GimpleParser parser = new GimpleParser(CallingConventions.fromFile(source));
-      functions.addAll(parser.parse(new StringReader(gimple)));
-    }
-
     GimpleCompiler compiler = new GimpleCompiler();
-    compiler.setOutputDirectory(new File("target/test-classes"));
-    compiler.setPackageName("org.renjin");
+    compiler.setOutputDirectory(new File("target/classes"));
+    compiler.setJimpleOutputDirectory(new File("target/jimple"));
+    compiler.setPackageName("org.renjin.appl");
     compiler.setClassName("Appl");
     compiler.getMethodTable().addReferenceClass(ExternalRoutines.class);
     compiler.setVerbose(true);
-    compiler.compile(functions);
+    compiler.compileSources(findSources());
   }
 
   private static List<File> findSources() {

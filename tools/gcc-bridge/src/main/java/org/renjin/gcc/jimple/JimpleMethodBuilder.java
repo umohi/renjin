@@ -76,6 +76,10 @@ public class JimpleMethodBuilder {
     body.add(statement);
   }
 
+  public void addAssignment(String tempVar, JimpleExpr value) {
+    addStatement(tempVar + " = " + value);
+  }
+
   public void add(JimpleBodyElement bodyElement) {
     this.body.add(bodyElement);
   }
@@ -126,11 +130,8 @@ public class JimpleMethodBuilder {
     return sb.toString().trim();
   }
 
-  public String resolveVarName(String name) {
-    return Jimple.id(name);
-  }
-
   public void addVarDecl(Class clazz, String name) {
     addVarDecl(new RealJimpleType(clazz), name);
   }
+
 }
