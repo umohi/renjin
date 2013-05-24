@@ -6,7 +6,6 @@ import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.VarUsage;
-import org.renjin.gcc.translate.var.PrimitiveArrayPtrVar;
 import org.renjin.gcc.translate.var.PrimitivePtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
@@ -40,10 +39,6 @@ public class PrimitivePtrTypeTranslator extends TypeTranslator {
 
   @Override
   public Variable createLocalVariable(FunctionContext functionContext, String gimpleName, VarUsage usage) {
-    if(pointerToArray) {
-      return new PrimitiveArrayPtrVar(functionContext, gimpleName, pointerType);
-    } else {
-      return new PrimitivePtrVar(functionContext, gimpleName, pointerType);
-    }
+    return new PrimitivePtrVar(functionContext, gimpleName, pointerType);
   }
 }

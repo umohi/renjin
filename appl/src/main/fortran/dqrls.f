@@ -92,10 +92,6 @@ c     reduce x.
 c
       call dqrdc2(x,n,n,p,tol,k,qraux,jpvt,work)
 
-      call dumpf("x", x, n*p)
-      call dumpi("k", k, 1)
-      call dumpf("qraux", qraux, p)
-
 c
 c     solve the truncated least squares problem for each rhs.
 c

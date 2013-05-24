@@ -162,13 +162,6 @@ c
       cxb = mod(job,10) .ne. 0
       ju = min0(k,n-1)
 
-      call dumpl("cqy", cqy);
-      call dumpl("cqty", cqty);
-
-      call dumpf("x(in)", x, n)
-      call dumpf("qraux(in)", qraux, 2)
-      call dumpf("y(in)", y, n)
-
 c
 c     special action when n=1.
 c
@@ -193,15 +186,11 @@ c
          if (cqy) call dcopy(n,y,1,qy,1)
          if (cqty) call dcopy(n,y,1,qty,1)
 
-         call dumpf("qy after copy", qy, n)
-         call dumpf("qty after copy", qty, n)
-
 
          if (.not.cqy) go to 70
 c
 c           compute qy.
 c
-            call dumpmsg("calcing qy")
 
             do 60 jj = 1, ju
                j = ju - jj + 1
@@ -229,8 +218,6 @@ c
    90       continue
   100    continue
 
-         call dumpf("qy", qy, n)
-         call dumpf("qty", qty, n)
 
 c
 c        set up to compute b, rsd, or xb.

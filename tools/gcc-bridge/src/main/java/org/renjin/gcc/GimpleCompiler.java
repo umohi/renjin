@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import io.airlift.command.Command;
+import io.airlift.command.Option;
+import io.airlift.command.OptionType;
 import org.renjin.gcc.gimple.GimpleCompilationUnit;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
@@ -21,13 +24,18 @@ import com.google.common.collect.Lists;
  * Compiles a set of Gimple functions to jvm class file
  * 
  */
-public class GimpleCompiler {
+public class GimpleCompiler  {
 
   private File jimpleOutputDirectory;
+
   private File outputDirectory;
+  
   private String packageName;
+
   private String className;
+
   private boolean verbose;
+
   private List<File> classPaths = Lists.newArrayList();
 
   private static Logger LOGGER = Logger.getLogger(GimpleCompiler.class.getName());

@@ -1,7 +1,6 @@
 package org.renjin.gcc;
 
 import org.junit.Assert;
-import org.netlib.blas.BLAS;
 import org.renjin.gcc.runtime.CharPtr;
 import org.renjin.gcc.runtime.DoublePtr;
 import org.renjin.gcc.runtime.IntPtr;

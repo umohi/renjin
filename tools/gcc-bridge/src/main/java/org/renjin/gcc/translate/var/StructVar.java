@@ -36,6 +36,10 @@ public class StructVar extends Variable {
   public GimpleType type() {
     return type;
   }
-  
-  
+
+
+  @Override
+  public void writeAssignment(FunctionContext context, Expr rhs) {
+    throw new UnsupportedOperationException();
+  }
 }
