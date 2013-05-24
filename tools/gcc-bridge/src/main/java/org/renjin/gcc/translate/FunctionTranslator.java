@@ -1,7 +1,5 @@
 package org.renjin.gcc.translate;
 
-import java.lang.reflect.Field;
-
 import org.renjin.gcc.gimple.GimpleAssign;
 import org.renjin.gcc.gimple.GimpleBasicBlock;
 import org.renjin.gcc.gimple.GimpleCall;
@@ -12,14 +10,6 @@ import org.renjin.gcc.gimple.GimpleReturn;
 import org.renjin.gcc.gimple.GimpleSwitch;
 import org.renjin.gcc.gimple.GimpleVisitor;
 import org.renjin.gcc.gimple.GimpleGoto;
-import org.renjin.gcc.gimple.expr.GimpleAddressOf;
-import org.renjin.gcc.gimple.expr.GimpleComponentRef;
-import org.renjin.gcc.gimple.expr.GimpleConstant;
-import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleExternal;
-import org.renjin.gcc.gimple.expr.GimpleMemRef;
-import org.renjin.gcc.gimple.expr.GimpleNull;
-import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.PointerType;
@@ -28,6 +18,7 @@ import org.renjin.gcc.gimple.type.VoidType;
 import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.call.CallTranslator;
 import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.marshall.Marshallers;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 import org.renjin.gcc.translate.var.Variable;
 
@@ -91,15 +82,13 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitReturn(GimpleReturn gimpleReturn) {
-    if (gimpleReturn.getValue() == null) {
+    
+    if(gimpleReturn.getValue() == null) {
       builder.addStatement("return");
     } else {
-      if (gimpleReturn.getValue() instanceof SymbolRef) {
-        Variable var = context.lookupVar(gimpleReturn.getValue());
-        builder.addStatement("return " + var.returnExpr());
-      } else {
-        throw new UnsupportedOperationException(gimpleReturn.getValue().toString());
-      }
+      Expr returnValue = context.resolveExpr(gimpleReturn.getValue());
+
+      builder.addStatement("return " + Marshallers.marshallReturnValue(context, returnValue));
     }
   }
 
@@ -116,7 +105,7 @@ public class FunctionTranslator extends GimpleVisitor {
   @Override
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
     Expr switchExpr = context.resolveExpr(gimpleSwitch.getExpr());
-    JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(switchExpr.asPrimitiveValue(context).toString());
+    JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(switchExpr.translateToPrimitive(context).toString());
     for (GimpleSwitch.Branch branch : gimpleSwitch.getBranches()) {
       jimpleSwitch.addBranch(branch.getValue(), branch.getLabel().getName());
     }

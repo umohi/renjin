@@ -45,6 +45,10 @@ public class JimpleMethodBuilder {
     varDecls.add(new JimpleVarDecl(type, name));
     return name;
   }
+  
+  public boolean hasBody() {
+    return !this.body.isEmpty();
+  }
 
   public void addParameter(JimpleType type, String name) {
     JimpleParam jimpleParam = new JimpleParam(type, name);
@@ -126,4 +130,7 @@ public class JimpleMethodBuilder {
     return Jimple.id(name);
   }
 
+  public void addVarDecl(Class clazz, String name) {
+    addVarDecl(new RealJimpleType(clazz), name);
+  }
 }

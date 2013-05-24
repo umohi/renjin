@@ -11,6 +11,7 @@ public abstract class AbstractClassBuilder {
   private final List<JimpleFieldBuilder> fields = Lists.newArrayList();
   private final List<JimpleMethodBuilder> methods = Lists.newArrayList();
 
+
   public String getFqcn() {
     if (packageName == null) {
       return className;

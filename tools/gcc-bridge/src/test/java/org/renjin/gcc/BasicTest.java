@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class GccTest extends AbstractGccTest {
+public class BasicTest extends AbstractGccTest {
 
   @Test
   public void simpleTest() throws Exception {

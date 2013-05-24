@@ -6,68 +6,81 @@ import org.renjin.gcc.gimple.GimpleCall;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
-import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.FunctionType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
+import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunSignature;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.JvmExprs;
+import org.renjin.gcc.translate.expr.LValue;
 import org.renjin.gcc.translate.var.FunPtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
 import com.google.common.collect.Lists;
 
 public class CallTranslator {
-
-  private ParamMarshallers paramMarshallers = new ParamMarshallers();
-  private CallUnmarshallers callUnmarshallers = new CallUnmarshallers();
-
-  private List<CallUnmarshaller> returnUnmarshallers;
   private FunctionContext context;
   private GimpleCall call;
 
   public CallTranslator(FunctionContext context, GimpleCall call) {
     this.context = context;
     this.call = call;
-
-    returnUnmarshallers = Lists.newArrayList();
-    returnUnmarshallers.add(new WrappedPtrUnmarshaller());
   }
 
   public void translate() {
     GimpleExpr functionExpr = call.getFunction();
     if (functionExpr instanceof GimpleAddressOf && 
         ((GimpleAddressOf) functionExpr).getValue() instanceof GimpleFunctionRef) {
-      translateStaticCall();
+      writeStaticCall();
 
     } else if (functionExpr instanceof SymbolRef) {
-      translateFunctionPointerCall();
+      writeFunctionPointerCall();
 
     } else {
       throw new UnsupportedOperationException(functionExpr.toString());
     }
   }
 
-  private void translateStaticCall() {
+  /**
+   * Write the Jimple necessary to call a static JVM method
+   */
+  private void writeStaticCall() {
     MethodRef method = context.resolveMethod(call);
-    JimpleExpr callExpr = composeCallExpr(method);
+    StringBuilder callExpr = new StringBuilder();
+    callExpr.append("staticinvoke").append(method.signature());
+    marshalParamList(callExpr, method.getParams());
 
-    callUnmarshallers.unmarshall(context, call.getLhs(), method.getReturnType(), callExpr);
+    writeCall(callExpr, method.getReturnType());
   }
 
-  private void translateFunctionPointerCall() {
+  /**
+   * Write the Jimple necessary to make a call to a function pointer
+   */
+  private void writeFunctionPointerCall() {
     FunSignature funPtr = getFunPtrInterface();
     FunPtrVar var = getFunPtrVar();
 
-    StringBuilder expr = new StringBuilder();
-    expr.append("interfaceinvoke ").append(var.getJimpleVariable()).append(".").append(funPtr.jimpleSignature());
+    StringBuilder call = new StringBuilder();
+    call.append("interfaceinvoke ").append(var.getJimpleVariable()).append(".").append(funPtr.jimpleSignature());
 
-    marshalParamList(expr, funPtr.getParams());
-
-    callUnmarshallers.unmarshall(context, call.getLhs(), funPtr.getReturnType(), new JimpleExpr(expr.toString()));
+    marshalParamList(call, funPtr.getParams());
+    
+    writeCall(call, funPtr.getReturnType());
   }
 
+  private void writeCall(StringBuilder call, JimpleType returnType) {
+    if(returnType.equals(JimpleType.VOID)) {
+      context.getBuilder().addStatement(call.toString());
+    } else {
+      LValue lvalue = (LValue) context.resolveExpr(this.call.getLhs());
+      Expr rhs = JvmExprs.toExpr(context, new JimpleExpr(call.toString()), returnType, false);
+      lvalue.writeAssignment(context, rhs);
+    }
+  }
+  
   private FunPtrVar getFunPtrVar() {
     Variable var = context.lookupVar(call.getFunction());
     if (!(var instanceof FunPtrVar)) {
@@ -84,12 +97,6 @@ public class CallTranslator {
     return context.getTranslationContext().getFunctionPointerMethod((FunctionType)type.getBaseType());
   }
 
-  private JimpleExpr composeCallExpr(MethodRef method) {
-    StringBuilder callExpr = new StringBuilder();
-    callExpr.append("staticinvoke").append(method.signature());
-    marshalParamList(callExpr, method.getParams());
-    return new JimpleExpr(callExpr.toString());
-  }
 
   private void marshalParamList(StringBuilder callExpr, List<CallParam> params) {
     callExpr.append("(");
@@ -107,7 +114,8 @@ public class CallTranslator {
   private List<JimpleExpr> marshallParams(List<CallParam> callParams) {
     List<JimpleExpr> exprs = Lists.newArrayList();
     for (int i = 0; i != call.getParamCount(); ++i) {
-      exprs.add(paramMarshallers.marshall(context, context.resolveExpr(call.getArguments().get(i)), callParams.get(i)));
+      Expr sourceExpr = context.resolveExpr(call.getArguments().get(i));
+      exprs.add(callParams.get(i).marshall(context, sourceExpr));
     }
     return exprs;
   }

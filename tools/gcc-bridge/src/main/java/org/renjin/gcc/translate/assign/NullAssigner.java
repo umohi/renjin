@@ -13,7 +13,7 @@ public class NullAssigner implements Assigner {
 
   @Override
   public boolean assign(FunctionContext context, Expr lhs, Expr rhs) {
-    if(lhs instanceof FunPtrVar && isNull(rhs)) {
+    if(lhs instanceof NullAssignable && isNull(rhs)) {
       ((NullAssignable)lhs).setToNull();
       return true;
     }
@@ -23,8 +23,8 @@ public class NullAssigner implements Assigner {
   private boolean isNull(Expr rhs) {
     if( rhs instanceof PrimitiveConstant) {
       Object value = ((PrimitiveConstant) rhs).getConstantValue();
-      if(value instanceof Integer) {
-        return ((Integer)value) == 0;
+      if(value instanceof Number) {
+        return ((Number)value).intValue() == 0;
       }
     }
     return false;

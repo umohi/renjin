@@ -65,9 +65,9 @@ public class Comparison {
 //    String tempVar = context.getBuilder().addTempVarDecl(JimpleType.INT);
 //
 //    context.getBuilder().addStatement(String.format("if %s %s %s goto %s",
-//        a.asPrimitiveValue(context),
+//        a.translateToPrimitive(context),
 //        op,
-//        b.asPrimitiveValue(context),
+//        b.translateToPrimitive(context),
 //        trueLabel));
 //
 //    context.getBuilder().addStatement(tempVar + " = 0");
@@ -86,17 +86,17 @@ public class Comparison {
     String cmp = context.declareTemp(JimpleType.INT);
     context.getBuilder().addStatement(String.format("%s = %s %s %s",
         cmp, 
-        a.asPrimitiveValue(context), 
+        a.translateToPrimitive(context),
         operator, 
-        b.asPrimitiveValue(context)));
+        b.translateToPrimitive(context)));
 
     return new JimpleExpr(cmp + " " + condition + " " + operand);
   }
   
   private JimpleExpr intComparison(FunctionContext context, String operator) {
     return JimpleExpr.binaryInfix(operator,
-        a.asPrimitiveValue(context),
-        b.asPrimitiveValue(context));
+        a.translateToPrimitive(context),
+        b.translateToPrimitive(context));
     
   }
 }

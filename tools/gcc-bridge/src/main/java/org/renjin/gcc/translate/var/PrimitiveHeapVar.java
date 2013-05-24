@@ -7,10 +7,8 @@ import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.assign.PrimitiveAssignable;
-import org.renjin.gcc.translate.expr.AbstractExpr;
-import org.renjin.gcc.translate.expr.Expr;
-import org.renjin.gcc.translate.expr.IndirectExpr;
+import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.expr.*;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
 /**
@@ -19,7 +17,7 @@ import org.renjin.gcc.translate.types.PrimitiveTypes;
  * can be addressed and passed by reference to other methods.
  * 
  */
-public class PrimitiveHeapVar extends Variable implements PrimitiveAssignable {
+public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValue {
   private FunctionContext context;
   private String jimpleName;
   private PrimitiveType type;
@@ -34,17 +32,12 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveAssignable {
   }
 
   @Override
-  public void assignPrimitiveValue(JimpleExpr expr) {
+  public void writePrimitiveAssignment(JimpleExpr expr) {
     context.getBuilder().addStatement(jimpleName + "[0] = " + expr);
   }
 
   @Override
-  public JimpleExpr asPrimitiveValue(FunctionContext context) {
-    return jimple();
-  }
-
-  @Override
-  public JimpleExpr returnExpr() {
+  public JimpleExpr translateToPrimitive(FunctionContext context) {
     return jimple();
   }
 
@@ -68,16 +61,16 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveAssignable {
     return new PointerTo();
   }
 
+  @Override
+  public void writeAssignment(FunctionContext context, Expr rhs) {
+    PrimitiveAssignment.assign(context, this, rhs);
+  }
+
   private class PointerTo extends AbstractExpr implements IndirectExpr {
 
     @Override
-    public JimpleExpr backingArray() {
-      return new JimpleExpr(jimpleName);
-    }
-
-    @Override
-    public JimpleExpr backingArrayIndex() {
-      return JimpleExpr.integerConstant(0);
+    public ArrayRef translateToArrayRef(FunctionContext context) {
+      return new ArrayRef(jimpleName, 0);
     }
 
     @Override

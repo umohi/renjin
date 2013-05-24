@@ -3,6 +3,14 @@ package org.renjin.gcc.gimple.type;
 public class RealType extends PrimitiveType {
   private int precision;
 
+  public RealType() {
+  }
+
+  public RealType(int precision) {
+    this.precision = precision;
+  }
+
+
   /**
    * 
    * @return The number of bits of precision

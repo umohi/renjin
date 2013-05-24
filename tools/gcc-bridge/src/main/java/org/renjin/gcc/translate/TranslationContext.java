@@ -150,4 +150,5 @@ public class TranslationContext {
   public JimpleType getInvokerType(MethodRef method) {
     return new InvokerJimpleType(getInvokerClass(method));
   }
+
 }

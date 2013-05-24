@@ -1,13 +1,15 @@
 package org.renjin.gcc.translate.expr;
 
 import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.jimple.JimpleExpr;
+import org.renjin.gcc.translate.FunctionContext;
 
+/**
+ * An intermediate expression that references a memory location
+ * (and is backed by a JVM array)
+ */
 public interface IndirectExpr extends Expr {
 
-  JimpleExpr backingArray();
-  
-  JimpleExpr backingArrayIndex();
+  ArrayRef translateToArrayRef(FunctionContext context);
 
   @Override
   IndirectType type();

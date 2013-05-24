@@ -1,15 +1,10 @@
 package org.renjin.gcc.translate.var;
 
-import java.util.List;
-
-import org.renjin.gcc.gimple.GimpleOp;
-import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.ArrayType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.IndirectType;
 import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
-import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
@@ -43,11 +38,6 @@ public class PrimitiveArrayPtrVar extends Variable {
   @Override
   public GimpleType type() {
     return type;
-  }
-
-  @Override
-  public JimpleExpr returnExpr() {
-    throw new UnsupportedOperationException();
   }
 
 }

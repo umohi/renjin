@@ -4,14 +4,17 @@ import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.assign.PrimitiveAssignable;
+import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.LValue;
+import org.renjin.gcc.translate.expr.PrimitiveLValue;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
 /**
  * Writes jimple instructions to store and retrieve a single primitive numeric
  * value in a local JVM variable, allocated on the stack.
  */
-public class PrimitiveStackVar extends Variable implements PrimitiveAssignable {
+public class PrimitiveStackVar extends Variable implements PrimitiveLValue, LValue {
 
   private FunctionContext context;
   private String jimpleName;
@@ -31,12 +34,17 @@ public class PrimitiveStackVar extends Variable implements PrimitiveAssignable {
   }
 
   @Override
-  public void assignPrimitiveValue(JimpleExpr expr) {
+  public void writePrimitiveAssignment(JimpleExpr expr) {
     context.getBuilder().addStatement(jimpleName + " = " + expr); 
   }
-  
+
   @Override
-  public JimpleExpr asPrimitiveValue(FunctionContext context) {
+  public void writeAssignment(FunctionContext context, Expr rhs) {
+    PrimitiveAssignment.assign(context, this, rhs);
+  }
+
+  @Override
+  public JimpleExpr translateToPrimitive(FunctionContext context) {
     return new JimpleExpr(jimpleName);
   }
 
@@ -45,8 +53,4 @@ public class PrimitiveStackVar extends Variable implements PrimitiveAssignable {
     return type;
   }
 
-  @Override
-  public JimpleExpr returnExpr() {
-    return new JimpleExpr(jimpleName);
-  }
 }

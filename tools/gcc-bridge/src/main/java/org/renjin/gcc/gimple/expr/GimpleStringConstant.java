@@ -13,20 +13,27 @@ public class GimpleStringConstant extends GimpleConstant {
     return value;
   }
   
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("\"");
+  public String literal() {
+    StringBuilder literal = new StringBuilder();
+    literal.append("\"");
     for(int i=0;i!=value.length();++i) {
       int cp = value.codePointAt(i);
-      if(cp >= 32 && cp <= 126) {
-        sb.appendCodePoint(cp);
+      if(cp == '"') {
+        literal.append("\\\"");
+      } else if(cp == '\\') {
+        literal.append("\\\\");
+      } else if(cp >= 32 && cp <= 126) {
+        literal.appendCodePoint(cp);
       } else {
-        sb.append("\\u");
-        sb.append(String.format("%04x", cp));
+        literal.append(String.format("\\u%04x", cp));
       }
     }
-    sb.append("\"");
-    return sb.toString();
+    literal.append("\"");
+    return literal.toString();
+  }
+  
+  @Override
+  public String toString() {
+    return literal();
   }
 }

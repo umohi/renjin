@@ -6,17 +6,14 @@ import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
-import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TypeChecker;
-import org.renjin.gcc.translate.assign.NullAssignable;
-import org.renjin.gcc.translate.assign.PrimitiveAssignable;
-import org.renjin.gcc.translate.expr.AbstractExpr;
-import org.renjin.gcc.translate.expr.Expr;
-import org.renjin.gcc.translate.expr.IndirectExpr;
+import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.expr.*;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
-public class PrimitivePtrVar extends Variable implements NullAssignable, IndirectExpr {
+
+public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
 
   private enum OffsetType {
     BYTES,
@@ -62,23 +59,14 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
   }
 
   @Override
-  public void assign(Expr expr) {
-    // TODO Auto-generated method stub
-    super.assign(expr);
-  }
-
-  @Override
-  public void setToNull() {
-    // TODO Auto-generated method stub
-
-  }
-
-  public void assignStringConstant(String literal) {
-    String stringVar = context.getBuilder().addTempVarDecl(new RealJimpleType(String.class));
-    context.getBuilder().addStatement(stringVar + " = " + JimpleExpr.stringLiteral(literal));
-    context.getBuilder().addStatement(
-        jimpleArrayName + " = virtualinvoke " + stringVar + ".<java.lang.String: char[] toCharArray()>()");
-    context.getBuilder().addStatement(jimpleOffsetName + " = 0");
+  public void writeAssignment(FunctionContext context, Expr rhs) {
+    if(rhs.isNull()) {
+      context.getBuilder().addStatement(jimpleArrayName + " = null");
+    } else if(rhs instanceof IndirectExpr) {
+      ArrayRef ptr = ((IndirectExpr) rhs).translateToArrayRef(context);
+      context.getBuilder().addStatement(jimpleArrayName + " = " +  ptr.getArrayExpr());
+      context.getBuilder().addStatement(jimpleOffsetName + " = " + ptr.getIndexExpr());
+    }
   }
 
   private JimpleExpr wrapPointer() {
@@ -92,42 +80,19 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     return new JimpleExpr(tempWrapper);
   }
 
-
   @Override
-  public JimpleExpr backingArray() {
-    return new JimpleExpr(jimpleArrayName);
+  public ArrayRef translateToArrayRef(FunctionContext context) {
+    return new ArrayRef(jimpleArrayName, jimpleOffsetName);
   }
 
   @Override
-  public JimpleExpr backingArrayIndex() {
-    return new JimpleExpr(jimpleOffsetName);
-  }
-
-  @Override
-  public JimpleExpr returnExpr() {
-    return wrapPointer();
-  }
-
-  @Override
-  public Expr value() {
+  public Expr memref() {
     return new ValueExpr();
   }
 
   @Override
   public IndirectType type() {
     return pointerType;
-  }
-
-  public void assign(PrimitivePtrVar var) {
-    context.getBuilder().addStatement(jimpleArrayName + " = " + var.jimpleArrayName);
-    context.getBuilder().addStatement(jimpleOffsetName + " = " + var.jimpleOffsetName);
-  }
-
-  public void assign(OffsetExpr offset) {
-    if(offset.variable() != this) {
-      context.getBuilder().addStatement(jimpleArrayName + " = " + offset.backingArray());
-    }
-    context.getBuilder().addStatement(jimpleOffsetName + " = " + offset.backingArrayIndex());
   }
 
   @Override
@@ -165,18 +130,19 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
       return PrimitivePtrVar.this;
     }
 
-    public JimpleExpr backingArray() {
-      return PrimitivePtrVar.this.backingArray();
+    @Override
+    public ArrayRef translateToArrayRef(FunctionContext context) {
+      return new ArrayRef(jimpleArrayName, computeIndex());
     }
 
-    public JimpleExpr backingArrayIndex() {
+    private JimpleExpr computeIndex() {
       if(offsetType == OffsetType.BYTES) {
-        JimpleExpr bytesToIncrement = offset.asPrimitiveValue(context);
+        JimpleExpr bytesToIncrement = offset.translateToPrimitive(context);
         String positionsToIncrement = context.declareTemp(JimpleType.INT);
         context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf());
         return new JimpleExpr(jimpleOffsetName + " + " + positionsToIncrement);    
       } else {
-        return new JimpleExpr(jimpleOffsetName + " + " + offset.asPrimitiveValue(context));    
+        return new JimpleExpr(jimpleOffsetName + " + " + offset.translateToPrimitive(context));
       }
     }
   }
@@ -186,7 +152,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
    * (*x)
    *
    */
-  public class ValueExpr extends AbstractExpr implements PrimitiveAssignable {
+  public class ValueExpr extends AbstractExpr implements PrimitiveLValue, LValue {
 
 
     @Override
@@ -195,7 +161,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     }
 
     @Override
-    public JimpleExpr asPrimitiveValue(FunctionContext context) {
+    public JimpleExpr translateToPrimitive(FunctionContext context) {
       return new JimpleExpr(jimpleArrayName + "[" + jimpleOffsetName + "]");
     }
 
@@ -205,8 +171,13 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     }
 
     @Override
-    public void assignPrimitiveValue(JimpleExpr expr) {
+    public void writePrimitiveAssignment(JimpleExpr expr) {
       context.getBuilder().addStatement(jimpleArrayName + "[" + jimpleOffsetName + "] = " + expr);
+    }
+
+    @Override
+    public void writeAssignment(FunctionContext context, Expr rhs) {
+      PrimitiveAssignment.assign(context, this, rhs);
     }
 
     @Override
@@ -216,7 +187,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
 
   }
 
-  public class ArrayElementExpr extends AbstractExpr implements PrimitiveAssignable {
+  public class ArrayElementExpr extends AbstractExpr implements PrimitiveLValue, LValue {
 
     /**
      * Index of the array, with reference to the current offset.
@@ -231,11 +202,12 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     }
 
     @Override
-    public JimpleExpr asPrimitiveValue(FunctionContext context) {
+    public JimpleExpr translateToPrimitive(FunctionContext context) {
       // get the overall index
       return new JimpleExpr(jimpleArrayName + "[" + computeOverallIndex(context) + "]");
     }
 
+    
     /**
      * Create a temporary variable storing the index of the element this expr references
      * with reference to the beginning of the array.
@@ -244,7 +216,7 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     private String computeOverallIndex(FunctionContext context) {
       String overallIndex = context.declareTemp(JimpleType.INT);
       context.getBuilder().addStatement(overallIndex + " = " + jimpleOffsetName + " + " +
-              index.asPrimitiveValue(context));
+              index.translateToPrimitive(context));
       return overallIndex;
     }
 
@@ -260,8 +232,13 @@ public class PrimitivePtrVar extends Variable implements NullAssignable, Indirec
     }
 
     @Override
-    public void assignPrimitiveValue(JimpleExpr expr) {
+    public void writePrimitiveAssignment(JimpleExpr expr) {
       context.getBuilder().addStatement(jimpleArrayName + "[" + computeOverallIndex(context) + "] = " + expr);
+    }
+
+    @Override
+    public void writeAssignment(FunctionContext context, Expr rhs) {
+      PrimitiveAssignment.assign(context, this, rhs);
     }
   }
 }

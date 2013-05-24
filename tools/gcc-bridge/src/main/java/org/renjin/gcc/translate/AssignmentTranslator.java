@@ -9,26 +9,18 @@ import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.IntegerType;
 import org.renjin.gcc.gimple.type.RealType;
 import org.renjin.gcc.jimple.JimpleExpr;
-import org.renjin.gcc.translate.assign.Assigner;
-import org.renjin.gcc.translate.assign.NullAssigner;
-import org.renjin.gcc.translate.assign.PrimitiveAssignable;
-import org.renjin.gcc.translate.assign.PrimitiveAssigner;
-import org.renjin.gcc.translate.assign.PrimitivePtrAssigner;
-import org.renjin.gcc.translate.assign.StringToPrimitivePtrVarAssigner;
+import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.expr.LValue;
+import org.renjin.gcc.translate.expr.PrimitiveLValue;
 import org.renjin.gcc.translate.expr.Expr;
 
 import com.google.common.collect.Lists;
 
 public class AssignmentTranslator {
   private FunctionContext context;
-  private List<Assigner> assigners = Lists.newArrayList();
 
   public AssignmentTranslator(FunctionContext context) {
     this.context = context;
-    assigners.add(new PrimitiveAssigner());
-    assigners.add(new PrimitivePtrAssigner());
-    assigners.add(new NullAssigner());
-    assigners.add(new StringToPrimitivePtrVarAssigner());
   }
 
   public void translate(GimpleAssign assign) {
@@ -135,15 +127,15 @@ public class AssignmentTranslator {
   private void assignNegated(Expr lhs, Expr expr) {
     TypeChecker.assertSameType(lhs, expr);
     
-    assignPrimitive(lhs, new JimpleExpr("neg " + expr.asPrimitiveValue(context)));
+    assignPrimitive(lhs, new JimpleExpr("neg " + expr.translateToPrimitive(context)));
   }
 
   private void assignBinaryOp(Expr lhs, String operator, List<Expr> operands) {
 
     TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
     
-    JimpleExpr a = operands.get(0).asPrimitiveValue(context);
-    JimpleExpr b = operands.get(1).asPrimitiveValue(context);
+    JimpleExpr a = operands.get(0).translateToPrimitive(context);
+    JimpleExpr b = operands.get(1).translateToPrimitive(context);
 
     assignPrimitive(lhs, JimpleExpr.binaryInfix(operator, a, b));
   }
@@ -161,11 +153,11 @@ public class AssignmentTranslator {
   }
   
   private void assignPrimitive(Expr lhs, JimpleExpr jimpleExpr) {
-    ((PrimitiveAssignable)lhs).assignPrimitiveValue(jimpleExpr);
+    ((PrimitiveLValue)lhs).writePrimitiveAssignment(jimpleExpr);
   }
 
   private void assignTruthNot(Expr lhs, Expr op) {
-    JimpleExpr expr = op.asPrimitiveValue(context);
+    JimpleExpr expr = op.translateToPrimitive(context);
     JimpleExpr condition = new JimpleExpr(expr + " != 0");
     assignBoolean(lhs, condition);
   }
@@ -178,8 +170,8 @@ public class AssignmentTranslator {
 
 
 
-    JimpleExpr a = ops.get(0).asPrimitiveValue(context);
-    JimpleExpr b = ops.get(1).asPrimitiveValue(context);
+    JimpleExpr a = ops.get(0).translateToPrimitive(context);
+    JimpleExpr b = ops.get(1).translateToPrimitive(context);
     
     String checkB = context.newLabel();
     String noneIsTrue = context.newLabel();
@@ -210,7 +202,7 @@ public class AssignmentTranslator {
   private void assignBitNot(Expr lhs, Expr op) {
     TypeChecker.assertSameType(lhs, op);
 
-    assignPrimitive(lhs, JimpleExpr.binaryInfix("^", op.asPrimitiveValue(context), JimpleExpr.integerConstant(-1)));
+    assignPrimitive(lhs, JimpleExpr.binaryInfix("^", op.translateToPrimitive(context), JimpleExpr.integerConstant(-1)));
   }
 
   private void assignIfElse(Expr lhs, JimpleExpr booleanExpr, JimpleExpr ifTrue, JimpleExpr ifFalse) {
@@ -240,8 +232,8 @@ public class AssignmentTranslator {
       //assignPrimitive(lhs, JimpleExpr.integerConstant(0));
       assignPrimitive(lhs, new JimpleExpr(String.format(
               "staticinvoke <org.renjin.gcc.runtime.Builtins: boolean unordered(double, double)>(%s, %s)",
-              x.asPrimitiveValue(context),
-              y.asPrimitiveValue(context))));
+              x.translateToPrimitive(context),
+              y.translateToPrimitive(context))));
     } else {
       throw new UnsupportedOperationException();
     }
@@ -254,7 +246,7 @@ public class AssignmentTranslator {
     
     assignPrimitive(lhs, new JimpleExpr(String.format("staticinvoke <java.lang.Math: %s>(%s)",
             absMethodForType(expr.type()),
-            expr.asPrimitiveValue(context))));
+            expr.translateToPrimitive(context))));
     
   }
 
@@ -278,8 +270,8 @@ public class AssignmentTranslator {
     String signature = "{t} max({t}, {t})"
             .replace("{t}", TypeChecker.primitiveJvmTypeName(lhs.type()));
     
-    JimpleExpr a = operands.get(0).asPrimitiveValue(context);
-    JimpleExpr b = operands.get(1).asPrimitiveValue(context);
+    JimpleExpr a = operands.get(0).translateToPrimitive(context);
+    JimpleExpr b = operands.get(1).translateToPrimitive(context);
 
     assignPrimitive(lhs, new JimpleExpr(String.format(
             "staticinvoke <java.lang.Math: %s>(%s, %s)",
@@ -289,12 +281,13 @@ public class AssignmentTranslator {
   }
   
   private void assign(Expr lhs, Expr rhs) {
-    for(Assigner assigner : assigners) {
-      if(assigner.assign(context, lhs, rhs)) {
-        return;
-      }
+    if(lhs instanceof PrimitiveLValue) {
+      PrimitiveAssignment.assign(context, lhs, rhs);
+    } else if(lhs instanceof LValue) {
+      ((LValue) lhs).writeAssignment(context, rhs);
+    } else {
+      throw new UnsupportedOperationException("Unsupported assignment of " + rhs.toString() + " to " + lhs.toString());
     }
-    throw new UnsupportedOperationException("Unsupported assignment of " + rhs.toString() + " to " + lhs.toString());
   }
 
 }

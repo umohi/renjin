@@ -14,17 +14,6 @@ import static org.junit.Assert.assertThat;
 
 public class Dqrdc2Test  extends AbstractGccTest {
 
-//  @Test
-//  public void daxpy() {
-//    Class clazz = compile(Arrays.asList("dqrdc2.f", "ddot.f", "daxpy.f", "dscal.f", "dnrm2.f"), "Dqrdc2");
-//
-//    clazz.getMethod("daxpy", IntPtr.class, DoublePtr.class, DoublePtr.class, )
-//    N,DA,DX,INCX,DY,INCY
-//
-//
-//
-//  }
-  
 
 
   @Test

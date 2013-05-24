@@ -3,6 +3,9 @@ package org.renjin.gcc.translate.expr;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 
+/**
+ * Provides default implementations for the {@link Expr} interface
+ */
 public abstract class AbstractExpr implements Expr {
   
   @Override
@@ -11,27 +14,22 @@ public abstract class AbstractExpr implements Expr {
   }
   
   @Override
-  public Expr value() {
+  public Expr memref() {
     throw new UnsupportedOperationException();
   }
   
   @Override
-  public JimpleExpr asPrimitiveValue(FunctionContext context) {
+  public JimpleExpr translateToPrimitive(FunctionContext context) {
     throw new UnsupportedOperationException();
   }
-  
-  @Override
-  public void assign(Expr expr) {
-    throw new UnsupportedOperationException();
-  }
-    
+
   @Override
   public Expr elementAt(Expr index) {
     throw new UnsupportedOperationException(this + " is not an array");
   }
   
   @Override
-  public Expr pointerPlus(Expr resolveExpr) {
+  public Expr pointerPlus(Expr offset) {
     throw new UnsupportedOperationException("Expression " + this + "  does not support pointer arithmatic");
   }
 
@@ -40,4 +38,8 @@ public abstract class AbstractExpr implements Expr {
     throw new UnsupportedOperationException("Expression " + this + "  does not support members");
   }
 
+  @Override
+  public boolean isNull() {
+    return false;
+  }
 }

@@ -12,39 +12,14 @@ import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.AbstractExpr;
 import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.expr.IndirectExpr;
+import org.renjin.gcc.translate.expr.LValue;
 
-public abstract class Variable extends AbstractExpr {
+public abstract class Variable extends AbstractExpr implements LValue {
 
 
-  public GimpleType getGimpleType() {
-    throw new UnsupportedOperationException("not implemented in " + getClass().getSimpleName());
-  }
 
   public void initFromParameter() {
 
-  }
-
-  public abstract JimpleExpr returnExpr();
-
-  @Override
-  public Expr addressOf() {
-    throw new UnsupportedOperationException(toString() + " (" + getClass().getSimpleName() + ")");
-  }
-
-  @Override
-  public Expr value() {
-    throw new UnsupportedOperationException(getClass().getSimpleName() + ": " + toString());
-  }
-
-  @Override
-  public JimpleExpr asPrimitiveValue(FunctionContext context) {
-    throw new UnsupportedOperationException(getClass().getSimpleName());
-
-  }
-
-  @Override
-  public GimpleType type() {
-    return getGimpleType();
   }
 
 

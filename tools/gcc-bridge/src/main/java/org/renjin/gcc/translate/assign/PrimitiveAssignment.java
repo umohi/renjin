@@ -9,24 +9,24 @@ import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.PrimitiveLValue;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
-public class PrimitiveAssigner implements Assigner {
+public class PrimitiveAssignment {
 
-  @Override
-  public boolean assign(FunctionContext context, Expr lhs, Expr rhs) {
-    if(lhs instanceof PrimitiveAssignable && typesCompatible(lhs.type(), rhs.type())) {
-      JimpleExpr jimpleExpr = rhs.asPrimitiveValue(context);
+  public static void assign(FunctionContext context, Expr lhs, Expr rhs) {
+    if(lhs instanceof PrimitiveLValue && typesCompatible(lhs.type(), rhs.type())) {
+      JimpleExpr jimpleExpr = rhs.translateToPrimitive(context);
       if(requiresCast(lhs, rhs)) {
         jimpleExpr = JimpleExpr.cast(jimpleExpr, PrimitiveTypes.get(lhs.type()));
       }
-      ((PrimitiveAssignable) lhs).assignPrimitiveValue(jimpleExpr);
-      return true;
+      ((PrimitiveLValue) lhs).writePrimitiveAssignment(jimpleExpr);
+    } else {
+      throw new UnsupportedOperationException(String.format("Unable to assign %s to %s", rhs, lhs));
     }
-    return false;
   }
 
-  private boolean requiresCast(Expr lhs, Expr rhs) {
+  private static boolean requiresCast(Expr lhs, Expr rhs) {
     // we need to insert a cast if the *jimple* types of the arguments
     // differ. (this is different than the gimple types
     // not matching, because we ignore signed/unsigned right now)
@@ -37,7 +37,7 @@ public class PrimitiveAssigner implements Assigner {
     return !ltype.equals(rtype);
   }
 
-  private boolean typesCompatible(GimpleType lhs, GimpleType rhs) {
+  private static boolean typesCompatible(GimpleType lhs, GimpleType rhs) {
     if(lhs instanceof IntegerType) {
       return (rhs instanceof IntegerType || rhs instanceof BooleanType) && 
           precision(lhs) >= precision(rhs);
@@ -50,7 +50,7 @@ public class PrimitiveAssigner implements Assigner {
     }
   }
 
-  private int precision(GimpleType type) {
+  private static int precision(GimpleType type) {
     if(type instanceof IntegerType) {
       return ((IntegerType) type).getPrecision();
     } else if(type instanceof RealType) {

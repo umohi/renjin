@@ -121,6 +121,7 @@ public class GimpleCompiler {
       FunctionTranslator translator = new FunctionTranslator(context);
       translator.translate(function);
     }
+
     return jimple;
   }
 
