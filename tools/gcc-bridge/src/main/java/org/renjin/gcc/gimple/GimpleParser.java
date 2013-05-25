@@ -8,6 +8,10 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+/**
+ * Invokes Jackson to parse the JSON-encoded Gimple emitted from our
+ * GCC plugin into the Gimple tree.
+ */
 public class GimpleParser {
 
   private ObjectMapper mapper;

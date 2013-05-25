@@ -4,11 +4,8 @@ package org.renjin.gcc.translate.marshall;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
-import org.renjin.gcc.translate.expr.IndirectExpr;
-
-import java.util.Arrays;
-import java.util.List;
+import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.expr.ImIndirectExpr;
 
 public class PrimitiveMarshaller implements Marshaller {
 
@@ -19,12 +16,12 @@ public class PrimitiveMarshaller implements Marshaller {
   }
 
   @Override
-  public JimpleExpr marshall(FunctionContext context, Expr expr) {
+  public JimpleExpr marshall(FunctionContext context, ImExpr expr) {
     
     // EXPERIMENT:
     // Allow implicit referencing of pointers to pass arguments by value
-    if(expr instanceof IndirectExpr) {
-      IndirectExpr ptr = (IndirectExpr) expr;
+    if(expr instanceof ImIndirectExpr) {
+      ImIndirectExpr ptr = (ImIndirectExpr) expr;
       return context.declareTemp(targetType, ptr.memref().translateToPrimitive(context));
     }
 

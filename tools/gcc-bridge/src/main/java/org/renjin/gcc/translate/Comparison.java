@@ -6,15 +6,15 @@ import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
-import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.ImExpr;
 
 public class Comparison {
   private GimpleOp op;
-  private Expr a;
-  private Expr b;
+  private ImExpr a;
+  private ImExpr b;
 
 
-  public Comparison(GimpleOp op, Expr a, Expr b) {
+  public Comparison(GimpleOp op, ImExpr a, ImExpr b) {
     super();
     this.op = op;
     this.a = a;

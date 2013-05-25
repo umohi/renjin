@@ -1,15 +1,10 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.translate.expr.AbstractExpr;
-import org.renjin.gcc.translate.expr.LValue;
+import org.renjin.gcc.translate.expr.AbstractImExpr;
+import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.expr.ImLValue;
 
-public abstract class Variable extends AbstractExpr implements LValue {
-
-
-
-  public void initFromParameter() {
-
-  }
+public interface Variable extends ImLValue {
 
 
 }

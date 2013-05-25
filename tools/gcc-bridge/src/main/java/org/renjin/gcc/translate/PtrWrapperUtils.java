@@ -4,12 +4,12 @@ import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.expr.ArrayRef;
-import org.renjin.gcc.translate.expr.IndirectExpr;
-import org.renjin.gcc.translate.types.PrimitiveTypes;
+import org.renjin.gcc.translate.expr.ImIndirectExpr;
+import org.renjin.gcc.translate.type.PrimitiveTypes;
 
 public class PtrWrapperUtils {
 
-  public static JimpleExpr wrapPointer(FunctionContext context, IndirectExpr ptr) {
+  public static JimpleExpr wrapPointer(FunctionContext context, ImIndirectExpr ptr) {
     ArrayRef ref = ptr.translateToArrayRef(context);
     GimplePrimitiveType baseType = (GimplePrimitiveType) ptr.type().getBaseType();
     JimpleType wrapperType = PrimitiveTypes.getWrapperType(baseType);

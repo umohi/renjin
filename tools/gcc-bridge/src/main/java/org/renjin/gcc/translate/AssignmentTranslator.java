@@ -2,16 +2,16 @@ package org.renjin.gcc.translate;
 
 import java.util.List;
 
-import org.renjin.gcc.gimple.GimpleAssign;
+import org.renjin.gcc.gimple.ins.GimpleAssign;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.GimpleBooleanType;
 import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
-import org.renjin.gcc.translate.expr.LValue;
+import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.expr.ImLValue;
 import org.renjin.gcc.translate.expr.PrimitiveLValue;
-import org.renjin.gcc.translate.expr.Expr;
 
 import com.google.common.collect.Lists;
 
@@ -23,8 +23,8 @@ public class AssignmentTranslator {
   }
 
   public void translate(GimpleAssign assign) {
-    Expr lhs = context.resolveExpr(assign.getLHS());
-    List<Expr> operands = resolveOps(assign.getOperands());
+    ImExpr lhs = context.resolveExpr(assign.getLHS());
+    List<ImExpr> operands = resolveOps(assign.getOperands());
 
     switch(assign.getOperator()) {
     case INTEGER_CST:
@@ -36,6 +36,7 @@ public class AssignmentTranslator {
     case NOP_EXPR:
     case ARRAY_REF:
     case PAREN_EXPR:
+    case COMPONENT_REF:
       assign(lhs, operands.get(0));
       return;
       
@@ -107,9 +108,9 @@ public class AssignmentTranslator {
     }
   }
 
-  private void assignDiv(Expr lhs, List<Expr> operands) {
-    Expr x = operands.get(0);
-    Expr y = operands.get(1);
+  private void assignDiv(ImExpr lhs, List<ImExpr> operands) {
+    ImExpr x = operands.get(0);
+    ImExpr y = operands.get(1);
 
     if(!x.type().equals(y.type())) {
       throw new UnsupportedOperationException();
@@ -123,13 +124,13 @@ public class AssignmentTranslator {
   }
 
 
-  private void assignNegated(Expr lhs, Expr expr) {
+  private void assignNegated(ImExpr lhs, ImExpr expr) {
     TypeChecker.assertSameType(lhs, expr);
     
     assignPrimitive(lhs, new JimpleExpr("neg " + expr.translateToPrimitive(context)));
   }
 
-  private void assignBinaryOp(Expr lhs, String operator, List<Expr> operands) {
+  private void assignBinaryOp(ImExpr lhs, String operator, List<ImExpr> operands) {
 
     TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
     
@@ -139,29 +140,29 @@ public class AssignmentTranslator {
     assignPrimitive(lhs, JimpleExpr.binaryInfix(operator, a, b));
   }
   
-  private List<Expr> resolveOps(List<GimpleExpr> operands) {
-    List<Expr> exprs = Lists.newArrayList();
+  private List<ImExpr> resolveOps(List<GimpleExpr> operands) {
+    List<ImExpr> exprs = Lists.newArrayList();
     for(GimpleExpr op : operands) {
       exprs.add(context.resolveExpr(op));
     }
     return exprs;
   }
 
-  private void assignComparison(Expr lhs, Comparison comparison) {
+  private void assignComparison(ImExpr lhs, Comparison comparison) {
     assignIfElse(lhs, comparison.toCondition(context), JimpleExpr.integerConstant(1), JimpleExpr.integerConstant(0));
   }
   
-  private void assignPrimitive(Expr lhs, JimpleExpr jimpleExpr) {
+  private void assignPrimitive(ImExpr lhs, JimpleExpr jimpleExpr) {
     ((PrimitiveLValue)lhs).writePrimitiveAssignment(jimpleExpr);
   }
 
-  private void assignTruthNot(Expr lhs, Expr op) {
+  private void assignTruthNot(ImExpr lhs, ImExpr op) {
     JimpleExpr expr = op.translateToPrimitive(context);
     JimpleExpr condition = new JimpleExpr(expr + " == 0");
     assignBoolean(lhs, condition);
   }
 
-  private void assignTruthOr(Expr lhs, List<Expr> ops) {
+  private void assignTruthOr(ImExpr lhs, List<ImExpr> ops) {
     if(! (ops.get(0).type() instanceof GimpleBooleanType &&
           ops.get(1).type() instanceof GimpleBooleanType)) {
       throw new UnsupportedOperationException();
@@ -194,17 +195,17 @@ public class AssignmentTranslator {
   }
   
 
-  private void assignBoolean(Expr lhs, JimpleExpr booleanExpr) {
+  private void assignBoolean(ImExpr lhs, JimpleExpr booleanExpr) {
     assignIfElse(lhs, booleanExpr, JimpleExpr.integerConstant(1), JimpleExpr.integerConstant(0));
   }
 
-  private void assignBitNot(Expr lhs, Expr op) {
+  private void assignBitNot(ImExpr lhs, ImExpr op) {
     TypeChecker.assertSameType(lhs, op);
 
     assignPrimitive(lhs, JimpleExpr.binaryInfix("^", op.translateToPrimitive(context), JimpleExpr.integerConstant(-1)));
   }
 
-  private void assignIfElse(Expr lhs, JimpleExpr booleanExpr, JimpleExpr ifTrue, JimpleExpr ifFalse) {
+  private void assignIfElse(ImExpr lhs, JimpleExpr booleanExpr, JimpleExpr ifTrue, JimpleExpr ifFalse) {
     String trueLabel = context.newLabel();
     String doneLabel = context.newLabel();
 
@@ -221,9 +222,9 @@ public class AssignmentTranslator {
   }
 
 
-  private void assignUnordered(Expr lhs, List<Expr> operands) {
-    Expr x = operands.get(0);
-    Expr y = operands.get(1);
+  private void assignUnordered(ImExpr lhs, List<ImExpr> operands) {
+    ImExpr x = operands.get(0);
+    ImExpr y = operands.get(1);
 
     TypeChecker.assertSameType(x, y);
 
@@ -239,7 +240,7 @@ public class AssignmentTranslator {
   }
 
 
-  private void assignAbs(Expr lhs, Expr expr) {
+  private void assignAbs(ImExpr lhs, ImExpr expr) {
     
     TypeChecker.assertSameType(lhs, expr);
     
@@ -263,7 +264,7 @@ public class AssignmentTranslator {
     throw new UnsupportedOperationException("abs on type " + type.toString());
   }
 
-  private void assignMax(Expr lhs, List<Expr> operands) {
+  private void assignMax(ImExpr lhs, List<ImExpr> operands) {
     TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
 
     String signature = "{t} max({t}, {t})"
@@ -279,11 +280,11 @@ public class AssignmentTranslator {
 
   }
   
-  private void assign(Expr lhs, Expr rhs) {
+  private void assign(ImExpr lhs, ImExpr rhs) {
     if(lhs instanceof PrimitiveLValue) {
       PrimitiveAssignment.assign(context, lhs, rhs);
-    } else if(lhs instanceof LValue) {
-      ((LValue) lhs).writeAssignment(context, rhs);
+    } else if(lhs instanceof ImLValue) {
+      ((ImLValue) lhs).writeAssignment(context, rhs);
     } else {
       throw new UnsupportedOperationException("Unsupported assignment of " + rhs.toString() + " to " + lhs.toString());
     }

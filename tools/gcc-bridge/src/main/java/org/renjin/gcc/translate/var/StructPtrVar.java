@@ -4,18 +4,19 @@ import org.renjin.gcc.gimple.type.GimpleRecordType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
-import org.renjin.gcc.translate.struct.Struct;
+import org.renjin.gcc.translate.expr.AbstractImExpr;
+import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.type.struct.ImRecordType;
 
-public class StructPtrVar extends Variable {
+public class StructPtrVar extends AbstractImExpr implements Variable {
 
   private GimpleRecordType type;
-  private Struct struct;
+  private ImRecordType struct;
   private String gimpleName;
   private String jimpleName;
   private FunctionContext context;
 
-  public StructPtrVar(FunctionContext context, String gimpleName, Struct struct) {
+  public StructPtrVar(FunctionContext context, String gimpleName, ImRecordType struct) {
     this.struct = struct;
     this.gimpleName = gimpleName;
     this.jimpleName = Jimple.id(gimpleName);
@@ -25,7 +26,7 @@ public class StructPtrVar extends Variable {
   }
 
   @Override
-  public void writeAssignment(FunctionContext context, Expr rhs) {
+  public void writeAssignment(FunctionContext context, ImExpr rhs) {
     throw new UnsupportedOperationException();
   }
 

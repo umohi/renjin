@@ -40,11 +40,15 @@ public class JimpleType {
   }
 
   public boolean isFunctionPointer() {
-    return false;
+    return toString().startsWith("org.renjin.gcc.runtime.FunPtr");
   }
 
   public boolean isAssignableFrom(Class otherClass) {
     return false;
+  }
+
+  public static JimpleType valueOf(Class clazz) {
+    return new RealJimpleType(clazz);
   }
 
 }

@@ -4,14 +4,13 @@ import org.renjin.gcc.gimple.type.*;
 import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
-import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.expr.PrimitiveLValue;
-import org.renjin.gcc.translate.types.PrimitiveTypes;
+import org.renjin.gcc.translate.type.PrimitiveTypes;
 
 public class PrimitiveAssignment {
 
-  public static void assign(FunctionContext context, Expr lhs, Expr rhs) {
+  public static void assign(FunctionContext context, ImExpr lhs, ImExpr rhs) {
     if(lhs instanceof PrimitiveLValue && typesCompatible(lhs.type(), rhs.type())) {
       JimpleExpr jimpleExpr = rhs.translateToPrimitive(context);
       if(requiresCast(lhs, rhs)) {
@@ -23,9 +22,9 @@ public class PrimitiveAssignment {
     }
   }
 
-  private static boolean requiresCast(Expr lhs, Expr rhs) {
-    // we need to insert a cast if the *jimple* types of the arguments
-    // differ. (this is different than the gimple types
+  private static boolean requiresCast(ImExpr lhs, ImExpr rhs) {
+    // we need to insert a cast if the *jimple* type of the arguments
+    // differ. (this is different than the gimple type
     // not matching, because we ignore signed/unsigned right now)
 
     JimpleType ltype = PrimitiveTypes.get(lhs.type());

@@ -42,7 +42,8 @@ public class JimpleExpr {
   }
 
   public static JimpleExpr staticFieldReference(Field field) {
-    return new JimpleExpr("<" + field.getDeclaringClass().getName() + ": " + Jimple.type(field.getType()) + " "
+    return new JimpleExpr("<" + field.getDeclaringClass().getName() + ": " +
+        JimpleType.valueOf(field.getType()) + " "
         + field.getName() + ">");
   }
 
@@ -65,19 +66,21 @@ public class JimpleExpr {
   }
 
   public static JimpleExpr stringLiteral(String value) {
-    StringBuilder expr = new StringBuilder();
-    expr.append('"');
+    StringBuilder literal = new StringBuilder();
+    literal.append("\"");
     for(int i=0;i!=value.length();++i) {
       int cp = value.codePointAt(i);
-      if(cp >= 32 && cp <= 126) {
-        expr.appendCodePoint(cp);
+      if(cp == '"') {
+        literal.append("\\\"");
+      } else if(cp == '\\') {
+        literal.append("\\\\");
+      } else if(cp >= 32 && cp <= 126) {
+        literal.appendCodePoint(cp);
       } else {
-        expr.append(String.format("\\u%04x", cp));
+        literal.append(String.format("\\u%04x", cp));
       }
     }
-    // TODO: escape
-    expr.append(value);
-    expr.append('"');
-    return new JimpleExpr(expr.toString());
+    literal.append("\"");
+    return new JimpleExpr(literal.toString());
   }
 }

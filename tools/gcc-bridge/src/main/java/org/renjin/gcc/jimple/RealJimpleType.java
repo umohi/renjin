@@ -4,6 +4,10 @@ import java.lang.reflect.Type;
 
 import org.renjin.gcc.runtime.Ptr;
 
+/**
+ * A reference to a jimple type (JVM class) that already
+ * exists on the classpath in compiled form.
+ */
 public class RealJimpleType extends JimpleType {
 
   private final Class clazz;
@@ -36,11 +40,6 @@ public class RealJimpleType extends JimpleType {
   @Override
   public boolean isPrimitive() {
     return clazz.isPrimitive();
-  }
-
-  @Override
-  public boolean isFunctionPointer() {
-    return clazz.getClass().getName().startsWith("org.renjin.gcc.runtime.FunPtr");
   }
 
   @Override

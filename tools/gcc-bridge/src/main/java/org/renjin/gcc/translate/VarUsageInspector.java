@@ -3,17 +3,14 @@ package org.renjin.gcc.translate;
 import java.util.List;
 import java.util.Map;
 
-import org.renjin.gcc.gimple.GimpleAssign;
-import org.renjin.gcc.gimple.GimpleCall;
+import org.renjin.gcc.gimple.ins.GimpleAssign;
+import org.renjin.gcc.gimple.ins.GimpleCall;
 import org.renjin.gcc.gimple.GimpleFunction;
-import org.renjin.gcc.gimple.GimpleParameter;
-import org.renjin.gcc.gimple.GimpleReturn;
-import org.renjin.gcc.gimple.GimpleSwitch;
-import org.renjin.gcc.gimple.GimpleVarDecl;
+import org.renjin.gcc.gimple.ins.GimpleReturn;
+import org.renjin.gcc.gimple.ins.GimpleSwitch;
 import org.renjin.gcc.gimple.GimpleVisitor;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleVariableRef;
 
 import com.google.common.collect.Maps;
 import org.renjin.gcc.gimple.expr.SymbolRef;

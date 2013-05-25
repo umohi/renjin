@@ -10,10 +10,10 @@ import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TypeChecker;
 import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.*;
-import org.renjin.gcc.translate.types.PrimitiveTypes;
+import org.renjin.gcc.translate.type.PrimitiveTypes;
 
 
-public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
+public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndirectExpr {
 
   private enum OffsetType {
     BYTES,
@@ -41,18 +41,6 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
 
     context.getBuilder().addVarDecl(arrayType, jimpleArrayName);
     context.getBuilder().addVarDecl(JimpleType.INT, jimpleOffsetName);
-
-  }
-
-  @Override
-  public void initFromParameter() {
-    assignFromWrapper(new JimpleExpr(Jimple.id(gimpleName)));
-  }
-
-  public void assignFromWrapper(JimpleExpr wrapperExpr) {
-    context.getBuilder().addStatement(
-        jimpleArrayName + " = " + wrapperExpr + ".<" + wrapperType + ": " + arrayType + " array>");
-    context.getBuilder().addStatement(jimpleOffsetName + " = " + wrapperExpr + ".<" + wrapperType + ": int offset>");
   }
 
   private int sizeOf() {
@@ -60,11 +48,11 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
   }
 
   @Override
-  public void writeAssignment(FunctionContext context, Expr rhs) {
+  public void writeAssignment(FunctionContext context, ImExpr rhs) {
     if(rhs.isNull()) {
       context.getBuilder().addStatement(jimpleArrayName + " = null");
-    } else if(rhs instanceof IndirectExpr) {
-      ArrayRef ptr = ((IndirectExpr) rhs).translateToArrayRef(context);
+    } else if(rhs instanceof ImIndirectExpr) {
+      ArrayRef ptr = ((ImIndirectExpr) rhs).translateToArrayRef(context);
       context.getBuilder().addStatement(jimpleArrayName + " = " +  ptr.getArrayExpr());
       context.getBuilder().addStatement(jimpleOffsetName + " = " + ptr.getIndexExpr());
     }
@@ -87,7 +75,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
   }
 
   @Override
-  public Expr memref() {
+  public ImExpr memref() {
     return new ValueExpr();
   }
 
@@ -97,7 +85,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
   }
 
   @Override
-  public Expr pointerPlus(Expr offset) {
+  public ImExpr pointerPlus(ImExpr offset) {
     return new OffsetExpr(offset, OffsetType.BYTES);
   }
 
@@ -110,13 +98,13 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
    * An expression representing this pointer + an offset (p+4)
    *
    */
-  public class OffsetExpr extends AbstractExpr implements IndirectExpr {
+  public class OffsetExpr extends AbstractImExpr implements ImIndirectExpr {
 
-    private Expr offset;
+    private ImExpr offset;
     private OffsetType offsetType;
 
 
-    public OffsetExpr(Expr offset, OffsetType offsetType) {
+    public OffsetExpr(ImExpr offset, OffsetType offsetType) {
       super();
       this.offset = offset;
       this.offsetType = offsetType;
@@ -153,11 +141,11 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
    * (*x)
    *
    */
-  public class ValueExpr extends AbstractExpr implements PrimitiveLValue, LValue {
+  public class ValueExpr extends AbstractImExpr implements PrimitiveLValue, ImLValue {
 
 
     @Override
-    public Expr addressOf() {
+    public ImExpr addressOf() {
       return PrimitivePtrVar.this;
     }
 
@@ -177,25 +165,25 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
     }
 
     @Override
-    public void writeAssignment(FunctionContext context, Expr rhs) {
+    public void writeAssignment(FunctionContext context, ImExpr rhs) {
       PrimitiveAssignment.assign(context, this, rhs);
     }
 
     @Override
-    public Expr elementAt(Expr index) {
+    public ImExpr elementAt(ImExpr index) {
       return new ArrayElementExpr(index);
     }
 
   }
 
-  public class ArrayElementExpr extends AbstractExpr implements PrimitiveLValue, LValue {
+  public class ArrayElementExpr extends AbstractImExpr implements PrimitiveLValue, ImLValue {
 
     /**
      * Index of the array, with reference to the current offset.
      */
-    private Expr index;
+    private ImExpr index;
 
-    public ArrayElementExpr(Expr index) {
+    public ArrayElementExpr(ImExpr index) {
       if(!TypeChecker.isInt(index.type())) {
         throw new UnsupportedOperationException();
       }
@@ -223,7 +211,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
 
 
     @Override
-    public Expr addressOf() {
+    public ImExpr addressOf() {
       return new OffsetExpr(index, OffsetType.ELEMENTS);
     }
 
@@ -238,7 +226,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
     }
 
     @Override
-    public void writeAssignment(FunctionContext context, Expr rhs) {
+    public void writeAssignment(FunctionContext context, ImExpr rhs) {
       PrimitiveAssignment.assign(context, this, rhs);
     }
   }

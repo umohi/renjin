@@ -4,7 +4,7 @@ package org.renjin.gcc.translate.call;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.marshall.Marshallers;
 
 /**
@@ -19,7 +19,7 @@ public class SimpleParam implements CallParam {
   }
 
   @Override
-  public JimpleExpr marshall(FunctionContext context, Expr expr) {
+  public JimpleExpr marshall(FunctionContext context, ImExpr expr) {
     return Marshallers.marshall(context, expr, type);
   }
 }

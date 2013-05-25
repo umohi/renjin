@@ -6,16 +6,17 @@ import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.jimple.SyntheticJimpleType;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
-import org.renjin.gcc.translate.expr.FunctionPtrExpr;
-import org.renjin.gcc.translate.expr.LValue;
-import org.renjin.gcc.translate.types.FunPtrJimpleType;
+import org.renjin.gcc.translate.expr.AbstractImExpr;
+import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.expr.ImFunctionPtrExpr;
+import org.renjin.gcc.translate.expr.ImLValue;
 
 /**
  * A variable which holds a pointer to a function
  */
-public class FunPtrVar extends Variable implements LValue, FunctionPtrExpr {
+public class FunPtrVar extends AbstractImExpr implements Variable, ImFunctionPtrExpr {
 
   private String jimpleName;
   private FunctionContext context;
@@ -25,7 +26,7 @@ public class FunPtrVar extends Variable implements LValue, FunctionPtrExpr {
   public FunPtrVar(FunctionContext context, String gimpleName, GimpleFunctionType type) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
-      this.jimpleType = new FunPtrJimpleType(context.getTranslationContext().getFunctionPointerInterfaceName(type));
+    this.jimpleType = new SyntheticJimpleType(context.getTranslationContext().getFunctionPointerInterfaceName(type));
     this.functionType = type;
     
     context.getBuilder().addVarDecl(jimpleType, jimpleName);
@@ -37,11 +38,11 @@ public class FunPtrVar extends Variable implements LValue, FunctionPtrExpr {
   }
 
   @Override
-  public void writeAssignment(FunctionContext context, Expr rhs) {
+  public void writeAssignment(FunctionContext context, ImExpr rhs) {
     if(rhs.isNull()) {
       context.getBuilder().addStatement(Jimple.id(jimpleName) + " = null");
-    } else if (rhs instanceof FunctionPtrExpr) {
-      context.getBuilder().addStatement(jimpleName + " = " + ((FunctionPtrExpr) rhs).invokerReference(context));
+    } else if (rhs instanceof ImFunctionPtrExpr) {
+      context.getBuilder().addStatement(jimpleName + " = " + ((ImFunctionPtrExpr) rhs).invokerReference(context));
     }
   }
 

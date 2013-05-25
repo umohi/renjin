@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import io.airlift.command.Command;
-import io.airlift.command.Option;
-import io.airlift.command.OptionType;
+import org.renjin.gcc.gimple.CallingConvention;
+import org.renjin.gcc.gimple.CallingConventions;
 import org.renjin.gcc.gimple.GimpleCompilationUnit;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.jimple.JimpleClassBuilder;

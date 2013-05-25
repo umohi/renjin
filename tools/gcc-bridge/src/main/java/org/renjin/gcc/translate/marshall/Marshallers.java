@@ -4,9 +4,7 @@ package org.renjin.gcc.translate.marshall;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
-
-import java.util.List;
+import org.renjin.gcc.translate.expr.ImExpr;
 
 public class Marshallers {
   
@@ -18,16 +16,16 @@ public class Marshallers {
     } else if(type.isFunctionPointer()) {
       return new FunPtrMarshaller();
     } else {
-      throw new UnsupportedOperationException(type.toString());
+      return new ObjectMarshaller(type.toString());
     }
   }
 
-  public static JimpleExpr marshallReturnValue(FunctionContext context, Expr returnValue) {
+  public static JimpleExpr marshallReturnValue(FunctionContext context, ImExpr returnValue) {
     JimpleType returnType = context.getBuilder().getReturnType();
     return marshall(context, returnValue, returnType);
   }
 
-  public static JimpleExpr marshall(FunctionContext context, Expr returnValue, JimpleType type) {
+  public static JimpleExpr marshall(FunctionContext context, ImExpr returnValue, JimpleType type) {
     return forType(type).marshall(context, returnValue);
   }
 }

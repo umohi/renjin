@@ -14,6 +14,11 @@ import org.renjin.gcc.translate.call.MethodRef;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+/**
+ * Maintains a list of methods/functions that are visible to the Gimple
+ * code being translated. These include builtin functions, JVM methods
+ * provided by the compiler user, and functions currently being compiled.
+ */
 public class MethodTable {
 
   private class MethodEntry {

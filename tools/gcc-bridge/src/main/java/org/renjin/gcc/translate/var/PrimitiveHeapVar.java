@@ -9,7 +9,7 @@ import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.*;
-import org.renjin.gcc.translate.types.PrimitiveTypes;
+import org.renjin.gcc.translate.type.PrimitiveTypes;
 
 /**
  * Writes jimple instructions to store and retrieve a single primitive numeric
@@ -17,7 +17,7 @@ import org.renjin.gcc.translate.types.PrimitiveTypes;
  * can be addressed and passed by reference to other methods.
  * 
  */
-public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValue {
+public class PrimitiveHeapVar extends AbstractImExpr implements Variable, PrimitiveLValue, ImLValue {
   private FunctionContext context;
   private String jimpleName;
   private GimplePrimitiveType type;
@@ -57,16 +57,16 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValu
   }
 
   @Override
-  public Expr addressOf() {
+  public ImExpr addressOf() {
     return new PointerTo();
   }
 
   @Override
-  public void writeAssignment(FunctionContext context, Expr rhs) {
+  public void writeAssignment(FunctionContext context, ImExpr rhs) {
     PrimitiveAssignment.assign(context, this, rhs);
   }
 
-  private class PointerTo extends AbstractExpr implements IndirectExpr {
+  private class PointerTo extends AbstractImExpr implements ImIndirectExpr {
 
     @Override
     public ArrayRef translateToArrayRef(FunctionContext context) {
@@ -79,7 +79,7 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValu
     }
 
     @Override
-    public Expr memref() {
+    public ImExpr memref() {
       return PrimitiveHeapVar.this;
     }
 

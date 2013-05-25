@@ -3,9 +3,7 @@ package org.renjin.gcc.translate.marshall;
 
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
-
-import java.util.List;
+import org.renjin.gcc.translate.expr.ImExpr;
 
 /**
  * Translator that knows how to marhshall an intermediate 
@@ -13,6 +11,6 @@ import java.util.List;
  */
 public interface Marshaller {
   
-  JimpleExpr marshall(FunctionContext context, Expr expr);
+  JimpleExpr marshall(FunctionContext context, ImExpr expr);
   
 }

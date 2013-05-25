@@ -2,6 +2,8 @@ package org.renjin.gcc;
 
 
 import com.google.common.collect.Lists;
+import org.renjin.gcc.gimple.CallingConvention;
+import org.renjin.gcc.gimple.CallingConventions;
 import org.renjin.gcc.gimple.GimpleCompilationUnit;
 import org.renjin.gcc.gimple.GimpleFunction;
 

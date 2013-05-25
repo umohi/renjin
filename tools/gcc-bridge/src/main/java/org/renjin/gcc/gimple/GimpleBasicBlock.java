@@ -1,6 +1,7 @@
 package org.renjin.gcc.gimple;
 
 import com.google.common.collect.Lists;
+import org.renjin.gcc.gimple.ins.GimpleIns;
 
 import java.util.List;
 
@@ -38,5 +39,4 @@ public class GimpleBasicBlock {
   public List<GimpleIns> getInstructions() {
     return instructions;
   }
-
 }

@@ -61,7 +61,6 @@ public class BasicTest extends AbstractGccTest {
     Method method = clazz.getMethod("test_account_value");
     Double result = (Double) method.invoke(null);
     assertThat(result, equalTo(5000d));
-    System.out.println(result);
   }
 
   @Test

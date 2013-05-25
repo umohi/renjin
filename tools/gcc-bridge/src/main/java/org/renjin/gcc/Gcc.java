@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class Gcc {
 
   private File workingDirectory;
-  private File pluginLibrary = new File("/home/alexander/dev/renjin-git/tools/gcc-plugin/renjin.so");
+  private File pluginLibrary;
 
   private List<File> includeDirectories = Lists.newArrayList();
 
@@ -119,7 +119,7 @@ public class Gcc {
   }
 
   private void checkEnvironment() {
-    if(PortableName.OS == PortableName.OSType.WINDOWS) {
+    if(PlatformUtils.OS == PlatformUtils.OSType.WINDOWS) {
       throw new GccException("Sorry, gcc-bridge does not work on Windows/Cygwin because of problems building \n" +
               "and linking the required gcc plugin. You can still compile on a *NIX platform and use the " +
               "resulting pure-Java class files on any platform.");
@@ -135,7 +135,7 @@ public class Gcc {
   }
   
   public void extractPlugin() throws IOException {
-    String libraryName = PortableName.getPortableLibraryName("gcc-bridge");
+    String libraryName = PlatformUtils.getPortableLibraryName("gcc-bridge");
     
     
     URL pluginResource;
@@ -147,10 +147,11 @@ public class Gcc {
               "You will need to build it yourself and specify the path to the binary. ");
     }
     
-    pluginLibrary = new File(workingDirectory, "bridge" + PortableName.getExtension());
+    pluginLibrary = new File(workingDirectory, "bridge" + PlatformUtils.getExtension());
     
     Files.copy(Resources.newInputStreamSupplier(pluginResource), pluginLibrary);
 
+    pluginLibrary.deleteOnExit();
   }
   
   public void checkVersion() {

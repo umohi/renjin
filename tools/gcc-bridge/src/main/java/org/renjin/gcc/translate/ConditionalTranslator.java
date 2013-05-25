@@ -1,6 +1,6 @@
 package org.renjin.gcc.translate;
 
-import org.renjin.gcc.gimple.GimpleConditional;
+import org.renjin.gcc.gimple.ins.GimpleConditional;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleGoto;
 

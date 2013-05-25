@@ -3,8 +3,8 @@ package org.renjin.gcc.translate;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.renjin.gcc.CallingConvention;
-import org.renjin.gcc.gimple.GimpleCall;
+import org.renjin.gcc.gimple.CallingConvention;
+import org.renjin.gcc.gimple.ins.GimpleCall;
 import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
@@ -15,12 +15,11 @@ import org.renjin.gcc.gimple.type.*;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
 import org.renjin.gcc.jimple.JimpleOutput;
 import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.jimple.SyntheticJimpleType;
 import org.renjin.gcc.translate.call.GccFunction;
 import org.renjin.gcc.translate.call.MethodRef;
-import org.renjin.gcc.translate.struct.Struct;
-import org.renjin.gcc.translate.struct.StructTable;
-import org.renjin.gcc.translate.types.*;
-import org.renjin.gcc.translate.types.RecordTypeTranslator;
+import org.renjin.gcc.translate.type.struct.ImRecordType;
+import org.renjin.gcc.translate.type.*;
 
 import com.google.common.collect.Lists;
 
@@ -29,14 +28,14 @@ public class TranslationContext {
   private MethodTable methodTable;
   private List<GimpleFunction> functions;
   private FunPtrTable funPtrTable;
-  private StructTable structTable;
+  private RecordTypeTable recordTypeTable;
 
   public TranslationContext(JimpleClassBuilder mainClass, MethodTable methodTable, List<GimpleFunction> functions) {
     this.mainClass = mainClass;
     this.methodTable = methodTable;
     this.functions = functions;
     this.funPtrTable = new FunPtrTable(this);
-    this.structTable = new StructTable(this);
+    this.recordTypeTable = new RecordTypeTable(this);
   }
 
   public JimpleClassBuilder getMainClass() {
@@ -95,9 +94,9 @@ public class TranslationContext {
     return methodTable.findField(external);
   }
 
-  public TypeTranslator resolveType(GimpleType type) {
+  public ImType resolveType(GimpleType type) {
     if (type instanceof GimplePrimitiveType) {
-      return new PrimitiveTypeTranslator((GimplePrimitiveType) type);
+      return new ImPrimitiveType((GimplePrimitiveType) type);
     } else if (type instanceof GimpleIndirectType) {
       GimpleType baseType = type.getBaseType();
       
@@ -106,17 +105,20 @@ public class TranslationContext {
         baseType = ((GimpleArrayType) baseType).getComponentType();
         type = new GimplePointerType(baseType);
       }
-      
+
       if(baseType instanceof GimplePrimitiveType) {
-        return new PrimitivePtrTypeTranslator((GimpleIndirectType) type);
+        return new ImPrimitivePtrType((GimpleIndirectType) type);
+
       } else if (baseType instanceof GimpleRecordType) {
-        return new RecordTypeTranslator(this, type);
+        return resolveRecordType((GimpleRecordType) baseType).pointerType();
+
       } else if (baseType instanceof GimpleFunctionType) {
-        return new FunPtrTranslator(this, (GimpleFunctionType) baseType);
+        return new ImFunctionPtrType(this, (GimpleFunctionType) baseType);
       } 
     } else if (type instanceof GimpleRecordType) {
-      return new RecordTypeTranslator(this, type);
-    } 
+
+      return resolveRecordType((GimpleRecordType) type);
+    }
     throw new UnsupportedOperationException(type.toString());
   }
 
@@ -140,12 +142,12 @@ public class TranslationContext {
     return functions;
   }
 
-  public Struct resolveStruct(GimpleRecordType recordType) {
-    return structTable.resolveStruct(recordType);
+  public ImRecordType resolveRecordType(GimpleRecordType recordType) {
+    return recordTypeTable.resolveStruct(recordType);
   }
 
   public JimpleType getInvokerType(MethodRef method) {
-    return new InvokerJimpleType(getInvokerClass(method));
+    return new SyntheticJimpleType(getInvokerClass(method));
   }
 
 }

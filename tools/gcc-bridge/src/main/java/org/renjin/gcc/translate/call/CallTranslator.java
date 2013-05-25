@@ -2,7 +2,7 @@ package org.renjin.gcc.translate.call;
 
 import java.util.List;
 
-import org.renjin.gcc.gimple.GimpleCall;
+import org.renjin.gcc.gimple.ins.GimpleCall;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
@@ -13,9 +13,9 @@ import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunSignature;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.expr.ImLValue;
 import org.renjin.gcc.translate.expr.JvmExprs;
-import org.renjin.gcc.translate.expr.LValue;
 import org.renjin.gcc.translate.var.FunPtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
@@ -75,8 +75,8 @@ public class CallTranslator {
     if(returnType.equals(JimpleType.VOID)) {
       context.getBuilder().addStatement(call.toString());
     } else {
-      LValue lvalue = (LValue) context.resolveExpr(this.call.getLhs());
-      Expr rhs = JvmExprs.toExpr(context, new JimpleExpr(call.toString()), returnType, false);
+      ImLValue lvalue = (ImLValue) context.resolveExpr(this.call.getLhs());
+      ImExpr rhs = JvmExprs.toExpr(context, new JimpleExpr(call.toString()), returnType, false);
       lvalue.writeAssignment(context, rhs);
     }
   }
@@ -114,7 +114,7 @@ public class CallTranslator {
   private List<JimpleExpr> marshallParams(List<CallParam> callParams) {
     List<JimpleExpr> exprs = Lists.newArrayList();
     for (int i = 0; i != call.getParamCount(); ++i) {
-      Expr sourceExpr = context.resolveExpr(call.getArguments().get(i));
+      ImExpr sourceExpr = context.resolveExpr(call.getArguments().get(i));
       exprs.add(callParams.get(i).marshall(context, sourceExpr));
     }
     return exprs;

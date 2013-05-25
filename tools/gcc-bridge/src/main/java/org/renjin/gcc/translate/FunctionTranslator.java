@@ -1,24 +1,23 @@
 package org.renjin.gcc.translate;
 
-import org.renjin.gcc.gimple.GimpleAssign;
+import org.renjin.gcc.gimple.ins.GimpleAssign;
 import org.renjin.gcc.gimple.GimpleBasicBlock;
-import org.renjin.gcc.gimple.GimpleCall;
-import org.renjin.gcc.gimple.GimpleConditional;
+import org.renjin.gcc.gimple.ins.GimpleCall;
+import org.renjin.gcc.gimple.ins.GimpleConditional;
 import org.renjin.gcc.gimple.GimpleFunction;
-import org.renjin.gcc.gimple.GimpleLabelIns;
-import org.renjin.gcc.gimple.GimpleReturn;
-import org.renjin.gcc.gimple.GimpleSwitch;
+import org.renjin.gcc.gimple.ins.GimpleReturn;
+import org.renjin.gcc.gimple.ins.GimpleSwitch;
 import org.renjin.gcc.gimple.GimpleVisitor;
-import org.renjin.gcc.gimple.GimpleGoto;
+import org.renjin.gcc.gimple.ins.GimpleGoto;
 import org.renjin.gcc.gimple.type.GimplePointerType;
 import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.gimple.type.GimpleVoidType;
 import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.call.CallTranslator;
-import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.marshall.Marshallers;
-import org.renjin.gcc.translate.types.PrimitiveTypes;
+import org.renjin.gcc.translate.type.PrimitiveTypes;
 
 /**
  * Translates a GimpleFunction to a Jimple function
@@ -84,7 +83,7 @@ public class FunctionTranslator extends GimpleVisitor {
     if(gimpleReturn.getValue() == null) {
       builder.addStatement("return");
     } else {
-      Expr returnValue = context.resolveExpr(gimpleReturn.getValue());
+      ImExpr returnValue = context.resolveExpr(gimpleReturn.getValue());
 
       builder.addStatement("return " + Marshallers.marshallReturnValue(context, returnValue));
     }
@@ -96,13 +95,8 @@ public class FunctionTranslator extends GimpleVisitor {
   }
 
   @Override
-  public void visitLabelIns(GimpleLabelIns labelIns) {
-    builder.addLabel(labelIns.getLabel().getName());
-  }
-
-  @Override
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
-    Expr switchExpr = context.resolveExpr(gimpleSwitch.getExpr());
+    ImExpr switchExpr = context.resolveExpr(gimpleSwitch.getExpr());
     JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(switchExpr.translateToPrimitive(context).toString());
     for (GimpleSwitch.Branch branch : gimpleSwitch.getBranches()) {
       jimpleSwitch.addBranch(branch.getValue(), branch.getLabel().getName());

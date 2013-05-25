@@ -1,5 +1,7 @@
 package org.renjin.gcc.gimple;
 
+import org.renjin.gcc.gimple.ins.*;
+
 public class GimpleVisitor {
 
   public void visitAssignment(GimpleAssign assignment) {
@@ -30,7 +32,4 @@ public class GimpleVisitor {
 
   }
 
-  public void visitLabelIns(GimpleLabelIns labelIns) {
-
-  }
 }

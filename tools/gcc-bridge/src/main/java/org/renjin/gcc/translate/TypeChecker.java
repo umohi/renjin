@@ -3,13 +3,13 @@ package org.renjin.gcc.translate;
 import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.translate.expr.Expr;
+import org.renjin.gcc.translate.expr.ImExpr;
 
 public class TypeChecker {
 
-  public static void assertSameType(Expr expr, Expr... otherExprs) {
+  public static void assertSameType(ImExpr expr, ImExpr... otherExprs) {
     
-    for(Expr other : otherExprs) {
+    for(ImExpr other : otherExprs) {
       if(!expr.type().equals(other.type())) {
         throw new IllegalArgumentException(String.format("Types do not match: %s:%s <> %s:%s",
             expr.toString(), expr.type().toString(),
