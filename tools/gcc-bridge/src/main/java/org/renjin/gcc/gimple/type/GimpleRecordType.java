@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class RecordType extends AbstractGimpleType {
+public class GimpleRecordType extends AbstractGimpleType {
   private String name;
   private int id;
   
-  private List<Field> fields = Lists.newArrayList();
+  private List<GimpleField> fields = Lists.newArrayList();
     
   public int getId() {
     return id;
@@ -23,7 +23,7 @@ public class RecordType extends AbstractGimpleType {
   } 
   
 
-  public List<Field> getFields() {
+  public List<GimpleField> getFields() {
     return fields;
   }
 

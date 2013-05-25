@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class ArrayType extends AbstractGimpleType {
+public class GimpleArrayType extends AbstractGimpleType {
   private GimpleType componentType;
   private int lbound;
   private Integer ubound;

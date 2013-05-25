@@ -1,10 +1,7 @@
-package org.renjin.gcc.translate.assign;
+package org.renjin.gcc.translate;
 
-import org.renjin.gcc.gimple.type.BooleanType;
-import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IntegerType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
-import org.renjin.gcc.gimple.type.RealType;
+import org.renjin.gcc.gimple.type.*;
+import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
@@ -38,12 +35,12 @@ public class PrimitiveAssignment {
   }
 
   private static boolean typesCompatible(GimpleType lhs, GimpleType rhs) {
-    if(lhs instanceof IntegerType) {
-      return (rhs instanceof IntegerType || rhs instanceof BooleanType) && 
+    if(lhs instanceof GimpleIntegerType) {
+      return (rhs instanceof GimpleIntegerType || rhs instanceof GimpleBooleanType) &&
           precision(lhs) >= precision(rhs);
           
-    } else if(lhs instanceof RealType) {
-      return rhs instanceof PrimitiveType && precision(lhs) >= precision(rhs);
+    } else if(lhs instanceof GimpleRealType) {
+      return rhs instanceof GimplePrimitiveType && precision(lhs) >= precision(rhs);
       
     } else {
       return lhs.equals(rhs);
@@ -51,11 +48,11 @@ public class PrimitiveAssignment {
   }
 
   private static int precision(GimpleType type) {
-    if(type instanceof IntegerType) {
-      return ((IntegerType) type).getPrecision();
-    } else if(type instanceof RealType) {
-      return ((RealType) type).getPrecision();
-    } else if(type instanceof BooleanType) {
+    if(type instanceof GimpleIntegerType) {
+      return ((GimpleIntegerType) type).getPrecision();
+    } else if(type instanceof GimpleRealType) {
+      return ((GimpleRealType) type).getPrecision();
+    } else if(type instanceof GimpleBooleanType) {
       return 1;
     } else {
       throw new UnsupportedOperationException(type.toString());

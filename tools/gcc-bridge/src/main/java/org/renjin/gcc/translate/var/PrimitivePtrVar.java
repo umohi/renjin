@@ -1,14 +1,14 @@
 package org.renjin.gcc.translate.var;
 
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TypeChecker;
-import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.*;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
@@ -22,14 +22,14 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
 
   private FunctionContext context;
   private String gimpleName;
-  private IndirectType pointerType;
-  private PrimitiveType gimpleType;
+  private GimpleIndirectType pointerType;
+  private GimplePrimitiveType gimpleType;
   private String jimpleArrayName;
   private String jimpleOffsetName;
   private JimpleType arrayType;
   private JimpleType wrapperType;
 
-  public PrimitivePtrVar(FunctionContext context, String gimpleName, IndirectType type) {
+  public PrimitivePtrVar(FunctionContext context, String gimpleName, GimpleIndirectType type) {
     this.context = context;
     this.gimpleName = gimpleName;
     this.pointerType = type;
@@ -92,7 +92,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
   }
 
   @Override
-  public IndirectType type() {
+  public GimpleIndirectType type() {
     return pointerType;
   }
 
@@ -123,7 +123,7 @@ public class PrimitivePtrVar extends Variable implements LValue, IndirectExpr {
     }
 
     @Override
-    public IndirectType type() {
+    public GimpleIndirectType type() {
       return PrimitivePtrVar.this.type();
     }
 

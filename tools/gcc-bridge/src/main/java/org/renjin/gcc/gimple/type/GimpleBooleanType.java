@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class BooleanType extends PrimitiveType {
+public class GimpleBooleanType extends GimplePrimitiveType {
 
   @Override
   public String toString() {
@@ -9,7 +9,7 @@ public class BooleanType extends PrimitiveType {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof BooleanType;
+    return obj instanceof GimpleBooleanType;
   }
 
   @Override

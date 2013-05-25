@@ -1,13 +1,13 @@
 package org.renjin.gcc.translate.var;
 
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
+import org.renjin.gcc.gimple.type.GimplePointerType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.gimple.type.PointerType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.*;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
 
@@ -20,9 +20,9 @@ import org.renjin.gcc.translate.types.PrimitiveTypes;
 public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValue {
   private FunctionContext context;
   private String jimpleName;
-  private PrimitiveType type;
+  private GimplePrimitiveType type;
 
-  public PrimitiveHeapVar(FunctionContext context, PrimitiveType type, String gimpleName) {
+  public PrimitiveHeapVar(FunctionContext context, GimplePrimitiveType type, String gimpleName) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
     this.type = type;
@@ -74,8 +74,8 @@ public class PrimitiveHeapVar extends Variable implements PrimitiveLValue, LValu
     }
 
     @Override
-    public IndirectType type() {
-      return new PointerType(PrimitiveHeapVar.this.type());
+    public GimpleIndirectType type() {
+      return new GimplePointerType(PrimitiveHeapVar.this.type());
     }
 
     @Override

@@ -1,10 +1,10 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.PrimitiveType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
-import org.renjin.gcc.translate.assign.PrimitiveAssignment;
+import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.expr.LValue;
 import org.renjin.gcc.translate.expr.PrimitiveLValue;
@@ -18,9 +18,9 @@ public class PrimitiveStackVar extends Variable implements PrimitiveLValue, LVal
 
   private FunctionContext context;
   private String jimpleName;
-  private PrimitiveType type;
+  private GimplePrimitiveType type;
 
-  public PrimitiveStackVar(FunctionContext context, PrimitiveType type, String gimpleName) {
+  public PrimitiveStackVar(FunctionContext context, GimplePrimitiveType type, String gimpleName) {
     this.context = context;
     this.type = type;
     this.jimpleName = Jimple.id(gimpleName);
@@ -49,7 +49,7 @@ public class PrimitiveStackVar extends Variable implements PrimitiveLValue, LVal
   }
 
   @Override
-  public PrimitiveType type() {
+  public GimplePrimitiveType type() {
     return type;
   }
 

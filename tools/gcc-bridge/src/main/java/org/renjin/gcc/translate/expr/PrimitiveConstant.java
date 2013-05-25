@@ -3,9 +3,9 @@ package org.renjin.gcc.translate.expr;
 import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleIntegerConstant;
 import org.renjin.gcc.gimple.expr.GimpleRealConstant;
-import org.renjin.gcc.gimple.type.BooleanType;
+import org.renjin.gcc.gimple.type.GimpleBooleanType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TypeChecker;
@@ -28,7 +28,7 @@ public class PrimitiveConstant extends AbstractExpr {
 
   @Override
   public JimpleExpr translateToPrimitive(FunctionContext context) {
-    if(TypeChecker.isInt(constant.getType()) || constant.getType() instanceof BooleanType) {
+    if(TypeChecker.isInt(constant.getType()) || constant.getType() instanceof GimpleBooleanType) {
       return JimpleExpr.integerConstant(((GimpleIntegerConstant) constant).getValue());
     } else if(TypeChecker.isLong(constant.getType())) {
       return JimpleExpr.longConstant(((GimpleIntegerConstant) constant).getValue());
@@ -57,7 +57,7 @@ public class PrimitiveConstant extends AbstractExpr {
   @Override
   public Expr addressOf() {
     // in order to provide an address, we'll create a heap variable on the fly
-    PrimitiveHeapVar var = new PrimitiveHeapVar(context, (PrimitiveType) constant.getType(),
+    PrimitiveHeapVar var = new PrimitiveHeapVar(context, (GimplePrimitiveType) constant.getType(),
             "__constant" + System.identityHashCode(this));
     var.writePrimitiveAssignment(translateToPrimitive(context));
 

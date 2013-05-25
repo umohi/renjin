@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class ReferenceType extends AbstractGimpleType implements IndirectType {
+public class GimpleReferenceType extends AbstractGimpleType implements GimpleIndirectType {
   private GimpleType baseType;
 
   public GimpleType getBaseType() {

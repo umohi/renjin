@@ -108,13 +108,18 @@ public class Gcc {
     String output = new String(ByteStreams.toByteArray(gcc.getInputStream()));
 
     if (gcc.exitValue() != 0) {
+
+      if(output.contains("error trying to exec 'f951': execvp: No such file or directory")) {
+        throw new GccException("Compilation failed: Fortran compiler is missing:\n" + output);
+      }
+
       throw new GccException("Compilation failed:\n" + output);
     }
     return output;
   }
 
   private void checkEnvironment() {
-    if(Strings.nullToEmpty(System.getProperty("os.name")).toLowerCase().contains("windows")) {
+    if(PortableName.OS == PortableName.OSType.WINDOWS) {
       throw new GccException("Sorry, gcc-bridge does not work on Windows/Cygwin because of problems building \n" +
               "and linking the required gcc plugin. You can still compile on a *NIX platform and use the " +
               "resulting pure-Java class files on any platform.");

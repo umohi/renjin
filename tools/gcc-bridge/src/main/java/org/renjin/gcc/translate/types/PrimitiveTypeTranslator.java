@@ -1,6 +1,6 @@
 package org.renjin.gcc.translate.types;
 
-import org.renjin.gcc.gimple.type.PrimitiveType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.VarUsage;
@@ -10,9 +10,9 @@ import org.renjin.gcc.translate.var.Variable;
 
 public class PrimitiveTypeTranslator extends TypeTranslator {
 
-  private PrimitiveType type;
+  private GimplePrimitiveType type;
 
-  public PrimitiveTypeTranslator(PrimitiveType type) {
+  public PrimitiveTypeTranslator(GimplePrimitiveType type) {
     this.type = type;
   }
 

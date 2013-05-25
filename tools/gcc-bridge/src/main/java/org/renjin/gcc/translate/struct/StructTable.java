@@ -2,7 +2,7 @@ package org.renjin.gcc.translate.struct;
 
 import com.google.common.collect.Maps;
 
-import org.renjin.gcc.gimple.type.RecordType;
+import org.renjin.gcc.gimple.type.GimpleRecordType;
 import org.renjin.gcc.translate.TranslationContext;
 
 import java.util.Map;
@@ -27,7 +27,7 @@ public class StructTable {
     this.context = context;
   }
 
-  public Struct resolveStruct(RecordType recordType) {
+  public Struct resolveStruct(GimpleRecordType recordType) {
     if (map.containsKey(recordType.getName())) {
       return map.get(recordType.getName());
     } else {

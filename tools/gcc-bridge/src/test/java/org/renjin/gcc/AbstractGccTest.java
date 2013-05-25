@@ -34,6 +34,8 @@ public abstract class AbstractGccTest {
   protected Class<?> compile(List<String> sources, String className) throws Exception {
 
     Gcc gcc = new Gcc();
+    gcc.extractPlugin();
+
     List<GimpleFunction> functions = Lists.newArrayList();
 
     for (String sourceName : sources) {

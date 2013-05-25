@@ -4,12 +4,11 @@ import java.util.List;
 
 import org.renjin.gcc.gimple.GimpleAssign;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.type.BooleanType;
+import org.renjin.gcc.gimple.type.GimpleBooleanType;
+import org.renjin.gcc.gimple.type.GimpleIntegerType;
+import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IntegerType;
-import org.renjin.gcc.gimple.type.RealType;
 import org.renjin.gcc.jimple.JimpleExpr;
-import org.renjin.gcc.translate.assign.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.LValue;
 import org.renjin.gcc.translate.expr.PrimitiveLValue;
 import org.renjin.gcc.translate.expr.Expr;
@@ -116,7 +115,7 @@ public class AssignmentTranslator {
       throw new UnsupportedOperationException();
     }
 
-    if(! (x.type() instanceof RealType || x.type() instanceof  IntegerType) ) {
+    if(! (x.type() instanceof GimpleRealType || x.type() instanceof GimpleIntegerType) ) {
       throw new UnsupportedOperationException("unsupported type for div " + x.type());
     }
     
@@ -163,8 +162,8 @@ public class AssignmentTranslator {
   }
 
   private void assignTruthOr(Expr lhs, List<Expr> ops) {
-    if(! (ops.get(0).type() instanceof BooleanType &&
-          ops.get(1).type() instanceof BooleanType)) {
+    if(! (ops.get(0).type() instanceof GimpleBooleanType &&
+          ops.get(1).type() instanceof GimpleBooleanType)) {
       throw new UnsupportedOperationException();
     }
 
@@ -251,13 +250,13 @@ public class AssignmentTranslator {
   }
 
   private String absMethodForType(GimpleType type) {
-    if (type instanceof RealType) {
-      if (((RealType) type).getPrecision() == 64) {
+    if (type instanceof GimpleRealType) {
+      if (((GimpleRealType) type).getPrecision() == 64) {
         return "double abs(double)";
       }
     }
-    if (type instanceof IntegerType) {
-      if (((IntegerType) type).getPrecision() == 32) {
+    if (type instanceof GimpleIntegerType) {
+      if (((GimpleIntegerType) type).getPrecision() == 32) {
         return "int abs(int)";
       }
     }

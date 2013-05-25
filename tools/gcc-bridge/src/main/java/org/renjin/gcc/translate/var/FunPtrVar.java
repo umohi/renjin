@@ -1,8 +1,8 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.FunctionType;
+import org.renjin.gcc.gimple.type.GimpleFunctionType;
+import org.renjin.gcc.gimple.type.GimplePointerType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
@@ -20,9 +20,9 @@ public class FunPtrVar extends Variable implements LValue, FunctionPtrExpr {
   private String jimpleName;
   private FunctionContext context;
   private JimpleType jimpleType;
-  private FunctionType functionType;
+  private GimpleFunctionType functionType;
 
-  public FunPtrVar(FunctionContext context, String gimpleName, FunctionType type) {
+  public FunPtrVar(FunctionContext context, String gimpleName, GimpleFunctionType type) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
       this.jimpleType = new FunPtrJimpleType(context.getTranslationContext().getFunctionPointerInterfaceName(type));
@@ -33,7 +33,7 @@ public class FunPtrVar extends Variable implements LValue, FunctionPtrExpr {
 
   @Override
   public GimpleType type() {
-    return new PointerType(functionType);
+    return new GimplePointerType(functionType);
   }
 
   @Override

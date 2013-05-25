@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class Field {
+public class GimpleField {
   private String name;
   private GimpleType type;
   

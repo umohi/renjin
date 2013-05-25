@@ -1,6 +1,6 @@
 package org.renjin.gcc.gimple.type;
 
-public class VoidType extends AbstractGimpleType {
+public class GimpleVoidType extends AbstractGimpleType {
 
   @Override
   public String toString() {

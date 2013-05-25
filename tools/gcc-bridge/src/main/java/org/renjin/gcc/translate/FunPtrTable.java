@@ -3,7 +3,7 @@ package org.renjin.gcc.translate;
 import java.util.List;
 import java.util.Set;
 
-import org.renjin.gcc.gimple.type.FunctionType;
+import org.renjin.gcc.gimple.type.GimpleFunctionType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
 import org.renjin.gcc.jimple.JimpleInterfaceBuilder;
@@ -28,7 +28,7 @@ public class FunPtrTable {
     this.context = context;
   }
 
-  public FunSignature signature(FunctionType type) {
+  public FunSignature signature(GimpleFunctionType type) {
     JimpleType returnType = context.resolveType(type.getReturnType()).returnType();
     List<JimpleType> paramTypes = Lists.newArrayList();
     for (GimpleType paramType : type.getArgumentTypes()) {
@@ -48,11 +48,11 @@ public class FunPtrTable {
     return getInterfaceName(new FunSignature(ref));
   }
 
-  public String getInterfaceName(FunctionType type) {
+  public String getInterfaceName(GimpleFunctionType type) {
     return getInterfaceName(signature(type));
   }
 
-  public FunSignature methodRef(FunctionType type) {
+  public FunSignature methodRef(GimpleFunctionType type) {
     return signature(type);
   }
 

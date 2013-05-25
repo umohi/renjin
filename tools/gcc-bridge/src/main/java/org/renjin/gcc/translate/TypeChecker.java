@@ -1,8 +1,8 @@
 package org.renjin.gcc.translate;
 
+import org.renjin.gcc.gimple.type.GimpleIntegerType;
+import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IntegerType;
-import org.renjin.gcc.gimple.type.RealType;
 import org.renjin.gcc.translate.expr.Expr;
 
 public class TypeChecker {
@@ -19,15 +19,15 @@ public class TypeChecker {
   }
   
   public static boolean isDouble(GimpleType type) {
-    return type instanceof RealType && ((RealType) type).getPrecision() == 64;
+    return type instanceof GimpleRealType && ((GimpleRealType) type).getPrecision() == 64;
   }
   
   public static boolean isInt(GimpleType type) {
-    return type instanceof IntegerType && ((IntegerType) type).getPrecision() == 32;
+    return type instanceof GimpleIntegerType && ((GimpleIntegerType) type).getPrecision() == 32;
   }
 
   public static boolean isLong(GimpleType type) {
-    return type instanceof IntegerType && ((IntegerType) type).getPrecision() == 64;
+    return type instanceof GimpleIntegerType && ((GimpleIntegerType) type).getPrecision() == 64;
   }
   
   public static String primitiveJvmTypeName(GimpleType type) {

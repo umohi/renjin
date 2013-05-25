@@ -8,7 +8,8 @@ import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.marshall.Marshallers;
 
 /**
- * A simple call parameter
+ * A simple call parameter consisting of a single JVM parameter
+ * mapped to a single gimple parameter
  */
 public class SimpleParam implements CallParam {
   private final JimpleType type;

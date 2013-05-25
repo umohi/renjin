@@ -1,13 +1,13 @@
 package org.renjin.gcc.gimple.type;
 
-public class PointerType extends AbstractGimpleType implements IndirectType {
+public class GimplePointerType extends AbstractGimpleType implements GimpleIndirectType {
   private GimpleType baseType;
 
-  public PointerType() {
+  public GimplePointerType() {
     
   }
   
-  public PointerType(GimpleType baseType) {
+  public GimplePointerType(GimpleType baseType) {
     this.baseType = baseType;
   }
 

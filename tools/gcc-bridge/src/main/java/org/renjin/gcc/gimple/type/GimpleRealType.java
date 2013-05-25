@@ -1,12 +1,12 @@
 package org.renjin.gcc.gimple.type;
 
-public class RealType extends PrimitiveType {
+public class GimpleRealType extends GimplePrimitiveType {
   private int precision;
 
-  public RealType() {
+  public GimpleRealType() {
   }
 
-  public RealType(int precision) {
+  public GimpleRealType(int precision) {
     this.precision = precision;
   }
 
@@ -44,7 +44,7 @@ public class RealType extends PrimitiveType {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    RealType other = (RealType) obj;
+    GimpleRealType other = (GimpleRealType) obj;
     return precision == other.precision;
   }
 

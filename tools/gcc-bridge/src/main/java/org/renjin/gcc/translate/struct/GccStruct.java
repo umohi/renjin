@@ -1,10 +1,8 @@
 package org.renjin.gcc.translate.struct;
 
 import com.google.common.collect.Maps;
-import org.renjin.gcc.gimple.GimpleFunction;
-import org.renjin.gcc.gimple.type.Field;
-import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.RecordType;
+import org.renjin.gcc.gimple.type.GimpleField;
+import org.renjin.gcc.gimple.type.GimpleRecordType;
 import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TranslationContext;
@@ -21,7 +19,7 @@ public class GccStruct extends Struct {
 
   private Map<String, JimpleType> types = Maps.newHashMap();
 
-  public GccStruct(TranslationContext context, RecordType recordType) {
+  public GccStruct(TranslationContext context, GimpleRecordType recordType) {
     this.context = context;
     this.name = recordType.getName();
     this.structClass = context.getJimpleOutput().newClass();
@@ -29,7 +27,7 @@ public class GccStruct extends Struct {
     this.structClass.setClassName(context.getMainClass().getClassName() + "$" + name);
 
 
-    for (Field member : recordType.getFields()) {
+    for (GimpleField member : recordType.getFields()) {
       JimpleType type = context.resolveType(member.getType()).paramType();
       types.put(member.getName(), type);
 

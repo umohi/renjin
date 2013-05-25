@@ -6,15 +6,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ 
-    @Type(value = IntegerType.class, name = "integer_type"),
-    @Type(value = RealType.class, name = "real_type"),
-    @Type(value = PointerType.class, name = "pointer_type"),
-    @Type(value = ReferenceType.class, name = "reference_type"), 
-    @Type(value = ArrayType.class, name = "array_type"),
-    @Type(value = BooleanType.class, name = "boolean_type"),
-    @Type(value = FunctionType.class, name = "function_type"),
-    @Type(value = RecordType.class, name = "record_type"),
-    @Type(value = VoidType.class, name = "void_type") })
+    @Type(value = GimpleIntegerType.class, name = "integer_type"),
+    @Type(value = GimpleRealType.class, name = "real_type"),
+    @Type(value = GimplePointerType.class, name = "pointer_type"),
+    @Type(value = GimpleReferenceType.class, name = "reference_type"),
+    @Type(value = GimpleArrayType.class, name = "array_type"),
+    @Type(value = GimpleBooleanType.class, name = "boolean_type"),
+    @Type(value = GimpleFunctionType.class, name = "function_type"),
+    @Type(value = GimpleRecordType.class, name = "record_type"),
+    @Type(value = GimpleVoidType.class, name = "void_type") })
 public interface GimpleType {
 
   boolean isPointerTo(Class<? extends GimpleType> clazz);

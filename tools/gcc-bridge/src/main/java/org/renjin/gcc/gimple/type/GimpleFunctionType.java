@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class FunctionType extends AbstractGimpleType {
+public class GimpleFunctionType extends AbstractGimpleType {
   private GimpleType returnType;
   private int size;
   private List<GimpleType> argumentTypes = Lists.newArrayList();

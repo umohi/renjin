@@ -4,12 +4,7 @@ import java.util.List;
 
 import org.renjin.gcc.CallingConvention;
 import org.renjin.gcc.F77CallingConvention;
-import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleNull;
-import org.renjin.gcc.gimple.expr.GimpleParamRef;
-import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.VoidType;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;

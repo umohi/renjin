@@ -13,14 +13,14 @@ public class PrimitiveTypes {
 
   
   public static JimpleType get(GimpleType type) {
-    if (type instanceof RealType) {
-      if (((RealType) type).getPrecision() == 64) {
+    if (type instanceof GimpleRealType) {
+      if (((GimpleRealType) type).getPrecision() == 64) {
         return JimpleType.DOUBLE;
-      } else if (((RealType) type).getPrecision() == 32) {
+      } else if (((GimpleRealType) type).getPrecision() == 32) {
         return JimpleType.FLOAT;
       }
-    } else if (type instanceof IntegerType) {
-      int precision = ((IntegerType) type).getPrecision();
+    } else if (type instanceof GimpleIntegerType) {
+      int precision = ((GimpleIntegerType) type).getPrecision();
       switch(precision) {
       case 8:
         return JimpleType.CHAR;
@@ -29,21 +29,21 @@ public class PrimitiveTypes {
       case 64:
         return JimpleType.LONG;
       }
-    } else if (type instanceof BooleanType) {
+    } else if (type instanceof GimpleBooleanType) {
       return JimpleType.BOOLEAN;
     }
     throw new UnsupportedOperationException("type:" + type);
   }
 
-  public static JimpleType getArrayType(PrimitiveType type) {
-    if (type instanceof RealType) {
-      if (((RealType) type).getPrecision() == 64) {
+  public static JimpleType getArrayType(GimplePrimitiveType type) {
+    if (type instanceof GimpleRealType) {
+      if (((GimpleRealType) type).getPrecision() == 64) {
         return new RealJimpleType(double[].class);
-      } else if (((RealType) type).getPrecision() == 32) {
+      } else if (((GimpleRealType) type).getPrecision() == 32) {
         return new RealJimpleType(float[].class);
       }
-    } else if (type instanceof IntegerType) {
-      int precision = ((IntegerType) type).getPrecision();
+    } else if (type instanceof GimpleIntegerType) {
+      int precision = ((GimpleIntegerType) type).getPrecision();
       switch(precision) {
       case 8:
         return new RealJimpleType(char[].class);
@@ -52,21 +52,21 @@ public class PrimitiveTypes {
       case 64:
         return new RealJimpleType(long[].class);
       }
-    } else if (type instanceof BooleanType) {
+    } else if (type instanceof GimpleBooleanType) {
       return new RealJimpleType(boolean[].class);
     }
     throw new UnsupportedOperationException(type.toString());
   }
 
-  public static JimpleType getWrapperType(PrimitiveType type) {
-    if (type instanceof RealType) {
-      if (((RealType) type).getPrecision() == 64) {
+  public static JimpleType getWrapperType(GimplePrimitiveType type) {
+    if (type instanceof GimpleRealType) {
+      if (((GimpleRealType) type).getPrecision() == 64) {
         return new RealJimpleType(DoublePtr.class);
-      } else if (((RealType) type).getPrecision() == 32) {
+      } else if (((GimpleRealType) type).getPrecision() == 32) {
         // TODO
       }
-    } else if (type instanceof IntegerType) {
-      int precision = ((IntegerType) type).getPrecision();
+    } else if (type instanceof GimpleIntegerType) {
+      int precision = ((GimpleIntegerType) type).getPrecision();
       switch(precision) {
       case 8:
         return new RealJimpleType(CharPtr.class);
@@ -75,7 +75,7 @@ public class PrimitiveTypes {
       case 64: 
         return new RealJimpleType(LongPtr.class);
       }
-    } else if (type instanceof BooleanType) {
+    } else if (type instanceof GimpleBooleanType) {
       // TODO
     }
     throw new UnsupportedOperationException(type.toString());

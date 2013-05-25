@@ -7,7 +7,7 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.expr.SymbolRef;
-import org.renjin.gcc.gimple.type.FunctionType;
+import org.renjin.gcc.gimple.type.GimpleFunctionType;
 import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
@@ -91,10 +91,10 @@ public class CallTranslator {
 
   private FunSignature getFunPtrInterface() {
     GimpleType type = context.getGimpleVariableType(call.getFunction());
-    if (!type.isPointerTo(FunctionType.class)) {
+    if (!type.isPointerTo(GimpleFunctionType.class)) {
       throw new UnsupportedOperationException("Function value must be of type FunctionPointer, got: " + type);
     }
-    return context.getTranslationContext().getFunctionPointerMethod((FunctionType)type.getBaseType());
+    return context.getTranslationContext().getFunctionPointerMethod((GimpleFunctionType)type.getBaseType());
   }
 
 

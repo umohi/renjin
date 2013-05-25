@@ -1,10 +1,10 @@
 package org.renjin.gcc.translate.expr;
 
 import org.renjin.gcc.gimple.expr.GimpleStringConstant;
-import org.renjin.gcc.gimple.type.ArrayType;
+import org.renjin.gcc.gimple.type.GimpleArrayType;
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
+import org.renjin.gcc.gimple.type.GimplePointerType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 
@@ -12,15 +12,15 @@ import org.renjin.gcc.translate.FunctionContext;
 public class StringConstant extends AbstractExpr {
 
   private GimpleStringConstant constant;
-  private ArrayType type;  
+  private GimpleArrayType type;
   
   public StringConstant(FunctionContext context, GimpleStringConstant constant) {
     this.constant = constant;
-    this.type = (ArrayType)constant.getType();
+    this.type = (GimpleArrayType)constant.getType();
   }
 
   @Override
-  public ArrayType type() {
+  public GimpleArrayType type() {
     return type;
   }
 
@@ -101,8 +101,8 @@ public class StringConstant extends AbstractExpr {
     }
 
     @Override
-    public IndirectType type() {
-      return new PointerType(type.getComponentType());
+    public GimpleIndirectType type() {
+      return new GimplePointerType(type.getComponentType());
     }
 
     @Override

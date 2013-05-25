@@ -1,9 +1,9 @@
 package org.renjin.gcc.translate;
 
 import org.renjin.gcc.gimple.GimpleOp;
-import org.renjin.gcc.gimple.type.BooleanType;
-import org.renjin.gcc.gimple.type.IntegerType;
-import org.renjin.gcc.gimple.type.RealType;
+import org.renjin.gcc.gimple.type.GimpleBooleanType;
+import org.renjin.gcc.gimple.type.GimpleIntegerType;
+import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.expr.Expr;
@@ -25,7 +25,7 @@ public class Comparison {
   public JimpleExpr toCondition(FunctionContext context) {
     TypeChecker.assertSameType(a, b);
 
-    if(a.type() instanceof RealType) {
+    if(a.type() instanceof GimpleRealType) {
       switch (op) {
       case NE_EXPR:
         return floatComparison(context, "cmpl", "!=", 0);
@@ -40,7 +40,7 @@ public class Comparison {
       case GE_EXPR:
         return floatComparison(context, "cmpl", ">=", 0);
       }
-    } else if(a.type() instanceof IntegerType || a.type() instanceof BooleanType) {
+    } else if(a.type() instanceof GimpleIntegerType || a.type() instanceof GimpleBooleanType) {
       switch (op) {
       case NE_EXPR:
         return intComparison(context, "!=");

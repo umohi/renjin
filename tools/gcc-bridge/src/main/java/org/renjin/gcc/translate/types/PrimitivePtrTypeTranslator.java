@@ -1,8 +1,8 @@
 package org.renjin.gcc.translate.types;
 
-import org.renjin.gcc.gimple.type.ArrayType;
-import org.renjin.gcc.gimple.type.IndirectType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
+import org.renjin.gcc.gimple.type.GimpleArrayType;
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.VarUsage;
@@ -12,14 +12,14 @@ import org.renjin.gcc.translate.var.Variable;
 public class PrimitivePtrTypeTranslator extends TypeTranslator {
 
   private JimpleType wrapperClass;
-  private PrimitiveType primitiveType;
-  private IndirectType pointerType;
+  private GimplePrimitiveType primitiveType;
+  private GimpleIndirectType pointerType;
   private boolean pointerToArray = false;
 
-  public PrimitivePtrTypeTranslator(IndirectType type) {
+  public PrimitivePtrTypeTranslator(GimpleIndirectType type) {
     this.pointerType = type;
-    if(type.getBaseType() instanceof ArrayType) {
-      this.primitiveType = (PrimitiveType) ((ArrayType) type.getBaseType()).getComponentType();
+    if(type.getBaseType() instanceof GimpleArrayType) {
+      this.primitiveType = (GimplePrimitiveType) ((GimpleArrayType) type.getBaseType()).getComponentType();
       this.pointerToArray = true;
     } else {
       this.primitiveType = type.getBaseType();

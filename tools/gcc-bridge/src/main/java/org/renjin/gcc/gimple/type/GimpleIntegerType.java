@@ -1,14 +1,14 @@
 package org.renjin.gcc.gimple.type;
 
-public class IntegerType extends PrimitiveType {
+public class GimpleIntegerType extends GimplePrimitiveType {
   private int precision;
   private boolean unsigned;
   
-  public IntegerType() {
+  public GimpleIntegerType() {
     
   }
   
-  public IntegerType(int precision) {
+  public GimpleIntegerType(int precision) {
     this.precision = precision;
     setSize(precision);
   }
@@ -60,7 +60,7 @@ public class IntegerType extends PrimitiveType {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    IntegerType other = (IntegerType) obj;
+    GimpleIntegerType other = (GimpleIntegerType) obj;
     if (precision != other.precision)
       return false;
     if (unsigned != other.unsigned)

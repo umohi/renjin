@@ -1,6 +1,6 @@
 package org.renjin.gcc.translate.expr;
 
-import org.renjin.gcc.gimple.type.IndirectType;
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
 import org.renjin.gcc.translate.FunctionContext;
 
 /**
@@ -12,5 +12,5 @@ public interface IndirectExpr extends Expr {
   ArrayRef translateToArrayRef(FunctionContext context);
 
   @Override
-  IndirectType type();
+  GimpleIndirectType type();
 }

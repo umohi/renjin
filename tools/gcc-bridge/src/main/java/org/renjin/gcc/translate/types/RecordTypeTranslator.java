@@ -1,8 +1,8 @@
 package org.renjin.gcc.translate.types;
 
-import org.renjin.gcc.gimple.type.RecordType;
+import org.renjin.gcc.gimple.type.GimplePointerType;
+import org.renjin.gcc.gimple.type.GimpleRecordType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.PointerType;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.translate.FunctionContext;
@@ -13,18 +13,18 @@ import org.renjin.gcc.translate.var.StructPtrVar;
 import org.renjin.gcc.translate.var.StructVar;
 import org.renjin.gcc.translate.var.Variable;
 
-public class StructTypeTranslator extends TypeTranslator {
+public class RecordTypeTranslator extends TypeTranslator {
 
-  private RecordType structType;
+  private GimpleRecordType structType;
   private boolean pointer;
   private Struct struct;
 
-  public StructTypeTranslator(TranslationContext translationContext, GimpleType type) {
-    if (type instanceof PointerType) {
-      this.structType = (RecordType) ((PointerType) type).getBaseType();
+  public RecordTypeTranslator(TranslationContext translationContext, GimpleType type) {
+    if (type instanceof GimplePointerType) {
+      this.structType = ((GimplePointerType) type).getBaseType();
       this.pointer = true;
-    } else if (type instanceof RecordType) {
-      this.structType = (RecordType) type;
+    } else if (type instanceof GimpleRecordType) {
+      this.structType = (GimpleRecordType) type;
       this.pointer = false;
     } else {
       throw new UnsupportedOperationException(type.toString());

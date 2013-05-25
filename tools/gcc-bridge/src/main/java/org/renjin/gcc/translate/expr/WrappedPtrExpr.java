@@ -1,7 +1,7 @@
 package org.renjin.gcc.translate.expr;
 
 
-import org.renjin.gcc.gimple.type.IndirectType;
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
@@ -37,7 +37,7 @@ public class WrappedPtrExpr extends AbstractExpr implements IndirectExpr {
   }
 
   @Override
-  public IndirectType type() {
+  public GimpleIndirectType type() {
     throw new UnsupportedOperationException();
   }
 }

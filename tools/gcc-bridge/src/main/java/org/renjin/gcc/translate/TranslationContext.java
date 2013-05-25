@@ -19,11 +19,8 @@ import org.renjin.gcc.translate.call.GccFunction;
 import org.renjin.gcc.translate.call.MethodRef;
 import org.renjin.gcc.translate.struct.Struct;
 import org.renjin.gcc.translate.struct.StructTable;
-import org.renjin.gcc.translate.types.FunPtrTranslator;
-import org.renjin.gcc.translate.types.PrimitivePtrTypeTranslator;
-import org.renjin.gcc.translate.types.PrimitiveTypeTranslator;
-import org.renjin.gcc.translate.types.StructTypeTranslator;
-import org.renjin.gcc.translate.types.TypeTranslator;
+import org.renjin.gcc.translate.types.*;
+import org.renjin.gcc.translate.types.RecordTypeTranslator;
 
 import com.google.common.collect.Lists;
 
@@ -82,7 +79,7 @@ public class TranslationContext {
   private MethodRef asRef(GimpleFunction function) {
     
     JimpleType returnType;
-    if(function.getReturnType() instanceof VoidType) {
+    if(function.getReturnType() instanceof GimpleVoidType) {
       returnType = JimpleType.VOID;
     } else {
       returnType = resolveType(function.getReturnType()).returnType();
@@ -99,26 +96,26 @@ public class TranslationContext {
   }
 
   public TypeTranslator resolveType(GimpleType type) {
-    if (type instanceof PrimitiveType) {
-      return new PrimitiveTypeTranslator((PrimitiveType) type);
-    } else if (type instanceof IndirectType) {
+    if (type instanceof GimplePrimitiveType) {
+      return new PrimitiveTypeTranslator((GimplePrimitiveType) type);
+    } else if (type instanceof GimpleIndirectType) {
       GimpleType baseType = type.getBaseType();
       
       // treat pointers to an array as simply pointers to the underlying type
-      if(baseType instanceof ArrayType) {
-        baseType = ((ArrayType) baseType).getComponentType();
-        type = new PointerType(baseType);
+      if(baseType instanceof GimpleArrayType) {
+        baseType = ((GimpleArrayType) baseType).getComponentType();
+        type = new GimplePointerType(baseType);
       }
       
-      if(baseType instanceof PrimitiveType) {
-        return new PrimitivePtrTypeTranslator((IndirectType) type);
-      } else if (baseType instanceof RecordType) {
-        return new StructTypeTranslator(this, type);
-      } else if (baseType instanceof FunctionType) {
-        return new FunPtrTranslator(this, (FunctionType) baseType);
+      if(baseType instanceof GimplePrimitiveType) {
+        return new PrimitivePtrTypeTranslator((GimpleIndirectType) type);
+      } else if (baseType instanceof GimpleRecordType) {
+        return new RecordTypeTranslator(this, type);
+      } else if (baseType instanceof GimpleFunctionType) {
+        return new FunPtrTranslator(this, (GimpleFunctionType) baseType);
       } 
-    } else if (type instanceof RecordType) {
-      return new StructTypeTranslator(this, type);
+    } else if (type instanceof GimpleRecordType) {
+      return new RecordTypeTranslator(this, type);
     } 
     throw new UnsupportedOperationException(type.toString());
   }
@@ -127,11 +124,11 @@ public class TranslationContext {
     return mainClass.getOutput();
   }
 
-  public String getFunctionPointerInterfaceName(FunctionType type) {
+  public String getFunctionPointerInterfaceName(GimpleFunctionType type) {
     return funPtrTable.getInterfaceName(type);
   }
 
-  public FunSignature getFunctionPointerMethod(FunctionType type) {
+  public FunSignature getFunctionPointerMethod(GimpleFunctionType type) {
     return funPtrTable.methodRef(type);
   }
 
@@ -143,7 +140,7 @@ public class TranslationContext {
     return functions;
   }
 
-  public Struct resolveStruct(RecordType recordType) {
+  public Struct resolveStruct(GimpleRecordType recordType) {
     return structTable.resolveStruct(recordType);
   }
 

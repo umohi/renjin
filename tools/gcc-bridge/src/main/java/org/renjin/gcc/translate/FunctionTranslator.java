@@ -10,17 +10,15 @@ import org.renjin.gcc.gimple.GimpleReturn;
 import org.renjin.gcc.gimple.GimpleSwitch;
 import org.renjin.gcc.gimple.GimpleVisitor;
 import org.renjin.gcc.gimple.GimpleGoto;
-import org.renjin.gcc.gimple.expr.SymbolRef;
+import org.renjin.gcc.gimple.type.GimplePointerType;
+import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.gimple.type.PointerType;
-import org.renjin.gcc.gimple.type.PrimitiveType;
-import org.renjin.gcc.gimple.type.VoidType;
+import org.renjin.gcc.gimple.type.GimpleVoidType;
 import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.call.CallTranslator;
 import org.renjin.gcc.translate.expr.Expr;
 import org.renjin.gcc.translate.marshall.Marshallers;
 import org.renjin.gcc.translate.types.PrimitiveTypes;
-import org.renjin.gcc.translate.var.Variable;
 
 /**
  * Translates a GimpleFunction to a Jimple function
@@ -52,14 +50,14 @@ public class FunctionTranslator extends GimpleVisitor {
   }
 
   private JimpleType translateReturnType(GimpleType returnType) {
-    if (returnType instanceof PrimitiveType) {
+    if (returnType instanceof GimplePrimitiveType) {
       return PrimitiveTypes.get(returnType);
-    } else if (returnType instanceof PointerType) {
+    } else if (returnType instanceof GimplePointerType) {
       GimpleType innerType = returnType.getBaseType();
-      if (innerType instanceof PrimitiveType) {
-        return PrimitiveTypes.getWrapperType((PrimitiveType) innerType);
+      if (innerType instanceof GimplePrimitiveType) {
+        return PrimitiveTypes.getWrapperType((GimplePrimitiveType) innerType);
       }
-    } else if (returnType instanceof VoidType) {
+    } else if (returnType instanceof GimpleVoidType) {
       return JimpleType.VOID;
     }
     throw new UnsupportedOperationException(returnType.toString());
