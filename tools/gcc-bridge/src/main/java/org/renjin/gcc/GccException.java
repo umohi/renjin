@@ -6,4 +6,7 @@ public class GccException extends RuntimeException {
     super(message);
   }
 
+  public GccException(String message, Exception e) {
+    super(message, e);
+  }
 }
