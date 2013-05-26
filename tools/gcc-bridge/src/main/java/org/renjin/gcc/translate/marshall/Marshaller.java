@@ -6,7 +6,7 @@ import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.ImExpr;
 
 /**
- * Translator that knows how to marhshall an intermediate 
+ * Translator that knows how to marshall an intermediate
  * expression to a return value or a call parameter.
  */
 public interface Marshaller {

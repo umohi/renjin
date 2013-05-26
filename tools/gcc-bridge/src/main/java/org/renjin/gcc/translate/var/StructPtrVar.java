@@ -1,16 +1,15 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.GimpleRecordType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.AbstractImExpr;
 import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 import org.renjin.gcc.translate.type.struct.ImRecordType;
 
 public class StructPtrVar extends AbstractImExpr implements Variable {
 
-  private GimpleRecordType type;
+  private ImPrimitiveType type;
   private ImRecordType struct;
   private String gimpleName;
   private String jimpleName;
@@ -31,7 +30,7 @@ public class StructPtrVar extends AbstractImExpr implements Variable {
   }
 
   @Override
-  public GimpleType type() {
+  public ImPrimitiveType type() {
     return type;
   }
 }

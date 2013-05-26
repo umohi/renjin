@@ -1,8 +1,10 @@
 package org.renjin.gcc.translate.expr;
 
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.ImType;
+import org.renjin.gcc.translate.type.PrimitiveType;
 
 /**
  * An intermediate representation of an expression used during
@@ -29,8 +31,9 @@ public interface ImExpr {
    * @return a jimple expression that will
    * evaluate to the primitive value of this expression.
    * @param context the function context
+   * @param type
    */
-  JimpleExpr translateToPrimitive(FunctionContext context);
+  JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type);
 
   JimpleExpr translateToObjectReference(FunctionContext context, String className);
 
@@ -48,7 +51,7 @@ public interface ImExpr {
    *
    * @return the gimple type of this expression
    */
-  GimpleType type();
+  ImType type();
 
   /**
    *

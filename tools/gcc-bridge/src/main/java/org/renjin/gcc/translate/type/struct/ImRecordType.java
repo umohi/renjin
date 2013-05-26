@@ -6,9 +6,8 @@ import org.renjin.gcc.translate.type.ImType;
 /**
  *
  */
-public abstract class ImRecordType extends ImType {
+public abstract class ImRecordType implements ImType {
 
   public abstract JimpleType getJimpleType();
 
-  public abstract ImType pointerType();
 }

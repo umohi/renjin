@@ -17,6 +17,10 @@ public class RStubs {
     return false;
   }
 
+  public static void error(CharPtr message) {
+    throw new RuntimeException(message.asString());
+  }
+
   public static void Rf_error(String msg) {
     throw new RuntimeException(msg);
   }

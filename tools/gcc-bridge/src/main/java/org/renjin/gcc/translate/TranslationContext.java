@@ -96,28 +96,23 @@ public class TranslationContext {
 
   public ImType resolveType(GimpleType type) {
     if (type instanceof GimplePrimitiveType) {
-      return new ImPrimitiveType((GimplePrimitiveType) type);
+      return ImPrimitiveType.valueOf(type);
+
+    } else if (type instanceof GimpleRecordType) {
+      return resolveRecordType((GimpleRecordType) type);
+
+    } else if(type instanceof GimpleFunctionType) {
+      return funPtrTable.resolveFunctionType((GimpleFunctionType) type);
+
     } else if (type instanceof GimpleIndirectType) {
       GimpleType baseType = type.getBaseType();
-      
+
       // treat pointers to an array as simply pointers to the underlying type
       if(baseType instanceof GimpleArrayType) {
         baseType = ((GimpleArrayType) baseType).getComponentType();
-        type = new GimplePointerType(baseType);
       }
 
-      if(baseType instanceof GimplePrimitiveType) {
-        return new ImPrimitivePtrType((GimpleIndirectType) type);
-
-      } else if (baseType instanceof GimpleRecordType) {
-        return resolveRecordType((GimpleRecordType) baseType).pointerType();
-
-      } else if (baseType instanceof GimpleFunctionType) {
-        return new ImFunctionPtrType(this, (GimpleFunctionType) baseType);
-      } 
-    } else if (type instanceof GimpleRecordType) {
-
-      return resolveRecordType((GimpleRecordType) type);
+      return resolveType(baseType).pointerType();
     }
     throw new UnsupportedOperationException(type.toString());
   }
@@ -130,7 +125,7 @@ public class TranslationContext {
     return funPtrTable.getInterfaceName(type);
   }
 
-  public FunSignature getFunctionPointerMethod(GimpleFunctionType type) {
+  public ImFunctionType getFunctionPointerMethod(GimpleFunctionType type) {
     return funPtrTable.methodRef(type);
   }
 

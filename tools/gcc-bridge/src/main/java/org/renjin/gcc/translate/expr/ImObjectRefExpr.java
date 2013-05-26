@@ -1,12 +1,16 @@
 package org.renjin.gcc.translate.expr;
 
 
-import org.renjin.gcc.gimple.type.GimpleType;
-import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.ImType;
 
+/**
+ * An intermediate expression representing a reference
+ * to an arbitrary JVM object.
+ */
 public class ImObjectRefExpr extends AbstractImExpr {
 
   private JimpleExpr expr;
@@ -26,7 +30,7 @@ public class ImObjectRefExpr extends AbstractImExpr {
   }
 
   @Override
-  public GimpleType type() {
+  public ImType type() {
     throw new UnsupportedOperationException();
   }
 }

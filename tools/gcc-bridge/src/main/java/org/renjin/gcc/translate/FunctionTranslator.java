@@ -17,6 +17,8 @@ import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.call.CallTranslator;
 import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.marshall.Marshallers;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.PrimitiveType;
 import org.renjin.gcc.translate.type.PrimitiveTypes;
 
 /**
@@ -38,7 +40,11 @@ public class FunctionTranslator extends GimpleVisitor {
       this.builder = translationContext.getMainClass().newMethod();
       builder.setModifiers(JimpleModifiers.PUBLIC, JimpleModifiers.STATIC);
       builder.setName(function.getName());
-      builder.setReturnType(translateReturnType(function.getReturnType()));
+      if(function.getReturnType() instanceof GimpleVoidType) {
+        builder.setReturnType(JimpleType.VOID);
+      } else {
+        builder.setReturnType(translationContext.resolveType(function.getReturnType()).returnType());
+      }
 
       context = new FunctionContext(translationContext, function, builder);
 
@@ -46,20 +52,6 @@ public class FunctionTranslator extends GimpleVisitor {
     } catch (Exception e) {
       throw new TranslationException("Exception translating function " + function.getName(), e);
     }
-  }
-
-  private JimpleType translateReturnType(GimpleType returnType) {
-    if (returnType instanceof GimplePrimitiveType) {
-      return PrimitiveTypes.get(returnType);
-    } else if (returnType instanceof GimplePointerType) {
-      GimpleType innerType = returnType.getBaseType();
-      if (innerType instanceof GimplePrimitiveType) {
-        return PrimitiveTypes.getWrapperType((GimplePrimitiveType) innerType);
-      }
-    } else if (returnType instanceof GimpleVoidType) {
-      return JimpleType.VOID;
-    }
-    throw new UnsupportedOperationException(returnType.toString());
   }
 
   @Override
@@ -96,11 +88,19 @@ public class FunctionTranslator extends GimpleVisitor {
 
   @Override
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
-    ImExpr switchExpr = context.resolveExpr(gimpleSwitch.getExpr());
-    JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(switchExpr.translateToPrimitive(context).toString());
-    for (GimpleSwitch.Branch branch : gimpleSwitch.getBranches()) {
-      jimpleSwitch.addBranch(branch.getValue(), branch.getLabel().getName());
+    ImExpr switchExpr = context.resolveExpr(gimpleSwitch.getValue());
+
+    JimpleSwitchStatement jimpleSwitch = new JimpleSwitchStatement(
+        switchExpr.translateToPrimitive(context, ImPrimitiveType.INT));
+
+    for (GimpleSwitch.Case branch : gimpleSwitch.getCases()) {
+      jimpleSwitch.addBranch(branch.getLow(), basicBlockLabel(branch.getBasicBlockIndex()));
     }
+
+    if(gimpleSwitch.getDefaultCase() != null) {
+      jimpleSwitch.addDefaultBranch(basicBlockLabel(gimpleSwitch.getDefaultCase().getBasicBlockIndex()));
+    }
+
     builder.add(jimpleSwitch);
   }
 
@@ -122,5 +122,4 @@ public class FunctionTranslator extends GimpleVisitor {
       throw new RuntimeException("Exception translating " + conditional, e);
     }
   }
-
 }

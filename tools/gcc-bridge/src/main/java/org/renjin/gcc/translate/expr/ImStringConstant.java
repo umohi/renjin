@@ -1,27 +1,25 @@
 package org.renjin.gcc.translate.expr;
 
 import org.renjin.gcc.gimple.expr.GimpleStringConstant;
-import org.renjin.gcc.gimple.type.GimpleArrayType;
-import org.renjin.gcc.gimple.type.GimpleIndirectType;
 import org.renjin.gcc.gimple.type.GimplePointerType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.ImType;
 
 
 public class ImStringConstant extends AbstractImExpr {
 
   private GimpleStringConstant constant;
-  private GimpleArrayType type;
+  private ImPrimitiveType type;
   
   public ImStringConstant(GimpleStringConstant constant) {
     this.constant = constant;
-    this.type = constant.getType();
   }
 
   @Override
-  public GimpleArrayType type() {
-    return type;
+  public ImType type() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -52,7 +50,7 @@ public class ImStringConstant extends AbstractImExpr {
     }
 
     @Override
-    public GimpleType type() {
+    public ImPrimitiveType type() {
       return type;
     }
   }
@@ -87,7 +85,7 @@ public class ImStringConstant extends AbstractImExpr {
 
     private JimpleExpr subtractLowerBound(FunctionContext context, ImExpr expr) {
       if(constant.getType().getLbound() == 0) {
-        return startIndex.translateToPrimitive(context);
+        return startIndex.translateToPrimitive(context, null);
       } else if(expr instanceof ImPrimitiveConstant) {
         Number startIndex = (Number)((ImPrimitiveConstant) expr).getConstantValue();
         return JimpleExpr.integerConstant(startIndex.intValue() - constant.getType().getLbound());
@@ -97,8 +95,8 @@ public class ImStringConstant extends AbstractImExpr {
     }
 
     @Override
-    public GimpleIndirectType type() {
-      return new GimplePointerType(type.getComponentType());
+    public ImType type() {
+      return ImPrimitiveType.CHAR.pointerType();
     }
 
     @Override

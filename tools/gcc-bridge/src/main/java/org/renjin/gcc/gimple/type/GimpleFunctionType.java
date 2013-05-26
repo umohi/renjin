@@ -3,6 +3,7 @@ package org.renjin.gcc.gimple.type;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 public class GimpleFunctionType extends AbstractGimpleType {
   private GimpleType returnType;

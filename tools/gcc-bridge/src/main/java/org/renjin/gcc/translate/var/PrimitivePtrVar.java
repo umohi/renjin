@@ -1,8 +1,5 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.GimpleIndirectType;
-import org.renjin.gcc.gimple.type.GimplePrimitiveType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
@@ -10,10 +7,11 @@ import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TypeChecker;
 import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.*;
-import org.renjin.gcc.translate.type.PrimitiveTypes;
+import org.renjin.gcc.translate.type.*;
 
 
 public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndirectExpr {
+
 
   private enum OffsetType {
     BYTES,
@@ -22,29 +20,23 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
 
   private FunctionContext context;
   private String gimpleName;
-  private GimpleIndirectType pointerType;
-  private GimplePrimitiveType gimpleType;
+  private final ImPrimitivePtrType type;
   private String jimpleArrayName;
   private String jimpleOffsetName;
-  private JimpleType arrayType;
-  private JimpleType wrapperType;
 
-  public PrimitivePtrVar(FunctionContext context, String gimpleName, GimpleIndirectType type) {
+  public PrimitivePtrVar(FunctionContext context, String gimpleName, ImPrimitivePtrType type) {
     this.context = context;
     this.gimpleName = gimpleName;
-    this.pointerType = type;
-    this.gimpleType = type.getBaseType();
+    this.type = type;
     this.jimpleArrayName = Jimple.id(gimpleName) + "_array";
     this.jimpleOffsetName = Jimple.id(gimpleName + "_offset");
-    this.arrayType = PrimitiveTypes.getArrayType(gimpleType);
-    this.wrapperType = PrimitiveTypes.getWrapperType(gimpleType);
 
-    context.getBuilder().addVarDecl(arrayType, jimpleArrayName);
+    context.getBuilder().addVarDecl(type.getArrayClass(), jimpleArrayName);
     context.getBuilder().addVarDecl(JimpleType.INT, jimpleOffsetName);
   }
 
   private int sizeOf() {
-    return gimpleType.getSize() / 8;
+    return type.getBaseType().getStorageSizeInBytes();
   }
 
   @Override
@@ -58,17 +50,6 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
     }
   }
 
-  private JimpleExpr wrapPointer() {
-    JimpleType wrapperType = PrimitiveTypes.getWrapperType(gimpleType);
-    String tempWrapper = context.declareTemp(wrapperType);
-    context.getBuilder().addStatement(tempWrapper + " = new " + wrapperType);
-    context.getBuilder().addStatement(
-        "specialinvoke " + tempWrapper + ".<" + wrapperType + ": void <init>("
-            + PrimitiveTypes.getArrayType(gimpleType) + ", int)>(" + jimpleArrayName + ", " + jimpleOffsetName + ")");
-
-    return new JimpleExpr(tempWrapper);
-  }
-
   @Override
   public ArrayRef translateToArrayRef(FunctionContext context) {
     return new ArrayRef(jimpleArrayName, jimpleOffsetName);
@@ -80,8 +61,8 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
   }
 
   @Override
-  public GimpleIndirectType type() {
-    return pointerType;
+  public ImPrimitivePtrType type() {
+    return type;
   }
 
   @Override
@@ -91,7 +72,7 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
 
   @Override
   public String toString() {
-    return gimpleName + ":" + pointerType;
+    return gimpleName + ":" + type;
   }
 
   /**
@@ -111,7 +92,7 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
     }
 
     @Override
-    public GimpleIndirectType type() {
+    public ImType type() {
       return PrimitivePtrVar.this.type();
     }
 
@@ -126,12 +107,13 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
 
     private JimpleExpr computeIndex() {
       if(offsetType == OffsetType.BYTES) {
-        JimpleExpr bytesToIncrement = offset.translateToPrimitive(context);
+        JimpleExpr bytesToIncrement = offset.translateToPrimitive(context, ImPrimitiveType.INT);
         String positionsToIncrement = context.declareTemp(JimpleType.INT);
         context.getBuilder().addStatement(positionsToIncrement + " = " + bytesToIncrement + " / " + sizeOf());
         return new JimpleExpr(jimpleOffsetName + " + " + positionsToIncrement);    
       } else {
-        return new JimpleExpr(jimpleOffsetName + " + " + offset.translateToPrimitive(context));
+        return new JimpleExpr(jimpleOffsetName + " + " +
+            offset.translateToPrimitive(context, ImPrimitiveType.INT));
       }
     }
   }
@@ -150,13 +132,15 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
     }
 
     @Override
-    public JimpleExpr translateToPrimitive(FunctionContext context) {
-      return new JimpleExpr(jimpleArrayName + "[" + jimpleOffsetName + "]");
+    public JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type) {
+      return type.castIfNeeded(
+          new JimpleExpr(jimpleArrayName + "[" + jimpleOffsetName + "]"),
+          type());
     }
 
     @Override
-    public GimpleType type() {
-      return pointerType.getBaseType();
+    public ImPrimitiveType type() {
+      return type.getBaseType();
     }
 
     @Override
@@ -191,9 +175,11 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
     }
 
     @Override
-    public JimpleExpr translateToPrimitive(FunctionContext context) {
+    public JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type) {
       // get the overall index
-      return new JimpleExpr(jimpleArrayName + "[" + computeOverallIndex(context) + "]");
+      return type.castIfNeeded(
+          new JimpleExpr(jimpleArrayName + "[" + computeOverallIndex(context) + "]"),
+          this.type());
     }
 
     
@@ -205,7 +191,7 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
     private String computeOverallIndex(FunctionContext context) {
       String overallIndex = context.declareTemp(JimpleType.INT);
       context.getBuilder().addStatement(overallIndex + " = " + jimpleOffsetName + " + " +
-              index.translateToPrimitive(context));
+              index.translateToPrimitive(context, ImPrimitiveType.INT));
       return overallIndex;
     }
 
@@ -216,8 +202,8 @@ public class PrimitivePtrVar extends AbstractImExpr implements Variable, ImIndir
     }
 
     @Override
-    public GimpleType type() {
-      return pointerType.getBaseType();
+    public ImPrimitiveType type() {
+      return type.getBaseType();
     }
 
     @Override

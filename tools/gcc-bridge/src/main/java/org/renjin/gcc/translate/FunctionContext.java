@@ -8,14 +8,13 @@ import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.GimpleVarDecl;
 import org.renjin.gcc.gimple.expr.*;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleMethodBuilder;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.translate.call.MethodRef;
 import org.renjin.gcc.translate.expr.*;
-import org.renjin.gcc.translate.marshall.Marshallers;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 import org.renjin.gcc.translate.type.ImType;
 import org.renjin.gcc.translate.var.Variable;
 
@@ -39,7 +38,8 @@ public class FunctionContext {
     VarUsageInspector varUsage = new VarUsageInspector(gimpleFunction);
 
     for (GimpleVarDecl decl : gimpleFunction.getVariableDeclarations()) {
-      Variable localVariable = translationContext.resolveType(decl.getType()).createLocalVariable(this, decl.getName(),
+      Variable localVariable = translationContext.resolveType(decl.getType())
+          .createLocalVariable(this, decl.getName(),
               varUsage.getUsage(decl.getId()));
 
       symbolTable.put(decl.getId(), localVariable);
@@ -106,20 +106,6 @@ public class FunctionContext {
     } else {
       throw new UnsupportedOperationException("Expected GimpleVar, got: " + gimpleExpr + " ["
           + gimpleExpr.getClass().getSimpleName() + "]");
-    }
-  }
-
-  public GimpleType getGimpleVariableType(GimpleExpr expr) {
-    if(expr instanceof SymbolRef) {
-      Variable variable = symbolTable.get(((SymbolRef) expr).getId());
-      if(variable == null) { 
-        throw new IllegalArgumentException(expr.toString());
-      }
-      return variable.type();
-    } else if(expr instanceof GimpleConstant) {
-      return ((GimpleConstant) expr).getType();
-    } else {
-      throw new UnsupportedOperationException(expr.toString());
     }
   }
 

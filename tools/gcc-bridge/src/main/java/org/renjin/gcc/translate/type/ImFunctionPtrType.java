@@ -9,16 +9,13 @@ import org.renjin.gcc.translate.VarUsage;
 import org.renjin.gcc.translate.var.FunPtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
-public class ImFunctionPtrType extends ImType {
+public class ImFunctionPtrType implements ImType {
 
-  private TranslationContext context;
-  private GimpleFunctionType type;
+  private ImFunctionType baseType;
   private String interfaceName;
 
-  public ImFunctionPtrType(TranslationContext context, GimpleFunctionType type) {
-    this.context = context;
-    this.type = type;
-    this.interfaceName = context.getFunctionPointerInterfaceName(type);
+  public ImFunctionPtrType(ImFunctionType type) {
+    this.baseType = type;
   }
 
   @Override
@@ -27,7 +24,7 @@ public class ImFunctionPtrType extends ImType {
   }
 
   private JimpleType jimpleType() {
-    return new SyntheticJimpleType(interfaceName);
+    return new SyntheticJimpleType(baseType.interfaceName());
   }
 
   @Override
@@ -37,6 +34,15 @@ public class ImFunctionPtrType extends ImType {
 
   @Override
   public Variable createLocalVariable(FunctionContext functionContext, String gimpleName, VarUsage usage) {
-    return new FunPtrVar(functionContext, gimpleName, type);
+    return new FunPtrVar(functionContext, gimpleName, this);
+  }
+
+  @Override
+  public ImType pointerType() {
+    throw new UnsupportedOperationException();
+  }
+
+  public JimpleType interfaceType() {
+    return new SyntheticJimpleType(baseType.interfaceName());
   }
 }

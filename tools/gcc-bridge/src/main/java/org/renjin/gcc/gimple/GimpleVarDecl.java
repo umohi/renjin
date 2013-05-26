@@ -1,6 +1,7 @@
 package org.renjin.gcc.gimple;
 
 import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 public class GimpleVarDecl {
   private int id;

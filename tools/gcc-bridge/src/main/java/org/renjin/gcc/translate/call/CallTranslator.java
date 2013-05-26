@@ -7,11 +7,9 @@ import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.expr.SymbolRef;
-import org.renjin.gcc.gimple.type.GimpleFunctionType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
-import org.renjin.gcc.translate.FunSignature;
+import org.renjin.gcc.translate.type.ImFunctionType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.expr.ImLValue;
@@ -60,7 +58,7 @@ public class CallTranslator {
    * Write the Jimple necessary to make a call to a function pointer
    */
   private void writeFunctionPointerCall() {
-    FunSignature funPtr = getFunPtrInterface();
+    ImFunctionType funPtr = getFunPtrInterface();
     FunPtrVar var = getFunPtrVar();
 
     StringBuilder call = new StringBuilder();
@@ -89,12 +87,14 @@ public class CallTranslator {
     return (FunPtrVar) var;
   }
 
-  private FunSignature getFunPtrInterface() {
-    GimpleType type = context.getGimpleVariableType(call.getFunction());
-    if (!type.isPointerTo(GimpleFunctionType.class)) {
-      throw new UnsupportedOperationException("Function value must be of type FunctionPointer, got: " + type);
-    }
-    return context.getTranslationContext().getFunctionPointerMethod((GimpleFunctionType)type.getBaseType());
+  private ImFunctionType getFunPtrInterface() {
+    throw new UnsupportedOperationException("to fix");
+//    ImType type = context.resolveExpr(call.getFunction()).type();
+//    if (!(type.isPointerTo(GimpleFunctionType.class))) {
+//      throw new UnsupportedOperationException("Function value must be of type FunctionPointer, got: " + type);
+//    }
+//    return context.getTranslationContext()
+//        .getFunctionPointerMethod((GimpleFunctionType) type.getBaseType());
   }
 
 

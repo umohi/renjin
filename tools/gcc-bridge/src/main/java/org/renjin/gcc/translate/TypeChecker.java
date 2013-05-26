@@ -2,8 +2,9 @@ package org.renjin.gcc.translate;
 
 import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.gimple.type.GimpleRealType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.ImType;
 
 public class TypeChecker {
 
@@ -17,28 +18,22 @@ public class TypeChecker {
       }
     }
   }
-  
-  public static boolean isDouble(GimpleType type) {
-    return type instanceof GimpleRealType && ((GimpleRealType) type).getPrecision() == 64;
+
+  public static ImPrimitiveType assertSamePrimitiveType(ImExpr expr, ImExpr... otherExprs) {
+    assertSameType(expr, otherExprs);
+    return (ImPrimitiveType) expr.type();
   }
   
-  public static boolean isInt(GimpleType type) {
-    return type instanceof GimpleIntegerType && ((GimpleIntegerType) type).getPrecision() == 32;
+  public static boolean isDouble(ImType type) {
+    return type == ImPrimitiveType.DOUBLE;
+  }
+  
+  public static boolean isInt(ImType type) {
+    return type == ImPrimitiveType.INT;
   }
 
-  public static boolean isLong(GimpleType type) {
-    return type instanceof GimpleIntegerType && ((GimpleIntegerType) type).getPrecision() == 64;
+  public static boolean isLong(ImType type) {
+    return type == ImPrimitiveType.LONG;
   }
-  
-  public static String primitiveJvmTypeName(GimpleType type) {
-    if(isDouble(type)) {
-      return "double";
-    } else if(isInt(type)) {
-      return "int";
-    } else if(isLong(type)) {
-      return "long";
-    } else {
-      throw new UnsupportedOperationException();
-    }
-  }
+
 }

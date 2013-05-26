@@ -3,10 +3,11 @@ package org.renjin.gcc.gimple;
 import java.util.List;
 
 import org.renjin.gcc.gimple.ins.GimpleIns;
-import org.renjin.gcc.gimple.type.GimpleType;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 public class GimpleFunction {
   private int id;

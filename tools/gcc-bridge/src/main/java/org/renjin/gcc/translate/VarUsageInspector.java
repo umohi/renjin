@@ -75,7 +75,7 @@ public class VarUsageInspector extends GimpleVisitor {
 
   @Override
   public void visitSwitch(GimpleSwitch gimpleSwitch) {
-    visitOperand(gimpleSwitch.getExpr());
+    visitOperand(gimpleSwitch.getValue());
   }
 
 }

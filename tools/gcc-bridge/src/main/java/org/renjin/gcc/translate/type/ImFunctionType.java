@@ -1,23 +1,29 @@
-package org.renjin.gcc.translate;
+package org.renjin.gcc.translate.type;
 
-import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.translate.FunPtrTable;
+import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.VarUsage;
 import org.renjin.gcc.translate.call.CallParam;
 import org.renjin.gcc.translate.call.GccFunction;
 import org.renjin.gcc.translate.call.MethodRef;
+import org.renjin.gcc.translate.var.Variable;
 
 import java.util.List;
 
-public class FunSignature {
+/**
+ * An intermediate representation of a function type.
+ */
+public class ImFunctionType implements ImType {
   private final JimpleType returnType;
   private final List<JimpleType> parameterTypes;
 
-  public FunSignature(MethodRef ref) {
+  public ImFunctionType(MethodRef ref) {
     this.returnType = ref.getReturnType();
     this.parameterTypes = ref.getParameterTypes();
   }
 
-  public FunSignature(JimpleType returnType, List<JimpleType> parameterTypes) {
+  public ImFunctionType(JimpleType returnType, List<JimpleType> parameterTypes) {
     this.returnType = returnType;
     this.parameterTypes = parameterTypes;
   }
@@ -75,7 +81,7 @@ public class FunSignature {
     if (o == null || getClass() != o.getClass())
       return false;
 
-    FunSignature that = (FunSignature) o;
+    ImFunctionType that = (ImFunctionType) o;
 
     if (!parameterTypes.equals(that.parameterTypes))
       return false;
@@ -90,5 +96,28 @@ public class FunSignature {
     int result = returnType.hashCode();
     result = 31 * result + parameterTypes.hashCode();
     return result;
+  }
+
+  @Override
+  public JimpleType paramType() {
+    throw new UnsupportedOperationException("Function values cannot be passed as parameters, " +
+        "only function pointers.");
+  }
+
+  @Override
+  public JimpleType returnType() {
+    throw new UnsupportedOperationException("Function values cannot be return values, " +
+        "only function pointers.");
+  }
+
+  @Override
+  public Variable createLocalVariable(FunctionContext functionContext, String gimpleName, VarUsage varUsage) {
+    throw new UnsupportedOperationException("Function values cannot be local variables, " +
+        "only function pointers.");
+  }
+
+  @Override
+  public ImType pointerType() {
+    return new ImFunctionPtrType(this);
   }
 }

@@ -1,15 +1,14 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.GimpleIndirectType;
 import org.renjin.gcc.gimple.type.GimplePointerType;
-import org.renjin.gcc.gimple.type.GimplePrimitiveType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.*;
-import org.renjin.gcc.translate.type.PrimitiveTypes;
+import org.renjin.gcc.translate.type.ImPrimitivePtrType;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.PrimitiveType;
 
 /**
  * Writes jimple instructions to store and retrieve a single primitive numeric
@@ -20,15 +19,15 @@ import org.renjin.gcc.translate.type.PrimitiveTypes;
 public class PrimitiveHeapVar extends AbstractImExpr implements Variable, PrimitiveLValue, ImLValue {
   private FunctionContext context;
   private String jimpleName;
-  private GimplePrimitiveType type;
+  private ImPrimitiveType type;
 
-  public PrimitiveHeapVar(FunctionContext context, GimplePrimitiveType type, String gimpleName) {
+  public PrimitiveHeapVar(FunctionContext context, ImPrimitiveType type, String gimpleName) {
     this.context = context;
     this.jimpleName = Jimple.id(gimpleName);
     this.type = type;
 
-    context.getBuilder().addVarDecl(PrimitiveTypes.getArrayType(type), jimpleName);
-    context.getBuilder().addStatement(jimpleName + " = newarray (" + PrimitiveTypes.get(type) + ")[1]");
+    context.getBuilder().addVarDecl(type.getArrayClass(), jimpleName);
+    context.getBuilder().addStatement(jimpleName + " = newarray (" + type.asJimple() + ")[1]");
   }
 
   @Override
@@ -37,8 +36,8 @@ public class PrimitiveHeapVar extends AbstractImExpr implements Variable, Primit
   }
 
   @Override
-  public JimpleExpr translateToPrimitive(FunctionContext context) {
-    return jimple();
+  public JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type) {
+    return type.castIfNeeded(jimple(), this.type);
   }
 
   public JimpleExpr jimple() {
@@ -47,7 +46,7 @@ public class PrimitiveHeapVar extends AbstractImExpr implements Variable, Primit
 
 
   @Override
-  public GimpleType type() {
+  public ImPrimitiveType type() {
     return type;
   }
 
@@ -74,8 +73,8 @@ public class PrimitiveHeapVar extends AbstractImExpr implements Variable, Primit
     }
 
     @Override
-    public GimpleIndirectType type() {
-      return new GimplePointerType(PrimitiveHeapVar.this.type());
+    public ImPrimitivePtrType type() {
+      return PrimitiveHeapVar.this.type().pointerType();
     }
 
     @Override

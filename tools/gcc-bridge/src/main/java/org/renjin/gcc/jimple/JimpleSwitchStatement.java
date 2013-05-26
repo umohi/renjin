@@ -22,15 +22,19 @@ public class JimpleSwitchStatement extends JimpleBodyElement {
     }
   }
 
-  private String switchExpr;
+  private JimpleExpr switchExpr;
   private List<Branch> branches = Lists.newArrayList();
 
-  public JimpleSwitchStatement(String switchExpr) {
+  public JimpleSwitchStatement(JimpleExpr switchExpr) {
     this.switchExpr = switchExpr;
   }
 
   public void addBranch(int value, String target) {
     this.branches.add(new Branch(value, target));
+  }
+
+  public void addDefaultBranch(String target) {
+    this.branches.add(new Branch(DEFAULT, target));
   }
 
   @Override

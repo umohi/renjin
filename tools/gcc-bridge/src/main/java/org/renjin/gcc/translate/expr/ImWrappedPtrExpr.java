@@ -1,11 +1,11 @@
 package org.renjin.gcc.translate.expr;
 
 
-import org.renjin.gcc.gimple.type.GimpleIndirectType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 public class ImWrappedPtrExpr extends AbstractImExpr implements ImIndirectExpr {
 
@@ -37,7 +37,7 @@ public class ImWrappedPtrExpr extends AbstractImExpr implements ImIndirectExpr {
   }
 
   @Override
-  public GimpleIndirectType type() {
+  public ImPrimitiveType type() {
     throw new UnsupportedOperationException();
   }
 }

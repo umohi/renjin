@@ -1,8 +1,9 @@
 package org.renjin.gcc.translate.expr;
 
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.PrimitiveType;
 
 /**
  * Provides default implementations for the {@link ImExpr} interface
@@ -21,7 +22,7 @@ public abstract class AbstractImExpr implements ImExpr {
   }
 
   @Override
-  public JimpleExpr translateToPrimitive(FunctionContext context) {
+  public JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type) {
     throw new UnsupportedOperationException("Expression " + this + " (" + getClass().getSimpleName() + ") cannot " +
             "be expressed as a primitive");
   }

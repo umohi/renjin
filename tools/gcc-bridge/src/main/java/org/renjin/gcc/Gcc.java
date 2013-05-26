@@ -11,6 +11,7 @@ import org.renjin.gcc.gimple.GimpleCompilationUnit;
 import org.renjin.gcc.gimple.GimpleParser;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
@@ -28,9 +29,11 @@ public class Gcc {
   private static final Logger LOGGER = Logger.getLogger(Gcc.class.getName());
 
   private boolean debug;
-  
+  private File gimpleOutputDir;
+
   public Gcc() {
     workingDirectory = Files.createTempDir();
+    gimpleOutputDir = workingDirectory;
 
   }
 
@@ -40,6 +43,15 @@ public class Gcc {
 
   public void setDebug(boolean debug) {
     this.debug = debug;
+  }
+
+  public void setGimpleOutputDir(File gimpleOutputDir) {
+    this.gimpleOutputDir = gimpleOutputDir;
+    this.gimpleOutputDir.mkdirs();
+  }
+
+  public File getGimpleOutputDir() {
+    return gimpleOutputDir;
   }
 
   public GimpleCompilationUnit compileToGimple(File source) throws IOException {
@@ -62,8 +74,12 @@ public class Gcc {
     // Enable our plugin which dumps the Gimple as JSON
     // to standard out
 
+
     arguments.add("-fplugin=" + pluginLibrary.getAbsolutePath());
-    arguments.add("-fplugin-arg-bridge-json-output-file=gimple.json");
+
+    File gimpleFile = new File(gimpleOutputDir, source.getName() + ".gimple");
+    arguments.add("-fplugin-arg-bridge-json-output-file=" +
+        gimpleFile.getAbsolutePath());
 
     for (File includeDir : includeDirectories) {
       arguments.add("-I");
@@ -76,13 +92,8 @@ public class Gcc {
 
     callGcc(arguments);
 
-    String json = Files.toString(new File(workingDirectory, "gimple.json"), Charsets.UTF_8);
-    if(debug) {
-      System.out.println(json);
-    }
-    
     GimpleParser parser = new GimpleParser();
-    return parser.parse(new StringReader(json));
+    return parser.parse(gimpleFile);
   }
 
   /**

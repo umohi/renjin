@@ -1,19 +1,18 @@
 package org.renjin.gcc.translate.var;
 
 import org.renjin.gcc.gimple.type.GimplePointerType;
-import org.renjin.gcc.gimple.type.GimpleRecordType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.AbstractImExpr;
 import org.renjin.gcc.translate.expr.ImExpr;
-import org.renjin.gcc.translate.expr.ImIndirectExpr;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.ImType;
 import org.renjin.gcc.translate.type.struct.SimpleRecordType;
 
 public class SimpleRecordVar extends AbstractImExpr implements Variable {
 
-  private GimpleRecordType type;
+  private ImPrimitiveType type;
   private SimpleRecordType recordType;
   private String jimpleName;
   private FunctionContext context;
@@ -36,7 +35,7 @@ public class SimpleRecordVar extends AbstractImExpr implements Variable {
   }
 
   @Override
-  public GimpleType type() {
+  public ImPrimitiveType type() {
     return type;
   }
 
@@ -65,8 +64,8 @@ public class SimpleRecordVar extends AbstractImExpr implements Variable {
   private class Pointer extends AbstractImExpr {
 
     @Override
-    public GimpleType type() {
-      return new GimplePointerType(SimpleRecordVar.this.type());
+    public ImType type() {
+      return SimpleRecordVar.this.type().pointerType();
     }
 
 

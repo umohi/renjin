@@ -8,18 +8,16 @@ import org.renjin.gcc.translate.var.Variable;
 /**
  * An intermediate representation of a type used during translation
  */
-public abstract class ImType {
+public interface ImType {
 
-  public abstract JimpleType paramType();
+  JimpleType paramType();
 
-  public abstract JimpleType returnType();
+  JimpleType returnType();
 
-  public abstract Variable createLocalVariable(
+  Variable createLocalVariable(
       FunctionContext functionContext,
       String gimpleName,
       VarUsage varUsage);
 
-  public ImType pointerType() {
-    throw new UnsupportedOperationException();
-  }
+  ImType pointerType();
 }

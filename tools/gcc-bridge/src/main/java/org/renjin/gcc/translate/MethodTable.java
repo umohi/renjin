@@ -47,6 +47,8 @@ public class MethodTable {
     addMethod("__builtin_cos__", Math.class, "cos");
     addMethod("__builtin_sqrt__", Math.class, "sqrt");
     addMethod("__builtin_pow__", Math.class, "pow");
+    addMethod("pow", Math.class, "pow");
+
     //addMethod("__builtin_copysign__", Math.class, "copySign");
 
     addMethod("sqrt", Math.class);

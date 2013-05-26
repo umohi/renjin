@@ -1,15 +1,14 @@
 package org.renjin.gcc.translate.var;
 
-import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.jimple.Jimple;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.PrimitiveAssignment;
 import org.renjin.gcc.translate.expr.AbstractImExpr;
 import org.renjin.gcc.translate.expr.ImExpr;
-import org.renjin.gcc.translate.expr.ImLValue;
 import org.renjin.gcc.translate.expr.PrimitiveLValue;
-import org.renjin.gcc.translate.type.PrimitiveTypes;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.PrimitiveType;
 
 /**
  * Writes jimple instructions to store and retrieve a single primitive numeric
@@ -19,14 +18,14 @@ public class PrimitiveStackVar extends AbstractImExpr implements Variable, Primi
 
   private FunctionContext context;
   private String jimpleName;
-  private GimplePrimitiveType type;
+  private ImPrimitiveType type;
 
-  public PrimitiveStackVar(FunctionContext context, GimplePrimitiveType type, String gimpleName) {
+  public PrimitiveStackVar(FunctionContext context, ImPrimitiveType type, String gimpleName) {
     this.context = context;
-    this.type = type;
     this.jimpleName = Jimple.id(gimpleName);
+    this.type = type;
 
-    context.getBuilder().addVarDecl(PrimitiveTypes.get(type), jimpleName);
+    context.getBuilder().addVarDecl(type.getPrimitiveClass(), jimpleName);
   }
 
   @Override
@@ -45,12 +44,14 @@ public class PrimitiveStackVar extends AbstractImExpr implements Variable, Primi
   }
 
   @Override
-  public JimpleExpr translateToPrimitive(FunctionContext context) {
-    return new JimpleExpr(jimpleName);
+  public JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type) {
+    return type.castIfNeeded(
+      new JimpleExpr(jimpleName),
+      type());
   }
 
   @Override
-  public GimplePrimitiveType type() {
+  public ImPrimitiveType type() {
     return type;
   }
 }

@@ -7,11 +7,14 @@ import org.renjin.gcc.gimple.type.GimpleRealType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.expr.ImExpr;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
+import org.renjin.gcc.translate.type.PrimitiveType;
 
 public class Comparison {
   private GimpleOp op;
   private ImExpr a;
   private ImExpr b;
+  private ImPrimitiveType type;
 
 
   public Comparison(GimpleOp op, ImExpr a, ImExpr b) {
@@ -19,13 +22,15 @@ public class Comparison {
     this.op = op;
     this.a = a;
     this.b = b;
+    TypeChecker.assertSameType(a,b);
+    this.type = (ImPrimitiveType) a.type();
   }
 
 
   public JimpleExpr toCondition(FunctionContext context) {
-    TypeChecker.assertSameType(a, b);
-
-    if(a.type() instanceof GimpleRealType) {
+    switch(type) {
+    case FLOAT:
+    case DOUBLE:
       switch (op) {
       case NE_EXPR:
         return floatComparison(context, "cmpl", "!=", 0);
@@ -40,7 +45,11 @@ public class Comparison {
       case GE_EXPR:
         return floatComparison(context, "cmpl", ">=", 0);
       }
-    } else if(a.type() instanceof GimpleIntegerType || a.type() instanceof GimpleBooleanType) {
+      break;
+    case INT:
+    case LONG:
+    case BOOLEAN:
+
       switch (op) {
       case NE_EXPR:
         return intComparison(context, "!=");
@@ -58,45 +67,22 @@ public class Comparison {
     }
     throw new UnsupportedOperationException(" don't know how to compare expressions of type " + a.type());
   }
-//
-//  private void translate(FunctionContext context) {
-//    String trueLabel = context.newLabel();
-//    String doneLabel = context.newLabel();
-//    String tempVar = context.getBuilder().addTempVarDecl(JimpleType.INT);
-//
-//    context.getBuilder().addStatement(String.format("if %s %s %s goto %s",
-//        a.translateToPrimitive(context),
-//        op,
-//        b.translateToPrimitive(context),
-//        trueLabel));
-//
-//    context.getBuilder().addStatement(tempVar + " = 0");
-//    context.getBuilder().addStatement("goto " + doneLabel);
-//
-//    context.getBuilder().addLabel(trueLabel);
-//    context.getBuilder().addStatement(tempVar + " = 1");
-//    context.getBuilder().addStatement("goto " + doneLabel);
-//
-//    context.getBuilder().addLabel(doneLabel);
-//    return new JimpleExpr(tempVar);
-//  }
-//  
 
   private JimpleExpr floatComparison(FunctionContext context, String operator, String condition, int operand) {
     String cmp = context.declareTemp(JimpleType.INT);
     context.getBuilder().addStatement(String.format("%s = %s %s %s",
         cmp, 
-        a.translateToPrimitive(context),
+        a.translateToPrimitive(context, type),
         operator, 
-        b.translateToPrimitive(context)));
+        b.translateToPrimitive(context, type)));
 
     return new JimpleExpr(cmp + " " + condition + " " + operand);
   }
   
   private JimpleExpr intComparison(FunctionContext context, String operator) {
     return JimpleExpr.binaryInfix(operator,
-        a.translateToPrimitive(context),
-        b.translateToPrimitive(context));
+        a.translateToPrimitive(context, ImPrimitiveType.INT),
+        b.translateToPrimitive(context, ImPrimitiveType.INT));
     
   }
 }

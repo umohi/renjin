@@ -1,9 +1,11 @@
 package org.renjin.gcc.gimple;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -28,6 +30,10 @@ public class GimpleParser {
 
   public GimpleCompilationUnit parse(Reader reader) throws IOException {
     return mapper.readValue(reader, GimpleCompilationUnit.class);
+  }
+
+  public GimpleCompilationUnit parse(File file) throws IOException {
+    return mapper.readValue(file, GimpleCompilationUnit.class);
   }
 
   public GimpleCompilationUnit parse(URL resource) throws IOException {

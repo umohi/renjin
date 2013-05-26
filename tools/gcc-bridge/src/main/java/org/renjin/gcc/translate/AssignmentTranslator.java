@@ -2,18 +2,19 @@ package org.renjin.gcc.translate;
 
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import org.renjin.gcc.gimple.ins.GimpleAssign;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
 import org.renjin.gcc.gimple.type.GimpleBooleanType;
 import org.renjin.gcc.gimple.type.GimpleIntegerType;
 import org.renjin.gcc.gimple.type.GimpleRealType;
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.expr.ImLValue;
 import org.renjin.gcc.translate.expr.PrimitiveLValue;
 
 import com.google.common.collect.Lists;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 public class AssignmentTranslator {
   private FunctionContext context;
@@ -74,6 +75,10 @@ public class AssignmentTranslator {
       assignBinaryOp(lhs, "%", operands);
       break;
 
+    case FIX_TRUNC_EXPR:
+      assignFixTruncExpr(lhs, operands.get(0));
+      break;
+
     case BIT_NOT_EXPR:
       assignBitNot(lhs, operands.get(0));
       break;
@@ -108,6 +113,11 @@ public class AssignmentTranslator {
     }
   }
 
+  private void assignFixTruncExpr(ImExpr lhs, ImExpr rhs) {
+    JimpleExpr jimpleRhs = rhs.translateToPrimitive(context, (ImPrimitiveType) lhs.type());
+    assignPrimitive(lhs, jimpleRhs);
+  }
+
   private void assignDiv(ImExpr lhs, List<ImExpr> operands) {
     ImExpr x = operands.get(0);
     ImExpr y = operands.get(1);
@@ -125,17 +135,17 @@ public class AssignmentTranslator {
 
 
   private void assignNegated(ImExpr lhs, ImExpr expr) {
-    TypeChecker.assertSameType(lhs, expr);
-    
-    assignPrimitive(lhs, new JimpleExpr("neg " + expr.translateToPrimitive(context)));
+    ImPrimitiveType type = TypeChecker.assertSamePrimitiveType(lhs, expr);
+
+    assignPrimitive(lhs, new JimpleExpr("neg " + expr.translateToPrimitive(context, type)));
   }
 
   private void assignBinaryOp(ImExpr lhs, String operator, List<ImExpr> operands) {
 
-    TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
+    ImPrimitiveType type = TypeChecker.assertSamePrimitiveType(lhs, operands.get(0), operands.get(1));
     
-    JimpleExpr a = operands.get(0).translateToPrimitive(context);
-    JimpleExpr b = operands.get(1).translateToPrimitive(context);
+    JimpleExpr a = operands.get(0).translateToPrimitive(context, type);
+    JimpleExpr b = operands.get(1).translateToPrimitive(context, type);
 
     assignPrimitive(lhs, JimpleExpr.binaryInfix(operator, a, b));
   }
@@ -157,7 +167,7 @@ public class AssignmentTranslator {
   }
 
   private void assignTruthNot(ImExpr lhs, ImExpr op) {
-    JimpleExpr expr = op.translateToPrimitive(context);
+    JimpleExpr expr = op.translateToPrimitive(context, ImPrimitiveType.BOOLEAN);
     JimpleExpr condition = new JimpleExpr(expr + " == 0");
     assignBoolean(lhs, condition);
   }
@@ -168,10 +178,8 @@ public class AssignmentTranslator {
       throw new UnsupportedOperationException();
     }
 
-
-
-    JimpleExpr a = ops.get(0).translateToPrimitive(context);
-    JimpleExpr b = ops.get(1).translateToPrimitive(context);
+    JimpleExpr a = ops.get(0).translateToPrimitive(context, ImPrimitiveType.BOOLEAN);
+    JimpleExpr b = ops.get(1).translateToPrimitive(context, ImPrimitiveType.BOOLEAN);
     
     String checkB = context.newLabel();
     String noneIsTrue = context.newLabel();
@@ -202,7 +210,9 @@ public class AssignmentTranslator {
   private void assignBitNot(ImExpr lhs, ImExpr op) {
     TypeChecker.assertSameType(lhs, op);
 
-    assignPrimitive(lhs, JimpleExpr.binaryInfix("^", op.translateToPrimitive(context), JimpleExpr.integerConstant(-1)));
+    assignPrimitive(lhs, JimpleExpr.binaryInfix("^",
+        op.translateToPrimitive(context, ImPrimitiveType.INT),
+        JimpleExpr.integerConstant(-1)));
   }
 
   private void assignIfElse(ImExpr lhs, JimpleExpr booleanExpr, JimpleExpr ifTrue, JimpleExpr ifFalse) {
@@ -226,52 +236,57 @@ public class AssignmentTranslator {
     ImExpr x = operands.get(0);
     ImExpr y = operands.get(1);
 
-    TypeChecker.assertSameType(x, y);
+    ImPrimitiveType type = TypeChecker.assertSamePrimitiveType(x, y);
+    Preconditions.checkArgument(type == ImPrimitiveType.DOUBLE);
 
     if(TypeChecker.isDouble(x.type())) {
       //assignPrimitive(lhs, JimpleExpr.integerConstant(0));
       assignPrimitive(lhs, new JimpleExpr(String.format(
               "staticinvoke <org.renjin.gcc.runtime.Builtins: boolean unordered(double, double)>(%s, %s)",
-              x.translateToPrimitive(context),
-              y.translateToPrimitive(context))));
+              x.translateToPrimitive(context, ImPrimitiveType.DOUBLE),
+              y.translateToPrimitive(context, ImPrimitiveType.DOUBLE))));
     } else {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  private ImPrimitiveType prtype(ImExpr expr) {
+    if(expr.type() instanceof ImPrimitiveType) {
+      return (ImPrimitiveType) expr.type();
+    } else {
+      throw new UnsupportedOperationException("Expected expression of primitive type, got: " + expr);
     }
   }
 
 
   private void assignAbs(ImExpr lhs, ImExpr expr) {
     
-    TypeChecker.assertSameType(lhs, expr);
-    
+    ImPrimitiveType type = TypeChecker.assertSamePrimitiveType(lhs, expr);
+
     assignPrimitive(lhs, new JimpleExpr(String.format("staticinvoke <java.lang.Math: %s>(%s)",
-            absMethodForType(expr.type()),
-            expr.translateToPrimitive(context))));
+        absMethodForType(prtype(expr)),
+        expr.translateToPrimitive(context, type))));
     
   }
 
-  private String absMethodForType(GimpleType type) {
-    if (type instanceof GimpleRealType) {
-      if (((GimpleRealType) type).getPrecision() == 64) {
+  private String absMethodForType(ImPrimitiveType type) {
+    switch(type) {
+      case DOUBLE:
         return "double abs(double)";
-      }
-    }
-    if (type instanceof GimpleIntegerType) {
-      if (((GimpleIntegerType) type).getPrecision() == 32) {
+      case INT:
         return "int abs(int)";
-      }
     }
     throw new UnsupportedOperationException("abs on type " + type.toString());
   }
 
   private void assignMax(ImExpr lhs, List<ImExpr> operands) {
-    TypeChecker.assertSameType(lhs, operands.get(0), operands.get(1));
+    ImPrimitiveType type = TypeChecker.assertSamePrimitiveType(lhs, operands.get(0), operands.get(1));
 
     String signature = "{t} max({t}, {t})"
-            .replace("{t}", TypeChecker.primitiveJvmTypeName(lhs.type()));
+            .replace("{t}", prtype(lhs).asJimple().toString());
     
-    JimpleExpr a = operands.get(0).translateToPrimitive(context);
-    JimpleExpr b = operands.get(1).translateToPrimitive(context);
+    JimpleExpr a = operands.get(0).translateToPrimitive(context, type);
+    JimpleExpr b = operands.get(1).translateToPrimitive(context, type);
 
     assignPrimitive(lhs, new JimpleExpr(String.format(
             "staticinvoke <java.lang.Math: %s>(%s, %s)",

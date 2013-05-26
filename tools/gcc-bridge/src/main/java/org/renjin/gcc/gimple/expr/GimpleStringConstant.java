@@ -2,6 +2,7 @@ package org.renjin.gcc.gimple.expr;
 
 import org.renjin.gcc.gimple.type.GimpleArrayType;
 import org.renjin.gcc.gimple.type.GimpleType;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 public class GimpleStringConstant extends GimpleConstant {
 

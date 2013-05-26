@@ -93,8 +93,14 @@ public class BasicTest extends AbstractGccTest {
   }
 
   @Test  
-  public void distBinary() throws Exception {
-    Class clazz = compile("distbinary.c", "DistBinary");
+  public void switchStatement() throws Exception {
+    Class clazz = compile("switch.c", "SwitchTest");
+
+    Method distance = clazz.getMethod("R_distance", IntPtr.class, int.class, int.class);
+
+    assertThat((Integer)distance.invoke(null, new IntPtr(1), 13, 14), equalTo(1));
+    assertThat((Integer)distance.invoke(null, new IntPtr(2), 3, 4), equalTo(-1));
+
   }
 
   @Test
@@ -175,6 +181,11 @@ public class BasicTest extends AbstractGccTest {
     Method method = clazz.getMethod("negate", double.class);
     assertThat((Double) method.invoke(null, 1.5), equalTo(-1.5));
     assertThat((Double) method.invoke(null, -1.5), equalTo(1.5));
+  }
+
+  @Test
+  public void approx() throws Exception {
+    Class clazz = compile("approx.c", "Approx");
 
   }
 
@@ -213,6 +224,10 @@ public class BasicTest extends AbstractGccTest {
     assertThat(call(clazz, "greaterThanEqual", 1.5, 1.2), equalTo(1));
     assertThat(call(clazz, "greaterThanEqual", NaN, NaN), equalTo(0));
     assertThat(call(clazz, "greaterThanEqual", NaN, 42), equalTo(0));
+
+    assertThat(call(clazz, "truncate", 1.1), equalTo(1));
+    assertThat(call(clazz, "truncate", 1.99), equalTo(1));
+
   }
 
 

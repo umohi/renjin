@@ -10,29 +10,6 @@ import org.renjin.gcc.runtime.LongPtr;
 
 public class PrimitiveTypes {
 
-  
-  public static JimpleType get(GimpleType type) {
-    if (type instanceof GimpleRealType) {
-      if (((GimpleRealType) type).getPrecision() == 64) {
-        return JimpleType.DOUBLE;
-      } else if (((GimpleRealType) type).getPrecision() == 32) {
-        return JimpleType.FLOAT;
-      }
-    } else if (type instanceof GimpleIntegerType) {
-      int precision = ((GimpleIntegerType) type).getPrecision();
-      switch(precision) {
-      case 8:
-        return JimpleType.CHAR;
-      case 32:
-        return JimpleType.INT;
-      case 64:
-        return JimpleType.LONG;
-      }
-    } else if (type instanceof GimpleBooleanType) {
-      return JimpleType.BOOLEAN;
-    }
-    throw new UnsupportedOperationException("type:" + type);
-  }
 
   public static JimpleType getArrayType(GimplePrimitiveType type) {
     if (type instanceof GimpleRealType) {

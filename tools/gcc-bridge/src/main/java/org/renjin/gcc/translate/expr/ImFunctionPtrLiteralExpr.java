@@ -1,8 +1,8 @@
 package org.renjin.gcc.translate.expr;
 
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 
 public class ImFunctionPtrLiteralExpr extends AbstractImExpr implements ImFunctionPtrExpr {
@@ -14,7 +14,7 @@ public class ImFunctionPtrLiteralExpr extends AbstractImExpr implements ImFuncti
   }
 
   @Override
-  public GimpleType type() {
+  public ImPrimitiveType type() {
     throw new UnsupportedOperationException();
   }
 

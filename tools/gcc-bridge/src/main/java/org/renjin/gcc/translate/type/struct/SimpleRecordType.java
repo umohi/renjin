@@ -7,6 +7,7 @@ import org.renjin.gcc.jimple.*;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TranslationContext;
 import org.renjin.gcc.translate.VarUsage;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 import org.renjin.gcc.translate.type.ImType;
 import org.renjin.gcc.translate.var.SimpleRecordVar;
 import org.renjin.gcc.translate.var.Variable;
@@ -23,7 +24,7 @@ public class SimpleRecordType extends ImRecordType {
   private String name;
   private JimpleClassBuilder recordClass;
 
-  private Map<String, JimpleType> types = Maps.newHashMap();
+  private Map<String, ImType> types = Maps.newHashMap();
 
   public SimpleRecordType(TranslationContext context, GimpleRecordType recordType) {
     this.context = context;
@@ -35,13 +36,21 @@ public class SimpleRecordType extends ImRecordType {
 
 
     for (GimpleField member : recordType.getFields()) {
-      JimpleType type = context.resolveType(member.getType()).paramType();
+      ImType type = context.resolveType(member.getType());
       types.put(member.getName(), type);
 
       JimpleFieldBuilder field = recordClass.newField();
       field.setName(member.getName());
-      field.setType(type);
+      field.setType(jimpleType(type));
       field.setModifiers(JimpleModifiers.PUBLIC);
+    }
+  }
+
+  private JimpleType jimpleType(ImType type) {
+    if(type instanceof ImPrimitiveType) {
+      return ((ImPrimitiveType) type).asJimple();
+    } else {
+      throw new UnsupportedOperationException(type.toString());
     }
   }
 
@@ -70,7 +79,7 @@ public class SimpleRecordType extends ImRecordType {
     return new SimpleRecordVar(functionContext, gimpleName, this);
   }
 
-  public JimpleType getMemberType(String member) {
-    return types.get(member);
+  public ImPrimitiveType getMemberType(String member) {
+    return (ImPrimitiveType) types.get(member);
   }
 }

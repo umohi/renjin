@@ -1,10 +1,10 @@
 package org.renjin.gcc.translate.expr;
 
-import org.renjin.gcc.gimple.type.GimpleType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.call.MethodRef;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 /**
  * An expression that evaluates to a function
@@ -19,7 +19,7 @@ public class ImFunctionExpr extends AbstractImExpr {
   }
 
   @Override
-  public GimpleType type() {
+  public ImPrimitiveType type() {
     throw new UnsupportedOperationException();
   }
 
@@ -36,7 +36,7 @@ public class ImFunctionExpr extends AbstractImExpr {
   public class Pointer extends AbstractImExpr implements ImFunctionPtrExpr {
 
     @Override
-    public GimpleType type() {
+    public ImPrimitiveType type() {
       throw new UnsupportedOperationException();
     }
 

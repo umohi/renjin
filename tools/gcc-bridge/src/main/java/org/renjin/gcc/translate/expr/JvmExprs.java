@@ -3,6 +3,7 @@ package org.renjin.gcc.translate.expr;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.translate.FunctionContext;
+import org.renjin.gcc.translate.type.ImPrimitiveType;
 
 
 public class JvmExprs {
@@ -17,7 +18,7 @@ public class JvmExprs {
    */
   public static ImExpr toExpr(FunctionContext context, JimpleExpr expr, JimpleType type, boolean simple) {
     if(type.isPrimitive()) {
-      return new ImLiteralPrimitiveExpr(expr, type);
+      return new ImLiteralPrimitiveExpr(expr, ImPrimitiveType.valueOf(type));
     } else if(type.isPointerWrapper()) {
       return new ImWrappedPtrExpr(ensureSimple(context, expr, type, simple), type);
     } else if(type.isFunctionPointer()) {

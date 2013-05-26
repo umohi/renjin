@@ -14,12 +14,13 @@ import org.renjin.gcc.translate.call.MethodRef;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.renjin.gcc.translate.type.ImFunctionType;
 
 public class FunPtrTable {
 
   public static final String PACKAGE_NAME = "org.renjin.gcc.runtime";
 
-  private Set<FunSignature> interfaces = Sets.newHashSet();
+  private Set<ImFunctionType> interfaces = Sets.newHashSet();
   private Set<MethodRef> invokers = Sets.newHashSet();
 
   private TranslationContext context;
@@ -28,16 +29,16 @@ public class FunPtrTable {
     this.context = context;
   }
 
-  public FunSignature signature(GimpleFunctionType type) {
+  public ImFunctionType resolveFunctionType(GimpleFunctionType type) {
     JimpleType returnType = context.resolveType(type.getReturnType()).returnType();
     List<JimpleType> paramTypes = Lists.newArrayList();
     for (GimpleType paramType : type.getArgumentTypes()) {
       paramTypes.add(context.resolveType(paramType).paramType());
     }
-    return new FunSignature(returnType, paramTypes);
+    return new ImFunctionType(returnType, paramTypes);
   }
 
-  private String getInterfaceName(FunSignature signature) {
+  private String getInterfaceName(ImFunctionType signature) {
     if (!interfaces.contains(signature)) {
       addInterface(signature);
     }
@@ -45,18 +46,18 @@ public class FunPtrTable {
   }
 
   public String getInterfaceName(MethodRef ref) {
-    return getInterfaceName(new FunSignature(ref));
+    return getInterfaceName(new ImFunctionType(ref));
   }
 
   public String getInterfaceName(GimpleFunctionType type) {
-    return getInterfaceName(signature(type));
+    return getInterfaceName(resolveFunctionType(type));
   }
 
-  public FunSignature methodRef(GimpleFunctionType type) {
-    return signature(type);
+  public ImFunctionType methodRef(GimpleFunctionType type) {
+    return resolveFunctionType(type);
   }
 
-  private void addInterface(FunSignature signature) {
+  private void addInterface(ImFunctionType signature) {
     JimpleInterfaceBuilder iface = context.getJimpleOutput().newInterface();
     iface.setPackageName(PACKAGE_NAME);
     iface.setClassName(signature.interfaceName());
@@ -117,6 +118,6 @@ public class FunPtrTable {
   }
 
   private String invokerName(MethodRef method) {
-    return method.getClassName() + "$" + method.getMethodName() + "$" + new FunSignature(method).interfaceName();
+    return method.getClassName() + "$" + method.getMethodName() + "$" + new ImFunctionType(method).interfaceName();
   }
 }
