@@ -31,8 +31,13 @@ public class ImLiteralPrimitiveExpr extends AbstractImExpr {
   @Override
   public JimpleExpr translateToPrimitive(FunctionContext context, ImPrimitiveType type) {
     if(this.type != type) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(this + " (" + this.type + ") => " + type.toString());
     }
     return expr;
+  }
+
+  @Override
+  public String toString() {
+    return expr.toString();
   }
 }

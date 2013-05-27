@@ -9,6 +9,8 @@ public class RStubs {
 
   public static double R_NaN = 0;
 
+  public static double my_global = 42;
+
   public static boolean R_finite(double x) {
     return true;
   }

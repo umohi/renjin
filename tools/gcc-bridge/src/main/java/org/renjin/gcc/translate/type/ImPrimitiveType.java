@@ -192,25 +192,27 @@ public enum ImPrimitiveType implements ImType {
   }
 
   public static ImPrimitiveType valueOf(JimpleType type) {
-    if(type.equals(JimpleType.DOUBLE)) {
-      return DOUBLE;
-    } else if(type.equals(JimpleType.FLOAT)) {
-      return FLOAT;
-    } else if(type.equals(JimpleType.BOOLEAN)) {
-      return BOOLEAN;
-    } else if(type.equals(JimpleType.INT)) {
-      return INT;
-    } else if(type.equals(JimpleType.CHAR)) {
-      return CHAR;
-    } else if(type.equals(JimpleType.LONG)) {
-      return LONG;
+    for(ImPrimitiveType value : values()) {
+      if(value.asJimple().equals(type)) {
+        return value;
+      }
     }
     throw new UnsupportedOperationException(type.toString());
   }
 
 
+  public static ImPrimitiveType valueOf(Class type) {
+    for(ImPrimitiveType value : values()) {
+      if(value.getPrimitiveClass().equals(type)) {
+        return value;
+      }
+    }
+    throw new UnsupportedOperationException(type.toString());
+  }
+
   @Override
   public String toString() {
     return name().toLowerCase();
   }
+
 }

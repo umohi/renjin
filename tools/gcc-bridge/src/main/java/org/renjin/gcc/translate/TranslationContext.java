@@ -9,7 +9,6 @@ import org.renjin.gcc.gimple.GimpleFunction;
 import org.renjin.gcc.gimple.GimpleParameter;
 import org.renjin.gcc.gimple.expr.GimpleAddressOf;
 import org.renjin.gcc.gimple.expr.GimpleExpr;
-import org.renjin.gcc.gimple.expr.GimpleExternal;
 import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.type.*;
 import org.renjin.gcc.jimple.JimpleClassBuilder;
@@ -90,8 +89,8 @@ public class TranslationContext {
     return new GccFunction(mainClass.getFqcn(), function.getName(), returnType, paramTypes);
   }
 
-  public Field findField(GimpleExternal external) {
-    return methodTable.findField(external);
+  public Field findGlobal(String name) {
+    return methodTable.findGlobal(name);
   }
 
   public ImType resolveType(GimpleType type) {
@@ -111,7 +110,6 @@ public class TranslationContext {
       if(baseType instanceof GimpleArrayType) {
         baseType = ((GimpleArrayType) baseType).getComponentType();
       }
-
       return resolveType(baseType).pointerType();
     }
     throw new UnsupportedOperationException(type.toString());

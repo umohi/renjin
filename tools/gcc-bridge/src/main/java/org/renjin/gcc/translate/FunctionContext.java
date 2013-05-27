@@ -1,5 +1,6 @@
 package org.renjin.gcc.translate;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.renjin.gcc.gimple.CallingConvention;
@@ -14,8 +15,8 @@ import org.renjin.gcc.jimple.JimpleType;
 import org.renjin.gcc.jimple.RealJimpleType;
 import org.renjin.gcc.translate.call.MethodRef;
 import org.renjin.gcc.translate.expr.*;
-import org.renjin.gcc.translate.type.ImPrimitiveType;
 import org.renjin.gcc.translate.type.ImType;
+import org.renjin.gcc.translate.var.PrimitiveFieldExpr;
 import org.renjin.gcc.translate.var.Variable;
 
 import com.google.common.collect.Maps;
@@ -92,17 +93,26 @@ public class FunctionContext {
     return "trlabel" + (nextLabelId++) + "__";
   }
 
-  private Variable lookupVar(int id) {
-    Variable variable = symbolTable.get(id);
-    if (variable == null) {
-      throw new IllegalArgumentException("No such variable " + id);
-    }
-    return variable;
-  }
-
-  public Variable lookupVar(GimpleExpr gimpleExpr) {
+  public ImExpr lookupVar(GimpleExpr gimpleExpr) {
     if (gimpleExpr instanceof SymbolRef) {
-      return lookupVar(((SymbolRef) gimpleExpr).getId());
+      SymbolRef symbol = (SymbolRef) gimpleExpr;
+      Variable variable = symbolTable.get(symbol.getId());
+
+      if(variable != null) {
+        return variable;
+      }
+
+      if(symbol.getName() != null) {
+        Field field = translationContext.findGlobal(symbol.getName());
+        if(field != null) {
+          return new PrimitiveFieldExpr(field);
+        }
+      }
+
+      if (variable == null) {
+        throw new IllegalArgumentException("No such variable " + gimpleExpr + " (id=" + symbol.getId() + ")");
+      }
+      return variable;
     } else {
       throw new UnsupportedOperationException("Expected GimpleVar, got: " + gimpleExpr + " ["
           + gimpleExpr.getClass().getSimpleName() + "]");

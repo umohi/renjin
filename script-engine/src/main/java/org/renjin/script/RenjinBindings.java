@@ -6,6 +6,10 @@ import java.util.Set;
 
 import javax.script.Bindings;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
+import com.sun.istack.internal.Nullable;
 import org.renjin.jvminterop.converters.Converters;
 import org.renjin.sexp.Frame;
 import org.renjin.sexp.SEXP;
@@ -48,7 +52,11 @@ public class RenjinBindings implements Bindings {
 
   @Override
   public Set<String> keySet() {
-    throw new UnsupportedOperationException("nyi");
+    Set<String> names = Sets.newHashSet();
+    for(Symbol symbol : frame.getSymbols()) {
+      names.add(symbol.getPrintName());
+    }
+    return names;
   }
 
   @Override
@@ -58,7 +66,13 @@ public class RenjinBindings implements Bindings {
 
   @Override
   public Collection<Object> values() {
-    throw new UnsupportedOperationException("nyi");
+    return Collections2.transform(frame.getSymbols(), new Function<Symbol, Object>() {
+
+      @Override
+      public Object apply(@Nullable Symbol symbol) {
+        return frame.getVariable(symbol);
+      }
+    });
   }
 
   @Override

@@ -92,6 +92,18 @@ public class BasicTest extends AbstractGccTest {
     assertThat(result, equalTo(5));
   }
 
+  @Test
+  public void logicalToInt() throws Exception {
+    Class clazz = compile("bool2int.f", "LogicalInt");
+    Method method = clazz.getMethod("test", IntPtr.class, IntPtr.class);
+
+    IntPtr x = new IntPtr(43);
+    IntPtr y = new IntPtr(0);
+
+    method.invoke(null, x, y);
+
+  }
+
   @Test  
   public void switchStatement() throws Exception {
     Class clazz = compile("switch.c", "SwitchTest");
@@ -184,16 +196,11 @@ public class BasicTest extends AbstractGccTest {
   }
 
   @Test
-  @Ignore("todo")
   public void globals() throws Exception {
     Class clazz = compile("globals.c", "Globals");
 
     Method magic_number = clazz.getMethod("magic_number");
     System.out.println(magic_number.invoke(null));
-
-    Method getna = clazz.getMethod("getna");
-    System.out.println(getna.invoke(null));
-
 
 
 

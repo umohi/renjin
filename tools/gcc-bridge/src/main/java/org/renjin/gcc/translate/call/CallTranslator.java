@@ -82,7 +82,7 @@ public class CallTranslator {
   }
   
   private FunPtrVar getFunPtrVar() {
-    Variable var = context.lookupVar(call.getFunction());
+    ImExpr var = context.lookupVar(call.getFunction());
     if (!(var instanceof FunPtrVar)) {
       throw new UnsupportedOperationException("Function value must be a FunPtrVar, got: " + var);
     }

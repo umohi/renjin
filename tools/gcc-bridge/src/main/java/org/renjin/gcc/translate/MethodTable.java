@@ -39,7 +39,6 @@ public class MethodTable {
   }
 
   private void addDefaults() {
-    addMethod("__isnan", Double.class, "isNaN");
 
     // G77 builtins
     addMethod("__builtin_sin__", Math.class, "sin");
@@ -103,7 +102,7 @@ public class MethodTable {
     }
   }
 
-  public Field findField(GimpleExternal external) {
+  public Field findGlobal(String name) {
     for (Class clazz : referenceClasses) {
       for (Field field : clazz.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
@@ -113,6 +112,6 @@ public class MethodTable {
         }
       }
     }
-    throw new IllegalArgumentException("Could not find field: " + external.getName());
+    return null;
   }
 }

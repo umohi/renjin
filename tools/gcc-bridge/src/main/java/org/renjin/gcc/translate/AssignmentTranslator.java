@@ -38,6 +38,7 @@ public class AssignmentTranslator {
     case ARRAY_REF:
     case PAREN_EXPR:
     case COMPONENT_REF:
+    case CONVERT_EXPR:
       assign(lhs, operands.get(0));
       return;
       

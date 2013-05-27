@@ -32,6 +32,11 @@ public class Builtins {
 		return result;
 	}
 
+  public static int __isnan(double x) {
+    return Double.isNaN(x) ? 1: 0;
+  }
+
+
   public static boolean unordered(double x, double y) {
     return Double.isNaN(x) || Double.isNaN(y);
   }

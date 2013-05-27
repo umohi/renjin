@@ -19,7 +19,7 @@ public class GimpleFunction {
   private List<GimpleVarDecl> variableDeclarations = Lists.newArrayList();
 
   public GimpleFunction() {
-    this.callingConvention = new F77CallingConvention();
+
   }
 
   public void setCallingConvention(CallingConvention callingConvention) {
