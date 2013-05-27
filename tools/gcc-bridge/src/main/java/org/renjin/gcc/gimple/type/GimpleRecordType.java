@@ -19,6 +19,9 @@ public class GimpleRecordType extends AbstractGimpleType {
   }
 
   public String getName() {
+    if(name == null) {
+      return "anonymous" + Math.abs(id);
+    }
     return name;
   } 
   

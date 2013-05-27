@@ -167,9 +167,9 @@ public class AssignmentTranslator {
   }
 
   private void assignTruthOr(ImExpr lhs, List<ImExpr> ops) {
-    if(! (ops.get(0).type() instanceof GimpleBooleanType &&
-          ops.get(1).type() instanceof GimpleBooleanType)) {
-      throw new UnsupportedOperationException();
+    ImPrimitiveType type = TypeChecker.assertSamePrimitiveType(ops.get(0), ops.get(1));
+    if(type != ImPrimitiveType.BOOLEAN) {
+      throw new UnsupportedOperationException(type.toString());
     }
 
     JimpleExpr a = ops.get(0).translateToPrimitive(context, ImPrimitiveType.BOOLEAN);

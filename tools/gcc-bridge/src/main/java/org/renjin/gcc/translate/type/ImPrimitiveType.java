@@ -76,7 +76,7 @@ public enum ImPrimitiveType implements ImType {
 
     @Override
     public JimpleExpr literalExpr(Object value) {
-      return JimpleExpr.integerConstant(((Number)value).intValue());
+      return JimpleExpr.longConstant(((Number)value).intValue());
     }
   },
   BOOLEAN {

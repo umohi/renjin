@@ -184,6 +184,22 @@ public class BasicTest extends AbstractGccTest {
   }
 
   @Test
+  @Ignore("todo")
+  public void globals() throws Exception {
+    Class clazz = compile("globals.c", "Globals");
+
+    Method magic_number = clazz.getMethod("magic_number");
+    System.out.println(magic_number.invoke(null));
+
+    Method getna = clazz.getMethod("getna");
+    System.out.println(getna.invoke(null));
+
+
+
+
+  }
+
+  @Test
   public void approx() throws Exception {
     Class clazz = compile("approx.c", "Approx");
 
@@ -229,6 +245,7 @@ public class BasicTest extends AbstractGccTest {
     assertThat(call(clazz, "truncate", 1.99), equalTo(1));
 
   }
+
 
 
 }

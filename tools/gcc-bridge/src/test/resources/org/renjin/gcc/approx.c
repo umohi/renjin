@@ -23,6 +23,7 @@
 #define _(String) (String)
 #define ISNA(x) 0
 #define R_FINITE(x) 1
+#define NAN -41
 
 
 /* Linear and Step Function Interpolation */

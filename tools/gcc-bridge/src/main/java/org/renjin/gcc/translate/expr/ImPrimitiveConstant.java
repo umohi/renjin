@@ -59,7 +59,7 @@ public class ImPrimitiveConstant extends AbstractImExpr {
     // in order to provide an address, we'll create a heap variable on the fly
     PrimitiveHeapVar var = new PrimitiveHeapVar(context, type,
             "__constant" + System.identityHashCode(this));
-    var.writePrimitiveAssignment(translateToPrimitive(context, null));
+    var.writePrimitiveAssignment(translateToPrimitive(context, type));
 
     return var.addressOf();
   }
