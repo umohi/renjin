@@ -122,14 +122,8 @@ public class AssignmentTranslator {
     ImExpr x = operands.get(0);
     ImExpr y = operands.get(1);
 
-    if(!x.type().equals(y.type())) {
-      throw new UnsupportedOperationException();
-    }
+    TypeChecker.assertSamePrimitiveType(x, y);
 
-    if(! (x.type() instanceof GimpleRealType || x.type() instanceof GimpleIntegerType) ) {
-      throw new UnsupportedOperationException("unsupported type for div " + x.type());
-    }
-    
     assignBinaryOp(lhs, "/", operands);
   }
 

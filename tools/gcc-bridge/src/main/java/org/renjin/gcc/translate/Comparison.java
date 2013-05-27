@@ -81,8 +81,8 @@ public class Comparison {
   
   private JimpleExpr intComparison(FunctionContext context, String operator) {
     return JimpleExpr.binaryInfix(operator,
-        a.translateToPrimitive(context, ImPrimitiveType.INT),
-        b.translateToPrimitive(context, ImPrimitiveType.INT));
+        a.translateToPrimitive(context, type),
+        b.translateToPrimitive(context, type));
     
   }
 }

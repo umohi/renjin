@@ -47,4 +47,12 @@ public class FunPtrVar extends AbstractImExpr implements Variable, ImFunctionPtr
   public JimpleExpr invokerReference(FunctionContext context) {
     return new JimpleExpr(jimpleName);
   }
+
+  @Override
+  public JimpleExpr translateToObjectReference(FunctionContext context, String className) {
+    if(className.equals(type.interfaceType().toString())) {
+      return invokerReference(context);
+    }
+    throw new UnsupportedOperationException(className);
+  }
 }

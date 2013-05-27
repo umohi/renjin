@@ -1,6 +1,7 @@
 package org.renjin.gcc.translate.type;
 
 import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.jimple.SyntheticJimpleType;
 import org.renjin.gcc.translate.FunPtrTable;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.VarUsage;
@@ -119,5 +120,9 @@ public class ImFunctionType implements ImType {
   @Override
   public ImType pointerType() {
     return new ImFunctionPtrType(this);
+  }
+
+  public JimpleType interfaceType() {
+    return new SyntheticJimpleType(FunPtrTable.PACKAGE_NAME + "." + interfaceName());
   }
 }

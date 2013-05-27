@@ -160,7 +160,7 @@ public enum ImPrimitiveType implements ImType {
 
   public JimpleExpr castIfNeeded(JimpleExpr expr, ImPrimitiveType type) {
     if(type != this) {
-      return JimpleExpr.cast(expr, type.asJimple());
+      return JimpleExpr.cast(expr, asJimple());
     } else {
       return expr;
     }
@@ -206,5 +206,11 @@ public enum ImPrimitiveType implements ImType {
       return LONG;
     }
     throw new UnsupportedOperationException(type.toString());
+  }
+
+
+  @Override
+  public String toString() {
+    return name().toLowerCase();
   }
 }

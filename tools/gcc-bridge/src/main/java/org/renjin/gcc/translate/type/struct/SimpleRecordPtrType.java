@@ -5,7 +5,6 @@ import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.TranslationContext;
 import org.renjin.gcc.translate.VarUsage;
 import org.renjin.gcc.translate.var.SimpleRecordVar;
-import org.renjin.gcc.translate.var.StructPtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
 public class SimpleRecordPtrType extends SimpleRecordType {

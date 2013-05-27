@@ -68,4 +68,8 @@ public class ImPrimitivePtrType implements ImType {
   public Class getArrayClass() {
     return baseType.getArrayClass();
   }
+
+  public JimpleType getArrayType() {
+    return new RealJimpleType(getArrayClass());
+  }
 }

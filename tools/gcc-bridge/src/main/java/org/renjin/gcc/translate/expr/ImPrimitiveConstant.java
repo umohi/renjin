@@ -4,6 +4,7 @@ import org.renjin.gcc.gimple.expr.GimpleConstant;
 import org.renjin.gcc.gimple.expr.GimpleIntegerConstant;
 import org.renjin.gcc.gimple.expr.GimpleRealConstant;
 import org.renjin.gcc.gimple.type.GimpleBooleanType;
+import org.renjin.gcc.gimple.type.GimpleIndirectType;
 import org.renjin.gcc.gimple.type.GimplePrimitiveType;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.translate.FunctionContext;
@@ -25,7 +26,12 @@ public class ImPrimitiveConstant extends AbstractImExpr {
     super();
     this.context = context;
     this.constant = constant;
-    this.type = ImPrimitiveType.valueOf(constant.getType());
+    if(constant.getType() instanceof GimpleIndirectType) {
+      // null basically, not sure if this right to handle this way
+      this.type = ImPrimitiveType.INT;
+    } else {
+      this.type = ImPrimitiveType.valueOf(constant.getType());
+    }
   }
 
   @Override

@@ -9,11 +9,13 @@ import org.renjin.gcc.gimple.expr.GimpleFunctionRef;
 import org.renjin.gcc.gimple.expr.SymbolRef;
 import org.renjin.gcc.jimple.JimpleExpr;
 import org.renjin.gcc.jimple.JimpleType;
+import org.renjin.gcc.translate.type.ImFunctionPtrType;
 import org.renjin.gcc.translate.type.ImFunctionType;
 import org.renjin.gcc.translate.FunctionContext;
 import org.renjin.gcc.translate.expr.ImExpr;
 import org.renjin.gcc.translate.expr.ImLValue;
 import org.renjin.gcc.translate.expr.JvmExprs;
+import org.renjin.gcc.translate.type.ImType;
 import org.renjin.gcc.translate.var.FunPtrVar;
 import org.renjin.gcc.translate.var.Variable;
 
@@ -88,13 +90,11 @@ public class CallTranslator {
   }
 
   private ImFunctionType getFunPtrInterface() {
-    throw new UnsupportedOperationException("to fix");
-//    ImType type = context.resolveExpr(call.getFunction()).type();
-//    if (!(type.isPointerTo(GimpleFunctionType.class))) {
-//      throw new UnsupportedOperationException("Function value must be of type FunctionPointer, got: " + type);
-//    }
-//    return context.getTranslationContext()
-//        .getFunctionPointerMethod((GimpleFunctionType) type.getBaseType());
+    ImType type = context.resolveExpr(call.getFunction()).type();
+    if (!(type instanceof ImFunctionPtrType)) {
+      throw new UnsupportedOperationException("Function value must be of type ImFunctionPtrType, got: " + type);
+    }
+    return ((ImFunctionPtrType) type).baseType();
   }
 
 

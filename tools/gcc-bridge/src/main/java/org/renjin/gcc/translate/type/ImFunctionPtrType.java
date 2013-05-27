@@ -12,7 +12,6 @@ import org.renjin.gcc.translate.var.Variable;
 public class ImFunctionPtrType implements ImType {
 
   private ImFunctionType baseType;
-  private String interfaceName;
 
   public ImFunctionPtrType(ImFunctionType type) {
     this.baseType = type;
@@ -20,16 +19,12 @@ public class ImFunctionPtrType implements ImType {
 
   @Override
   public JimpleType returnType() {
-    return jimpleType();
-  }
-
-  private JimpleType jimpleType() {
-    return new SyntheticJimpleType(baseType.interfaceName());
+    return baseType.interfaceType();
   }
 
   @Override
   public JimpleType paramType() {
-    return jimpleType();
+    return baseType.interfaceType();
   }
 
   @Override
@@ -43,6 +38,10 @@ public class ImFunctionPtrType implements ImType {
   }
 
   public JimpleType interfaceType() {
-    return new SyntheticJimpleType(baseType.interfaceName());
+    return baseType.interfaceType();
+  }
+
+  public ImFunctionType baseType() {
+    return baseType;
   }
 }

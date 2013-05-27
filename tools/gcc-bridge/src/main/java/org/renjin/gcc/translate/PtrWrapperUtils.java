@@ -19,7 +19,7 @@ public class PtrWrapperUtils {
     context.getBuilder().addStatement(tempWrapper + " = new " + wrapperType);
     context.getBuilder().addStatement(
         "specialinvoke " + tempWrapper + ".<" + wrapperType + ": void <init>("
-            + ptrType.getArrayClass().getName() + ", int)>(" + ref.getArrayExpr() + ", " + ref.getIndexExpr() + ")");
+            + ptrType.getArrayType() + ", int)>(" + ref.getArrayExpr() + ", " + ref.getIndexExpr() + ")");
 
     return new JimpleExpr(tempWrapper);
   }
