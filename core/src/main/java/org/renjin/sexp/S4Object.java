@@ -3,7 +3,7 @@ package org.renjin.sexp;
 public class S4Object extends AbstractSEXP {
 
   public S4Object() {
-    
+
   }
   
   public S4Object(AttributeMap attributes) {
