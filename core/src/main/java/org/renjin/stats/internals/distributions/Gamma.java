@@ -5,7 +5,12 @@
 package org.renjin.stats.internals.distributions;
 
 import org.renjin.eval.Session;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.DataParallel;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.primitives.MathExt;
+
+import javax.xml.crypto.Data;
 
 
 /**
@@ -44,7 +49,9 @@ public class Gamma {
   static double q0, b, si, c;/* no. 2 (step 4) */
 
 
-  public static double rgamma(Session context, double a, double scale) {
+  @Primitive
+  @DataParallel
+  public static double rgamma(@Current Session context, double a, double scale) {
 
     double e, p, q, r, t, u, v, w, x, ret_val;
 

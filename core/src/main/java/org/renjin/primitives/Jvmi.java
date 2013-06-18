@@ -1,7 +1,6 @@
 package org.renjin.primitives;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -9,14 +8,12 @@ import java.net.URLClassLoader;
 
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.jvminterop.ClassBinding;
-import org.renjin.jvminterop.ClassFrame;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Evaluate;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Evaluate;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.Environment;
+import org.renjin.sexp.ExternalPtr;
 import org.renjin.sexp.SEXP;
-import org.renjin.sexp.StringVector;
 import org.renjin.sexp.Symbol;
 
 
@@ -48,14 +45,11 @@ public class Jvmi {
           className);
     }
 
-    Environment env = Environment.createChildEnvironment(Environment.EMPTY, 
-            new ClassFrame(ClassBinding.get(clazz)));
-    
-    rho.setVariable(Symbol.get(clazz.getSimpleName()), env);
-    
+    ExternalPtr ptr = new ExternalPtr(clazz);
+    rho.setVariable(Symbol.get(clazz.getSimpleName()), ptr);
     context.setInvisibleFlag();
-    
-    return env;
+
+    return ptr;
   }
   
 

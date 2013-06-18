@@ -2,7 +2,7 @@ package org.renjin.primitives;
 
 import java.util.Set;
 
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.ExpressionVector;
 import org.renjin.sexp.FunctionCall;
 import org.renjin.sexp.SEXP;

@@ -25,7 +25,7 @@ import com.google.common.base.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.*;
 
 import java.util.List;

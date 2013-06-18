@@ -22,7 +22,7 @@
 package org.renjin.primitives;
 
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.*;
+import org.renjin.invoke.annotations.*;
 import org.renjin.primitives.summary.DeferredMean;
 import org.renjin.primitives.vector.DeferredComputation;
 import org.renjin.sexp.*;

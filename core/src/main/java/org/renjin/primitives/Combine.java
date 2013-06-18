@@ -27,9 +27,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.ArgumentList;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.NamedFlag;
+import org.renjin.invoke.annotations.ArgumentList;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.NamedFlag;
 import org.renjin.sexp.*;
 
 import java.util.List;

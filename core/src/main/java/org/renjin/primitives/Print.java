@@ -26,8 +26,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.renjin.eval.Context;
 import org.renjin.parser.ParseUtil;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.primitives.vector.RowNamesVector;
 import org.renjin.sexp.*;
 

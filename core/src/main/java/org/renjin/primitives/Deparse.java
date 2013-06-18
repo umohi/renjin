@@ -25,9 +25,9 @@ package org.renjin.primitives;
 import org.apache.commons.math.complex.Complex;
 import org.renjin.eval.Context;
 import org.renjin.parser.ParseUtil;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
-import org.renjin.primitives.annotations.Recycle;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
+import org.renjin.invoke.annotations.Recycle;
 import org.renjin.sexp.AtomicVector;
 import org.renjin.sexp.BuiltinFunction;
 import org.renjin.sexp.CHARSEXP;
@@ -51,7 +51,6 @@ import org.renjin.sexp.Symbol;
 import org.renjin.sexp.Symbols;
 import org.renjin.sexp.Vector;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 public class Deparse {
@@ -78,7 +77,6 @@ public class Deparse {
   public static String[] CONTROL_STATEMENTS = new String[] { "break", "next" };
   
   @Primitive
-  @Recycle(false)
   public static String deparse(@Current Context context, SEXP exp, int widthCutoff, boolean backTick, int options, int nlines) {
     return new DeparsingVisitor(context, exp).getResult();
   }

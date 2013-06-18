@@ -26,12 +26,8 @@ import com.google.common.io.ByteStreams;
 import org.apache.commons.vfs2.*;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.eval.Session;
+import org.renjin.invoke.annotations.*;
 import org.renjin.primitives.Warning;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
-import org.renjin.primitives.annotations.Recycle;
-import org.renjin.primitives.annotations.Visible;
 import org.renjin.primitives.text.regex.ExtendedRE;
 import org.renjin.primitives.text.regex.RE;
 import org.renjin.sexp.*;
@@ -62,6 +58,7 @@ public class Files {
    * @return the expanded path
    */
   @Primitive("path.expand")
+  @DataParallel
   public static String pathExpand(String path) {
     if(path.startsWith("~/")) {
       return java.lang.System.getProperty("user.home") + path.substring(2);
@@ -169,6 +166,7 @@ public class Files {
    *
    */
   @Primitive
+  @DataParallel
   public static String normalizePath(@Current Context context, @Recycle String path, String winSlash, SEXP mustWork) {
     try {
       return context.resolveFile(path).getName().getURI();
@@ -211,6 +209,7 @@ public class Files {
    * @throws FileSystemException
    */
   @Primitive("file.exists")
+  @DataParallel
   public static boolean fileExists(@Current Context context, String path) throws FileSystemException {
     return context.resolveFile(path).exists();
   }
@@ -226,6 +225,8 @@ public class Files {
    * @param path the file path
    * @return  removes all of the path up to and including the last path separator (if any).
    */
+  @Primitive
+  @DataParallel
   public static String basename(String path) {
     for(int i=path.length()-1;i>=0;--i) {
       if(path.charAt(i) == '\\' || path.charAt(i) == '/') {
@@ -271,6 +272,8 @@ public class Files {
    * @return  the part of the path up to but excluding the last path separator, or "."
    * if there is no path separator.
    */
+  @Primitive
+  @DataParallel
   public static String dirname(String path) {
     for(int i=path.length()-1;i>=0;--i) {
       if(path.charAt(i) == '\\' || path.charAt(i) == '/') {
@@ -405,6 +408,7 @@ public class Files {
    *
    * @return temporary sub directory
    */
+  @Primitive
   public static String tempdir() {
     return java.lang.System.getProperty("java.io.tmpdir");
   }
@@ -418,6 +422,8 @@ public class Files {
    *
    * @return path that can be used as names for temporary files
    */
+  @Primitive
+  @DataParallel
   public static String tempfile(String pattern, String tempdir, String fileExt) {
     return tempdir + "/" + pattern + fileExt;
   }
@@ -433,6 +439,7 @@ public class Files {
    * @param context the current call Context
    * @return an absolute filename representing the current working directory
    */
+  @Primitive
   public static String getwd(@Current Context context) {
     return context.getSession().getWorkingDirectory().getName().getURI();
   }
@@ -594,6 +601,7 @@ public class Files {
   }
   
   @Primitive("file.create")
+  @DataParallel
   public static boolean fileCreate(@Current Context context, @Recycle String fileName, @Recycle(false) boolean showWarnings) throws IOException {
     try {
       FileObject file = context.resolveFile(fileName);
@@ -619,7 +627,8 @@ public class Files {
    * rule is used to align names given in vectors of different lengths.
    */
   @Primitive("file.append")
-  public static boolean fileAppend(@Current Context context, @Recycle String destFileName, @Recycle String sourceFileName) {
+  @DataParallel
+  public static boolean fileAppend(@Current Context context, String destFileName, String sourceFileName) {
     try {
       FileObject sourceFile = context.resolveFile(sourceFileName);
       if(!sourceFile.exists()) {

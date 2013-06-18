@@ -1,11 +1,13 @@
 package org.renjin.primitives;
 
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.DataParallel;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.DoubleVector;
 import org.renjin.stats.internals.distributions.SignRank;
 
 
 public class PsiGamma {
+
 
   public static class dpsifn {
 
@@ -380,7 +382,8 @@ public class PsiGamma {
   } /* end of static psifn class */
 
 
-  @Primitive("psigamma")
+  @Primitive
+  @DataParallel
   public static double psigamma(double x, double deriv) {
     /* n-th derivative of psi(x);  e.g., psigamma(x,0) == digamma(x) */
     int k, n;

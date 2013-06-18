@@ -24,18 +24,17 @@ package org.renjin.primitives.subset;
 import com.google.common.base.Strings;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
+import org.renjin.invoke.annotations.*;
 import org.renjin.methods.MethodDispatch;
-import org.renjin.primitives.annotations.*;
 import org.renjin.sexp.*;
 import org.renjin.util.NamesBuilder;
 
 public class Subsetting {
 
   private Subsetting() {
+
   }
 
-
-    
   @Primitive("$")
   public static SEXP getElementByName(PairList list, @Evaluate(false) SEXP nameExp) {
     String name = asString(nameExp);
@@ -51,6 +50,16 @@ public class Subsetting {
       }
     }
     return matchCount == 1 ? match : Null.INSTANCE;
+  }
+
+  private static Symbol asSymbol(SEXP nameExp) {
+    if(nameExp instanceof Symbol) {
+      return (Symbol) nameExp;
+    } else if(nameExp instanceof StringVector && nameExp.length() == 1) {
+      return Symbol.get( ((StringVector) nameExp).getElementAsString(0) );
+    } else {
+      throw new EvalException("illegal argument: " + nameExp);
+    }
   }
 
   private static String asString(SEXP nameExp) {
@@ -72,7 +81,17 @@ public class Subsetting {
     }
     return value;
   }
-  
+
+  @Primitive("$")
+  public static SEXP getMemberByName(ExternalPtr<?> externalPtr, @Evaluate(false) SEXP nameExp) {
+    return externalPtr.getMember(asSymbol(nameExp));
+  }
+
+  @Primitive("$<-")
+  public static SEXP setElementByName(ExternalPtr<?> externalPtr, @Evaluate(false) SEXP nameExp, SEXP value) {
+    externalPtr.setMember(asSymbol(nameExp), value);
+    return externalPtr;
+  }
 
   @Primitive("@")
   public static SEXP getSlotValue(@Current Context context, @Current MethodDispatch methods, SEXP object, @Evaluate(false) Symbol slotName) {

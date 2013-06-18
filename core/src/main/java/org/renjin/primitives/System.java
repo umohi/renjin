@@ -28,10 +28,10 @@ import org.apache.commons.vfs2.provider.local.LocalFile;
 import org.renjin.RVersion;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
-import org.renjin.primitives.annotations.Recycle;
-import org.renjin.primitives.annotations.Visible;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
+import org.renjin.invoke.annotations.Recycle;
+import org.renjin.invoke.annotations.Visible;
 import org.renjin.sexp.*;
 
 import java.io.File;

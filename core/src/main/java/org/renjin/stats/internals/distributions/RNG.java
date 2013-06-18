@@ -9,8 +9,8 @@ import org.apache.commons.math.random.MersenneTwister;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
 import org.renjin.eval.Session;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.*;
 
 

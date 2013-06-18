@@ -25,10 +25,10 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Generic;
-import org.renjin.primitives.annotations.InvokeAsCharacter;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Generic;
+import org.renjin.invoke.annotations.InvokeAsCharacter;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.primitives.vector.RowNamesVector;
 import org.renjin.sexp.*;
 

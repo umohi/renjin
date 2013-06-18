@@ -28,10 +28,8 @@ import org.renjin.eval.Context;
 import org.renjin.eval.Context.Type;
 import org.renjin.eval.EvalException;
 import org.renjin.eval.Options;
-import org.renjin.jvminterop.ClassFrame;
-import org.renjin.jvminterop.ObjectFrame;
-import org.renjin.jvminterop.converters.*;
-import org.renjin.primitives.annotations.*;
+import org.renjin.invoke.reflection.converters.*;
+import org.renjin.invoke.annotations.*;
 import org.renjin.primitives.vector.ConstantDoubleVector;
 import org.renjin.primitives.vector.ConvertingDoubleVector;
 import org.renjin.primitives.vector.ConvertingStringVector;
@@ -257,21 +255,21 @@ public class Types {
 
   @Generic
   @Primitive("is.nan")
-  @AllowNA
-  public static boolean isNaN(@Recycle double value) {
+  @DataParallel(passNA = true)
+  public static boolean isNaN(double value) {
     return !DoubleVector.isNA(value) && DoubleVector.isNaN(value);
   }
 
   @Generic
   @Primitive("is.finite")
-  @AllowNA
-  public static boolean isFinite(@Recycle double value) {
+  @DataParallel(passNA = true)
+  public static boolean isFinite(double value) {
     return !Double.isNaN(value) && !Double.isInfinite(value);
   }
 
   @Generic
   @Primitive("is.infinite")
-  @AllowNA
+  @DataParallel(passNA = true)
   public static boolean isInfinite(@Recycle double value) {
     return Double.isInfinite(value);
   }
@@ -450,41 +448,33 @@ public class Types {
 
   @Generic
   @Primitive("as.character")
-  public static StringVector asCharacter(Environment env) {
-    Frame frame = env.getFrame();
-    if (frame instanceof ObjectFrame) {
-      ObjectFrame oframe = (ObjectFrame) frame;
-      Object instance = oframe.getInstance();
-      if (StringConverter.accept(instance.getClass())) {
-        return (StringVector) StringConverter.INSTANCE
-            .convertToR((String) instance);
-      } else if (StringArrayConverter.accept(instance.getClass())) {
-        return (StringVector) StringArrayConverter.INSTANCE
-            .convertToR(instance);
-      }
+  public static StringVector asCharacter(ExternalPtr<?> ptr) {
+    Object instance = ptr.getInstance();
+    if (StringConverter.accept(instance.getClass())) {
+      return (StringVector) StringConverter.INSTANCE
+          .convertToR((String) instance);
+    } else if (StringArrayConverter.accept(instance.getClass())) {
+      return (StringVector) StringArrayConverter.INSTANCE
+          .convertToR(instance);
+    } else {
+      return StringArrayVector.valueOf(ptr.getInstance().toString());
     }
-    throw new EvalException(
-        "unsupported converter, only for environment with  String or String[] ObjectFrame");
   }
 
   @Generic
   @Primitive("as.logical")
-  public static LogicalVector asLogical(Environment env) {
-    Frame frame = env.getFrame();
-    if (frame instanceof ObjectFrame) {
-      ObjectFrame oframe = (ObjectFrame) frame;
-      Object instance = oframe.getInstance();
-      Class clazz = instance.getClass();
-      if (BooleanConverter.accept(clazz)) {
-        return (LogicalVector) BooleanConverter.INSTANCE
-            .convertToR((Boolean) instance);
-      } else if (BooleanArrayConverter.accept(clazz)) {
-        return (LogicalVector) BooleanArrayConverter.INSTANCE
-            .convertToR((Boolean[]) instance);
-      }
+  public static LogicalVector asLogical(ExternalPtr ptr) {
+    Object instance = ptr.getInstance();
+    Class clazz = instance.getClass();
+    if (BooleanConverter.accept(clazz)) {
+      return BooleanConverter.INSTANCE
+          .convertToR((Boolean) instance);
+    } else if (BooleanArrayConverter.accept(clazz)) {
+      return BooleanArrayConverter.INSTANCE
+          .convertToR((Boolean[]) instance);
+    } else {
+      return new LogicalArrayVector(Logical.NA);
     }
-    throw new EvalException(
-        "unsurpported converter,only environment with boolean\\boolean[] or Boolean\\Boolean[] ObjectFrame is implemented");
   }
 
   @Generic
@@ -495,22 +485,18 @@ public class Types {
 
   @Generic
   @Primitive("as.integer")
-  public static IntVector asInteger(Environment env) {
-    Frame frame = env.getFrame();
-    if (frame instanceof ObjectFrame) {
-      ObjectFrame oframe = (ObjectFrame) frame;
-      Object instance = oframe.getInstance();
-      Class clazz = instance.getClass();
-      if (IntegerConverter.accept(clazz)) {
-        return (IntVector) IntegerConverter.INSTANCE
-            .convertToR((Integer) instance);
-      } else if (IntegerArrayConverter.accept(clazz)) {
-        return (IntVector) IntegerArrayConverter.INSTANCE
-            .convertToR((Integer[]) instance);
-      }
+  public static IntVector asInteger(ExternalPtr ptr) {
+    Object instance = ptr.getInstance();
+    Class clazz = instance.getClass();
+    if (IntegerConverter.accept(clazz)) {
+      return (IntVector) IntegerConverter.INSTANCE
+          .convertToR((Number) instance);
+    } else if (IntegerArrayConverter.accept(clazz)) {
+      return (IntVector) IntegerArrayConverter.INSTANCE
+          .convertToR((Number[]) instance);
+    } else {
+      return IntVector.valueOf(IntVector.NA);
     }
-    throw new EvalException(
-        "unsurpported converter,only environment with one element or array of int\\short\\Integer\\Short ObjectFrame is implemented");
   }
 
   @Generic
@@ -521,22 +507,18 @@ public class Types {
 
   @Generic
   @Primitive("as.double")
-  public static DoubleVector asDouble(Environment env) {
-    Frame frame = env.getFrame();
-    if (frame instanceof ObjectFrame) {
-      ObjectFrame oframe = (ObjectFrame) frame;
-      Object instance = oframe.getInstance();
-      Class clazz = instance.getClass();
-      if (DoubleConverter.accept(clazz)) {
-        return (DoubleVector) DoubleConverter.INSTANCE
-            .convertToR((Double) instance);
-      } else if (DoubleArrayConverter.accept(clazz)) {
-        return (DoubleVector)new DoubleArrayConverter(clazz)
-            .convertToR((Double[]) instance);
-      }
+  public static DoubleVector asDouble(ExternalPtr ptr) {
+    Object instance = ptr.getInstance();
+    Class clazz = instance.getClass();
+    if (DoubleConverter.accept(clazz)) {
+      return (DoubleVector) DoubleConverter.INSTANCE
+          .convertToR(instance);
+    } else if (DoubleArrayConverter.accept(clazz)) {
+      return (DoubleVector)new DoubleArrayConverter(clazz)
+          .convertToR(instance);
+    } else {
+      return new DoubleArrayVector(DoubleVector.NA);
     }
-    throw new EvalException(
-        "unsurpported converter,only environment with double[] ObjectFrame is implemented");
   }
 
   @Generic
@@ -560,6 +542,7 @@ public class Types {
 
   @Generic
   @Primitive("as.complex")
+  @DataParallel
   public static Complex asComplex(@Recycle double x){
     return new Complex(x,0);
   }
@@ -686,7 +669,6 @@ public class Types {
     return list.build();
   }
 
-  @Recycle
   @Primitive("as.environment")
   public static Environment asEnvironment(@Current Context context, int pos) {
     Environment env;
@@ -778,19 +760,10 @@ public class Types {
   @Primitive
   public static StringVector ls(Environment environment, boolean allNames) {
     StringVector.Builder names = new StringVector.Builder();
-    if (environment.getFrame() instanceof ClassFrame) {
-      ClassFrame of = (ClassFrame)environment.getFrame();
-      of.getSymbols();
-      for (Symbol name : of.getSymbols()) {
-        if (allNames || !name.getPrintName().startsWith(".")) {
-          names.add(name.getPrintName());
-        }
-      }
-    } else {
-      for (Symbol name : environment.getSymbolNames()) {
-        if (allNames || !name.getPrintName().startsWith(".")) {
-          names.add(name.getPrintName());
-        }
+
+    for (Symbol name : environment.getSymbolNames()) {
+      if (allNames || !name.getPrintName().startsWith(".")) {
+        names.add(name.getPrintName());
       }
     }
     return names.build();
@@ -877,11 +850,11 @@ public class Types {
     } else if(x instanceof S4Object) {
       return identicalAttributes(x, y);
 
-    } else if(x instanceof ExternalExp) {
-      if(!(y instanceof ExternalExp)) {
+    } else if(x instanceof ExternalPtr) {
+      if(!(y instanceof ExternalPtr)) {
         return false;
       }
-      return identicalPtrs((ExternalExp)x, (ExternalExp)y);
+      return identicalPtrs((ExternalPtr)x, (ExternalPtr)y);
       
     } else if(x instanceof Symbol || x instanceof Environment || x instanceof Function) {
       return x == y;
@@ -891,7 +864,7 @@ public class Types {
     }
   }
   
-  private static boolean identicalPtrs(ExternalExp x, ExternalExp y) {
+  private static boolean identicalPtrs(ExternalPtr x, ExternalPtr y) {
     return Objects.equal(x, y);
   }
 
@@ -1099,7 +1072,8 @@ public class Types {
   }
 
   @Primitive
-  public static boolean exists(@Current Context context, String x,
+  @DataParallel
+  public static boolean exists(@Current Context context, @Recycle String x,
       Environment environment, String mode, boolean inherits) {
     return environment.findVariable(context, Symbol.get(x), Types.modePredicate(mode),
         inherits) != Symbol.UNBOUND_VALUE;
@@ -1356,27 +1330,6 @@ public class Types {
     }
     return results.build();
   }
-
-  /**
-   * returns a vector of type "expression" containing its arguments
-   * (unevaluated).
-   */
-  @Primitive
-  @PassThrough
-  public static ExpressionVector expression(Context context, Environment rho, FunctionCall call) {
-    NamesBuilder names = NamesBuilder.withInitialLength(0);
-    List<SEXP> expressions = Lists.newArrayList();
-    for(PairList.Node node : call.getArguments().nodes()) {
-      names.add(node.getName());
-      expressions.add(node.getValue());
-    }
-    AttributeMap.Builder attributes = AttributeMap.builder();
-    if(names.haveNames()) {
-      attributes.setNames((StringVector)names.build());
-    }
-    return new ExpressionVector(expressions, attributes.build());
-  }
-  
   
   @Primitive("length<-")
   public static Vector setLength(Vector source, int length) {

@@ -4,8 +4,8 @@ import java.util.BitSet;
 import java.util.List;
 
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.ArgumentList;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.ArgumentList;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.AtomicVector;
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.LogicalBitSetVector;

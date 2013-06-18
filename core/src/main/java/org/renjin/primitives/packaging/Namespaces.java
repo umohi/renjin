@@ -23,9 +23,9 @@ package org.renjin.primitives.packaging;
 
 import java.io.IOException;
 
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Evaluate;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Evaluate;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.Environment;
 import org.renjin.sexp.Null;
 import org.renjin.sexp.SEXP;

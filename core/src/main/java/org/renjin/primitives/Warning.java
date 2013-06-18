@@ -23,8 +23,8 @@ package org.renjin.primitives;
 
 import org.renjin.eval.Context;
 import org.renjin.eval.Options;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.Environment;
 import org.renjin.sexp.FunctionCall;
 import org.renjin.sexp.ListVector;

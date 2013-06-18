@@ -25,28 +25,17 @@ import org.apache.commons.math.linear.RealVector;
 import org.renjin.eval.Calls;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.PassThrough;
-import org.renjin.primitives.annotations.Primitive;
-import org.renjin.primitives.annotations.processor.ArgumentIterator;
+import org.renjin.invoke.annotations.ArgumentList;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Generic;
+import org.renjin.invoke.annotations.Primitive;
+import org.renjin.invoke.annotations.processor.ArgumentIterator;
 import org.renjin.primitives.sequence.DoubleSequence;
 import org.renjin.primitives.sequence.IntSequence;
 import org.renjin.primitives.sequence.RepDoubleVector;
 import org.renjin.primitives.sequence.RepIntVector;
 import org.renjin.primitives.vector.DeferredComputation;
-import org.renjin.sexp.AtomicVector;
-import org.renjin.sexp.DoubleArrayVector;
-import org.renjin.sexp.DoubleVector;
-import org.renjin.sexp.Environment;
-import org.renjin.sexp.FunctionCall;
-import org.renjin.sexp.IntArrayVector;
-import org.renjin.sexp.IntVector;
-import org.renjin.sexp.Null;
-import org.renjin.sexp.PairList;
-import org.renjin.sexp.SEXP;
-import org.renjin.sexp.Symbol;
-import org.renjin.sexp.Symbols;
-import org.renjin.sexp.Vector;
+import org.renjin.sexp.*;
 import org.renjin.util.NamesBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -135,9 +124,10 @@ public class Sequences {
     }
   }
 
-  @PassThrough
+  @Generic
   @Primitive("rep")
-  public static SEXP repeat(Context context, Environment rho, FunctionCall call) {
+  public static SEXP repeat(@Current Context context, @Current Environment rho,
+                            @ArgumentList ListVector argList) {
 
     // rep is one of the very few primitives that uses argument matching
     // *ALMOST* like that employed for closures.
@@ -146,23 +136,24 @@ public class Sequences {
     // even if 'x' is provided as named argument elsewhere
     
     // check for zero args -- the result should be null
-    PairList arguments = call.getArguments();
+    PairList arguments = new PairList.Builder().addAll(argList).build();
+
     if(arguments == Null.INSTANCE) {
       context.setInvisibleFlag();
       return Null.INSTANCE;
     }
-    
     // evaluate the first arg
     ArgumentIterator argIt = new ArgumentIterator(context, rho, arguments);
     PairList.Node firstArgNode = argIt.nextNode();
     SEXP firstArg = context.evaluate( firstArgNode.getValue(), rho);
     if(firstArg.isObject()) {
-      SEXP result = S3.tryDispatchFromPrimitive(context, rho, call, "rep", firstArg, arguments);
+      SEXP result = S3.tryDispatchFromPrimitive(context, rho, context.getCall(),
+          "rep", firstArg, arguments);
       if(result != null) {
         return result;
       }
     }
-    
+
     // create a new pair list of evaluated arguments
     PairList.Builder evaled = new PairList.Builder();
     evaled.add(firstArgNode.getRawTag(), firstArg);
@@ -304,12 +295,14 @@ public class Sequences {
     }
   }
 
-  @PassThrough
   @Primitive("seq.int")
-  public static SEXP seqInt(Context context, Environment rho, FunctionCall call) {
+  public static SEXP seqInt(@Current Context context, @Current Environment rho,
+                            @ArgumentList ListVector argList) {
 
     // TODO: move this argument matching somewhere else,
     // and this is super inefficient...
+
+    PairList args = new PairList.Builder().addAll(argList).build();
 
     // match arguments
     PairList.Builder formals = new PairList.Builder();
@@ -319,8 +312,9 @@ public class Sequences {
     formals.add("length.out", Symbol.MISSING_ARG);
     formals.add("along.with", Symbol.MISSING_ARG);
 
-    boolean One = (call.getArguments().length() == 1);
-    PairList matched = Calls.matchArguments(formals.build(), call.getArguments(), true);
+    boolean One = (args.length() == 1);
+    PairList matched = Calls.matchArguments(formals.build(),
+        args, true);
     SEXP from = matched.findByTag(Symbol.get("from"));
     SEXP to = matched.findByTag(Symbol.get("to"));
     SEXP by = matched.findByTag(Symbol.get("by"));
@@ -339,7 +333,6 @@ public class Sequences {
     if(len!=Symbol.MISSING_ARG) {
       len = context.evaluate( len, rho);
     }
-
     return doSeqInt(from, to, by, len, along, One);
   }
 

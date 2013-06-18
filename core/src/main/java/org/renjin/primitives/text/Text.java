@@ -26,8 +26,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
+import org.renjin.invoke.annotations.*;
 import org.renjin.primitives.Deparse;
-import org.renjin.primitives.annotations.*;
 import org.renjin.primitives.text.regex.ExtendedRE;
 import org.renjin.primitives.text.regex.RE;
 import org.renjin.primitives.text.regex.REFactory;
@@ -187,7 +187,6 @@ public class Text {
     return messages;
   }
 
-  @Recycle(false)
   @Primitive
   public static String ngettext(double n,
                                 String singularMessage,
@@ -211,6 +210,7 @@ public class Text {
    * @return the translated string
    */
   @Primitive("chartr")
+  @DataParallel
   public static String chartr(String oldChars, String newChars, @Recycle String x) {
     StringBuilder translation = new StringBuilder(x.length());
     for(int i=0;i!=x.length();++i) {
@@ -226,11 +226,13 @@ public class Text {
   }
 
   @Primitive
+  @DataParallel
   public static String tolower(String x) {
     return x.toLowerCase();
   }
 
   @Primitive
+  @DataParallel
   public static String toupper(String x) {
     return x.toUpperCase();
   }
@@ -242,8 +244,8 @@ public class Text {
    * @param allowNA
    * @return
    */
-  @AllowNA
   @Primitive
+  @DataParallel(passNA = true)
   public static int nchar(@Recycle String x, String type, boolean allowNA) {
     if(StringVector.isNA(x)) {
       return 2;
@@ -257,8 +259,8 @@ public class Text {
    * @param x the string to check
    * @return true if the string of non-zero length, false if the string is empty
    */
-  @AllowNA
   @Primitive
+  @DataParallel(passNA = true)
   public static boolean nzchar(String x) {
     return StringVector.isNA(x) || x.length() != 0;
   }
@@ -270,7 +272,6 @@ public class Text {
    * denoted by \1, \2, ...\n
    * @param x The string in which to replace
    * @param ignoreCase  true to ignore case
-   * @param extended true to use extended regexps
    * @param perl true to use perl-compatible regexps
    * @param fixed true to use normal string replacement
    * @param useBytes true to perform matching on byte-level rather than character-level.
@@ -278,6 +279,7 @@ public class Text {
    * @return  the string with replacements made
    */
   @Primitive
+  @DataParallel
   public static String sub(String pattern, String replacement,
                            @Recycle String x,
                            boolean ignoreCase,
@@ -297,7 +299,6 @@ public class Text {
    * denoted by \1, \2, ...\n
    * @param x The string in which to replace
    * @param ignoreCase  true to ignore case
-   * @param extended true to use extended regexps
    * @param perl true to use perl-compatible regexps
    * @param fixed true to use normal string replacement
    * @param useBytes true to perform matching on byte-level rather than character-level.
@@ -305,6 +306,7 @@ public class Text {
    * @return  the string with replacements made
    */
   @Primitive
+  @DataParallel
   public static String gsub(String pattern, String replacement,
                             @Recycle String x,
                             boolean ignoreCase,
@@ -320,7 +322,6 @@ public class Text {
    * Substitute the all patterns in a string
    * @param split a regular expression pattern to look for
    * @param x The string in which to replace
-   * @param extended true to use extended regexps
    * @param perl true to use perl-compatible regexps
    * @param fixed true to use normal string replacement
    * @param useBytes true to perform matching on byte-level rather than character-level.
@@ -328,6 +329,7 @@ public class Text {
    * @return  a {@code StringVector} containing the splits
    */
   @Primitive
+  @DataParallel
   public static StringVector strsplit(@Recycle String x, @Recycle String split,
                                       boolean fixed,
                                       boolean perl,
@@ -374,7 +376,6 @@ public class Text {
    * @param pattern
    * @param x
    * @param ignoreCase
-   * @param extended
    * @param value
    * @param perl
    * @param fixed
@@ -499,12 +500,12 @@ public class Text {
    * The character "X" is prepended if necessary. All invalid characters are translated to ".".
    * A missing value is translated to "NA". Names which match R keywords have a dot appended to them.
    *
-   * @param names
+   * @param name
    * @param allow
    * @return
    */
   @Primitive("make.names")
-  @AllowNA
+  @DataParallel(passNA = true)
   public static String makeNames(@Recycle String name, @Recycle(false) boolean allow) {
     if(StringVector.isNA(name)) {
       return "NA.";
@@ -575,8 +576,9 @@ public class Text {
   }
 
 
-  @Primitive("strtrim")
-  public static String strtrim(@Recycle String source, @Recycle int n) {
+  @Primitive
+  @DataParallel
+  public static String strtrim(String source, int n) {
     int index;
     if (n > source.length()) {
       index = source.length();
@@ -898,8 +900,8 @@ public class Text {
    * @return
    */
   @Primitive
-  @PreserveAttributes(PreserveAttributeStyle.ALL)
-  public static Vector iconv(@InvokeAsCharacter Vector x, String from, String to, String sub, boolean mark, boolean toRaw) {
+  public static Vector iconv(@InvokeAsCharacter Vector x, String from, String to, String sub,
+                             boolean mark, boolean toRaw) {
     if(toRaw) {
       Charset destCharSet = RCharsets.getByName(to);
       ListVector.Builder result = new ListVector.Builder();
@@ -915,7 +917,7 @@ public class Text {
   }
 
   @Primitive
-  @PreserveAttributes(PreserveAttributeStyle.NONE)
+  @DataParallel(PreserveAttributeStyle.NONE)
   public static int strtoi(@Recycle String x, @Recycle(false) int base) {
     if(base == 0) {
       // For the default ‘base = 0L’, the base chosen from the string

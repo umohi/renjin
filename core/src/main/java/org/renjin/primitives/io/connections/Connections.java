@@ -26,9 +26,9 @@ import com.google.common.base.Strings;
 import org.apache.commons.vfs2.FileSystemException;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
-import org.renjin.primitives.annotations.Recycle;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
+import org.renjin.invoke.annotations.Recycle;
 import org.renjin.primitives.io.connections.Connection.Type;
 import org.renjin.sexp.*;
 
@@ -44,7 +44,7 @@ import java.net.UnknownHostException;
  * Functions which create and manipulates connection objects.
  * 
  * <p>
- * Connection objects are {@link ExternalExp}s that hold a reference to a class
+ * Connection objects are {@link org.renjin.sexp.ExternalPtr}s that hold a reference to a class
  * implementing the {@link Connection} interface.
  * 
  */

@@ -23,10 +23,10 @@ package org.renjin.primitives;
 import com.google.common.collect.Lists;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
-import org.renjin.primitives.annotations.ArgumentList;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Generic;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.ArgumentList;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Generic;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.*;
 
 import java.util.Arrays;

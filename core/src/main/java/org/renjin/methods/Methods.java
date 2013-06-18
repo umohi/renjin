@@ -26,25 +26,11 @@ import org.renjin.eval.Context.Type;
 import org.renjin.eval.EvalException;
 import org.renjin.methods.PrimitiveMethodTable.prim_methods_t;
 import org.renjin.primitives.Contexts;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.primitives.special.SubstituteFunction;
-import org.renjin.sexp.Closure;
-import org.renjin.sexp.DoubleVector;
-import org.renjin.sexp.Environment;
-import org.renjin.sexp.ExternalExp;
-import org.renjin.sexp.Function;
-import org.renjin.sexp.FunctionCall;
-import org.renjin.sexp.Logical;
-import org.renjin.sexp.LogicalVector;
-import org.renjin.sexp.Null;
-import org.renjin.sexp.PrimitiveFunction;
-import org.renjin.sexp.S4Object;
-import org.renjin.sexp.SEXP;
-import org.renjin.sexp.StringArrayVector;
-import org.renjin.sexp.StringVector;
-import org.renjin.sexp.Symbol;
-import org.renjin.sexp.Symbols;
+import org.renjin.sexp.*;
+import org.renjin.sexp.ExternalPtr;
 
 import com.google.common.base.Strings;
 
@@ -74,8 +60,8 @@ public class Methods {
   }
 
 
-  public static ExternalExp R_externalptr_prototype_object() {
-    return new ExternalExp(null);
+  public static ExternalPtr R_externalptr_prototype_object() {
+    return new ExternalPtr(null);
   }
 
   public static SEXP R_set_slot(@Current Context context, SEXP object, String name, SEXP value) {

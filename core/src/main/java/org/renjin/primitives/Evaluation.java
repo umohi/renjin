@@ -27,10 +27,9 @@ import org.renjin.eval.Calls;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
 import org.renjin.parser.RParser;
-import org.renjin.primitives.annotations.Current;
-import org.renjin.primitives.annotations.Evaluate;
-import org.renjin.primitives.annotations.PassThrough;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Current;
+import org.renjin.invoke.annotations.Evaluate;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.primitives.io.connections.Connection;
 import org.renjin.primitives.io.connections.Connections;
 import org.renjin.primitives.special.ReturnException;
@@ -232,20 +231,6 @@ public class Evaluation {
     return doCall(context, function, arguments, environment);
   }
 
-  @PassThrough
-  @Primitive
-  public static SEXP call(@Current Context context, @Current Environment rho, FunctionCall call) {
-    if(call.length() < 1) {
-      throw new EvalException("first argument must be character string");
-    }
-    SEXP name = context.evaluate(call.getArgument(0), rho);
-    if(!(name instanceof StringVector) || name.length() != 1) {
-      throw new EvalException("first argument must be character string");
-    }
-
-    return new FunctionCall(Symbol.get(((StringVector) name).getElementAsString(0)),
-        ((PairList.Node)call.getArguments()).getNextNode());
-  }
 
   @Primitive
   public static SEXP eval(@Current Context context,

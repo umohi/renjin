@@ -2,7 +2,7 @@ package org.renjin.stats.internals;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import org.apache.commons.math.complex.Complex;
-import org.renjin.primitives.annotations.Primitive;
+import org.renjin.invoke.annotations.Primitive;
 import org.renjin.sexp.ComplexVector;
 import org.renjin.sexp.DoubleVector;
 import org.renjin.sexp.IntVector;
