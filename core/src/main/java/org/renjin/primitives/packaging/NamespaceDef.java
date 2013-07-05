@@ -185,5 +185,4 @@ public class NamespaceDef {
       Closeables.closeQuietly(reader);
     }
   }
-  
 }
