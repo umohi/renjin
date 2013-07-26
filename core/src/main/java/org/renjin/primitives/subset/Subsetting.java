@@ -25,6 +25,7 @@ import com.google.common.base.Strings;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
 import org.renjin.invoke.annotations.*;
+import org.renjin.iterator.IntIterator;
 import org.renjin.methods.MethodDispatch;
 import org.renjin.sexp.*;
 import org.renjin.util.NamesBuilder;
@@ -194,8 +195,10 @@ public class Subsetting {
     Selection selection = new VectorIndexSelection(source, subscripts.get(0));
     FunctionCall.Builder call = FunctionCall.newBuilder();
     call.withAttributes(source.getAttributes());
-    
-    for(Integer sourceIndex : selection) {
+
+    IntIterator it = selection.intIterator();
+    while(it.hasNext()) {
+      int sourceIndex = it.nextInt();
       call.addCopy(source.getNode(sourceIndex));
     }
     return call.build();
@@ -206,25 +209,6 @@ public class Subsetting {
       .setSource(source, subscripts)
       .setDrop(drop)
       .extract();
-  }
-
-  /**
-   * Extracts a set of elements from a Vector using the supplied subscripts. 
-   * @param source
-   * @param subscripts
-   * @return
-   */
-  private static Vector extractVector(Vector source, ListVector subscripts) {
-    Selection selection = SelectionFactory.fromSubscripts(source, subscripts);
-    Vector.Builder result = source.newBuilderWithInitialCapacity(selection.getElementCount());
-    NamesBuilder names = NamesBuilder.withInitialCapacity(selection.getElementCount());
-    
-    for(Integer sourceIndex : selection) {
-      result.addFrom(source, sourceIndex);
-      names.add(source.getName(sourceIndex));
-    }
-    result.setAttribute(Symbols.NAMES, names.build());
-    return result.build();
   }
 
   

@@ -1,4 +1,4 @@
-package org.renjin;
+package org.renjin.stats.dist;
 
 import org.renjin.invoke.annotations.Operand;
 import org.renjin.primitives.vector.DeferredComputation;
@@ -8,27 +8,27 @@ import org.renjin.sexp.SEXP;
 import org.renjin.sexp.Vector;
 
 
-public class DistanceMatrix extends DoubleVector implements DeferredComputation {
+public class Euclidean1dDistanceMatrix extends DoubleVector implements DeferredComputation {
 
   @Operand
   private Vector vector;
   private int size; // size of matrix
   private int length;
 
-  public DistanceMatrix(Vector vector, AttributeMap attributes) {
+  public Euclidean1dDistanceMatrix(Vector vector, AttributeMap attributes) {
     super(attributes);
     this.vector = vector;
     this.size = vector.length();
     this.length = size * size;
   }
 
-  public DistanceMatrix(Vector vector) {
+  public Euclidean1dDistanceMatrix(Vector vector) {
     this(vector, AttributeMap.dim(vector.length(), vector.length()));
   }
 
   @Override
   protected SEXP cloneWithNewAttributes(AttributeMap attributes) {
-    return new DistanceMatrix(vector, attributes);
+    return new Euclidean1dDistanceMatrix(vector, attributes);
   }
 
   @Override

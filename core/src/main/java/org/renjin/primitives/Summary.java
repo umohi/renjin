@@ -230,7 +230,8 @@ public class Summary {
     double doubleSum = 0;
     boolean haveDouble = false;
 
-    if(arguments.length() == 1 && arguments.get(0) instanceof DoubleVector && !removeNA) {
+    if(arguments.length() == 1 && arguments.get(0).length() > 2000 &&
+        arguments.get(0) instanceof DoubleVector && !removeNA) {
       return new DeferredSum((Vector) arguments.get(0), AttributeMap.EMPTY);
     }
 
