@@ -78,7 +78,7 @@ public class WrapperGenerator2 {
     List<Entry> entries = Primitives.getEntries();
     for(Entry entry : entries) {
       if(singleFunction == null || singleFunction.equals(entry.name)) {
-        List<JvmMethod> overloads = JvmMethod.findOverloads(entry.functionClass, entry.name, entry.methodName);
+        List<JvmMethod> overloads = JvmMethod.findOverloads(entry);
         if(!overloads.isEmpty()) {
           generate(codeModel, new PrimitiveModel(entry, overloads));
           implementedCount ++;

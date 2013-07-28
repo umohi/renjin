@@ -29,6 +29,7 @@ import org.apache.commons.math.complex.Complex;
 import org.apache.commons.math.special.Gamma;
 import org.renjin.eval.EvalException;
 import org.renjin.invoke.annotations.*;
+import org.renjin.primitives.Primitives;
 import org.renjin.sexp.*;
 
 import java.lang.annotation.Annotation;
@@ -302,6 +303,10 @@ public class JvmMethod implements Comparable<JvmMethod> {
 
   public boolean isPassNA() {
     return passNA;
+  }
+
+  public static List<JvmMethod> findOverloads(Primitives.Entry entry) {
+    return findOverloads(entry.functionClass, entry.name, entry.methodName);
   }
 
   public class Argument {
