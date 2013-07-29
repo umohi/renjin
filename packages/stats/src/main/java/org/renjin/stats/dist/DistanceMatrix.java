@@ -6,6 +6,11 @@ import org.renjin.sexp.DoubleVector;
 import org.renjin.sexp.SEXP;
 import org.renjin.sexp.Vector;
 
+/**
+ * This view wraps the result of the distance matrix, which is stored as the lower
+ * triangle of the matrix, minus the diagonal. We normally try to avoid using this
+ * view as it's another layer of indirection, but we do
+ */
 public class DistanceMatrix extends DoubleVector implements DeferredComputation {
   
   private Vector triangle;
