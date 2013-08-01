@@ -6,7 +6,8 @@ import org.renjin.sexp.Vector;
 
 public interface VectorPipeliner {
 
-  public static boolean DEBUG = "true".equals(System.getProperty("renjin.vp.debug"));
+  public static boolean DEBUG = System.getProperty("renjin.vp.debug") != null;
+
   public static int MAX_DEPTH = 25;
 
   /**

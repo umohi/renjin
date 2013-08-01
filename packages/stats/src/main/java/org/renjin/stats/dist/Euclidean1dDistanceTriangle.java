@@ -23,7 +23,10 @@ public class Euclidean1dDistanceTriangle extends DoubleVector implements Deferre
     this.size = vector.length();
     this.length = (size * (size - 1)) / 2;
   }
-
+  
+  public Vector getVector() {
+    return vector;
+  }
 
   @Override
   public Vector[] getOperands() {
