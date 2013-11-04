@@ -47,7 +47,7 @@ public class DoubleSequence extends DoubleVector {
     return new DoubleSequence(attributes, from, by, length);
   }
 
-  public static Vector fromTo(double n1, double n2) {
+  public static DoubleSequence fromTo(double n1, double n2) {
     if(n1 <= n2) {
       return new DoubleSequence(n1, 1d, (int)Math.ceil(n2-n1));
     } else {
